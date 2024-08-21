@@ -1,0 +1,31 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  url: MyString
+  name: MyString
+  description: MyString
+  repository: 
+  packages: 
+  commits: 
+  events: 
+  keywords: MyString
+  last_synced_at: 2024-08-21 14:57:13
+  issue_stats: 
+  dependencies: 
+  owner: 
+  readme: MyText
+
+two:
+  url: MyString
+  name: MyString
+  description: MyString
+  repository: 
+  packages: 
+  commits: 
+  events: 
+  keywords: MyString
+  last_synced_at: 2024-08-21 14:57:13
+  issue_stats: 
+  dependencies: 
+  owner: 
+  readme: MyText
