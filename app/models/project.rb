@@ -11,7 +11,7 @@ class Project < ApplicationRecord
   scope :owner, ->(owner) { where("(repository ->> 'owner') = ?", owner) }
   scope :keyword, ->(keyword) { where("keywords @> ARRAY[?]::varchar[]", keyword) }
   scope :with_readme, -> { where.not(readme: nil) }
-  scope :with_repository, -> { where.not(repository: nil) }
+  scope :with_repository, -> { where.not(repository: {}) }
   scope :with_commits, -> { where.not(commits: nil) }
   scope :with_keywords, -> { where.not(keywords: []) }
   scope :without_keywords, -> { where(keywords: []) }
