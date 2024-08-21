@@ -3,6 +3,8 @@ class Allocation < ApplicationRecord
   has_many :project_allocations
 
   def calculate_funded_projects
+    # TODO only calculate if the fund has over a certain amount of money
+
     # get a list of all possible projects for this fund
     projects = find_possible_projects
 
@@ -43,6 +45,7 @@ class Allocation < ApplicationRecord
     # save the project allocations
     # TODO insert all allocations in a single transaction
     # TODO do we both to save allocations with a score of 0?
+    # TODO there should be a minimum allocation amount
     allocations.each do |allocation|
       ProjectAllocation.create!(
         project_id: allocation[:project_id],
@@ -96,6 +99,8 @@ class Allocation < ApplicationRecord
   def find_possible_projects
     # TODO include aliases
     Project.keyword(fund.primary_topic)
+    # TODO project must have a license
+    # TODO project should not be archived or deleted
   end
 
   def export_to_csv
