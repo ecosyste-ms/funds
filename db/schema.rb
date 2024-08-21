@@ -10,10 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_21_135713) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_21_145853) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "plpgsql"
+
+  create_table "allocations", force: :cascade do |t|
+    t.integer "fund_id"
+    t.integer "year"
+    t.integer "month"
+    t.integer "total_cents"
+    t.integer "funded_projects_count"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "funds", force: :cascade do |t|
     t.string "name"
@@ -24,6 +34,16 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_21_135713) do
     t.string "wikipedia_url"
     t.string "github_url"
     t.integer "projects_count", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "project_allocations", force: :cascade do |t|
+    t.integer "allocation_id"
+    t.integer "project_id"
+    t.integer "fund_id"
+    t.integer "amount_cents"
+    t.float "score"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

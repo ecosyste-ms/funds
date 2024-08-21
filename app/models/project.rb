@@ -1,8 +1,8 @@
-require 'csv'
-
 class Project < ApplicationRecord
 
   validates :url, presence: true, uniqueness: { case_sensitive: false }
+
+  has_many :project_allocations
 
   scope :active, -> { where("(repository ->> 'archived') = ?", 'false') }
   scope :archived, -> { where("(repository ->> 'archived') = ?", 'true') }
@@ -56,7 +56,8 @@ class Project < ApplicationRecord
   end
 
   def sync
-    check_url
+    status = check_url
+    return if status.blank?
     fetch_repository
     fetch_owner
     fetch_dependencies
@@ -88,8 +89,10 @@ class Project < ApplicationRecord
     puts "Duplicate url #{url}"
     puts e.class
     destroy
+    return nil
   rescue
     puts "Error checking url for #{url}"
+    return nil
   end
 
   def combine_keywords

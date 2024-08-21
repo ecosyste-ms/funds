@@ -2,6 +2,8 @@ class Fund < ApplicationRecord
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true
 
+  has_many :allocations
+
   def self.import_from_topic(topic)
     topic_url = "https://awesome.ecosyste.ms/api/v1/topics/#{topic}"
 

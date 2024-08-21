@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  fund_id: 1
+  year: 1
+  month: 1
+  total_cents: 1
+  funded_projects_count: 1
+
+two:
+  fund_id: 1
+  year: 1
+  month: 1
+  total_cents: 1
+  funded_projects_count: 1
