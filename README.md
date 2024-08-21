@@ -1,4 +1,4 @@
-# [Ecosyste.ms: funds](https://funds.ecosyste.ms)
+# [Ecosyste.ms: Funds](https://funds.ecosyste.ms)
 
 An open API service to provide information about funding of key open source projects within ecosystems.
 
