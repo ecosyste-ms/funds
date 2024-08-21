@@ -379,6 +379,10 @@ class Project < ApplicationRecord
     repository['icon_url']
   end
 
+  def stars
+    return 0 unless repository.present?
+    repository['stars'] || 0
+  end
   
   def packages_count
     return 0 unless packages.present?
@@ -393,6 +397,16 @@ class Project < ApplicationRecord
   def downloads
     return 0 unless packages.present?
     packages.map{|p| p["downloads"] || 0 }.sum
+  end
+
+  def dependent_repos_count
+    return 0 unless packages.present?
+    packages.map{|p| p["dependent_repos_count"] || 0 }.sum
+  end
+
+  def dependent_packages_count
+    return 0 unless packages.present?
+    packages.map{|p| p["dependent_packages_count"] || 0 }.sum
   end
 
   def issue_associations
