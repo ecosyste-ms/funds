@@ -1,0 +1,36 @@
+<div class="container-sm">
+  <h1><%= link_to @fund, fund_path(@fund) %>: <%= @allocation.name %></h1>
+
+  <p>
+    Total: <%= number_to_currency(@allocation.total_cents/100) %><br/>
+    Projects: <%= @project_allocations.count %>
+  </p>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Project</th>
+        <th>Amount</th>
+        <th>Score</th>
+        <th>Downloads</th>
+        <th>Dependent Repos</th>
+        <th>Dependent Pkgs</th>
+        <th>Stars</th>
+      </tr>
+      </tr>
+    </thead>
+    <tbody>
+      <% @project_allocations.each do |project_allocation| %>
+        <tr>
+          <td><%= link_to project_allocation.project, project_allocation.project.url, target: :_blank %></td>
+          <td>$<%= project_allocation.amount_cents/100.0 %></td>
+          <td><%= project_allocation.score.round(4) %></td>
+          <td><%= number_with_delimiter project_allocation.project.downloads %></td>
+          <td><%= number_with_delimiter project_allocation.project.dependent_repos_count %></td>
+          <td><%= number_with_delimiter project_allocation.project.dependent_packages_count %></td>
+          <td><%= number_with_delimiter project_allocation.project.stars %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

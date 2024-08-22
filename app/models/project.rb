@@ -381,7 +381,7 @@ class Project < ApplicationRecord
 
   def stars
     return 0 unless repository.present?
-    repository['stars'] || 0
+    repository['stargazers_count'] || 0
   end
   
   def packages_count

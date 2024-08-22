@@ -4,7 +4,9 @@ one:
   name: MyString
   slug: MyString
   primary_topic: MyString
-  secondary_topics: MyString
+  # secondary_topics: 
+  #   - MyString
+  #   - MyString
   description: MyString
   wikipedia_url: MyString
   github_url: MyString
@@ -14,7 +16,9 @@ two:
   name: MyString
   slug: MyString
   primary_topic: MyString
-  secondary_topics: MyString
+  # secondary_topics: 
+  #   - MyString
+  #   - MyString
   description: MyString
   wikipedia_url: MyString
   github_url: MyString

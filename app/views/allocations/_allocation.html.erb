@@ -1,0 +1,15 @@
+<div class="card mb-3 allocation d-flex" id="allocation_<%= allocation.id %>">
+  <div class="card-body pb-1">
+    <div class="d-flex">
+      <div class="flex-grow-1 ms-3 text-break">
+        <h5 class='card-title'>
+          <%= link_to allocation.name, fund_allocation_path(allocation.fund, allocation) %>
+        </h5>
+      
+        <p class="card-subtitle mb-2 text-muted">
+          $<%= allocation.total_cents/100.0 %>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

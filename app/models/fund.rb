@@ -4,6 +4,14 @@ class Fund < ApplicationRecord
 
   has_many :allocations
 
+  def to_param
+    slug
+  end
+
+  def to_s
+    name
+  end
+
   def self.import_from_topic(topic)
     topic_url = "https://awesome.ecosyste.ms/api/v1/topics/#{topic}"
 

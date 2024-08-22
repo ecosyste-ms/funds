@@ -2,6 +2,10 @@ class Allocation < ApplicationRecord
   belongs_to :fund
   has_many :project_allocations
 
+  def name
+    created_at.strftime('%Y-%m')
+  end
+
   def calculate_funded_projects
     # TODO only calculate if the fund has over a certain amount of money
 
