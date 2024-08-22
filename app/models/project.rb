@@ -592,7 +592,7 @@ class Project < ApplicationRecord
   end
 
   def funding_links
-    (package_funding_links + repo_funding_links + owner_funding_links + readme_funding_links).uniq
+    @funding_links ||= (package_funding_links + repo_funding_links + owner_funding_links + readme_funding_links).uniq
   end
 
   def package_funding_links
@@ -658,12 +658,23 @@ class Project < ApplicationRecord
     'communitybridge.org', 'tidelift.com', 'buymeacoffee.com', 'paypal.com', 'paypal.me','givebutter.com', 'polar.sh']
   end
 
+  def unique_funding_domains
+    funding_links.map{|u| URI.parse(u).host.gsub(/^www\./, '').gsub('paypal.me', 'paypal.com') rescue nil }.compact.uniq
+  end
+
+  def preferred_funding_platform
+    # pick the first funding platform from unique_funding_domains, preferring opencollective.com, otherwise prefer github.com if it's there
+    unique_funding_domains.find{|d| d == 'opencollective.com' } || unique_funding_domains.find{|d| d == 'github.com' } || unique_funding_domains.first || 'Unknown'
+  end
+
   def readme_funding_links
     urls = readme_urls.select{|u| funding_domains.any?{|d| u.include?(d) } || u.include?('github.com/sponsors') }.reject{|u| ['.svg', '.png'].include? File.extname(URI.parse(u).path) }
     # remove anchors
     urls = urls.map{|u| u.gsub(/#.*$/, '') }.uniq
     # remove sponsor/9/website from open collective urls
     urls = urls.map{|u| u.gsub(/\/sponsor\/\d+\/website$/, '') }.uniq
+    # remove backer/9/website from open collective urls
+    urls = urls.map{|u| u.gsub(/\/backer\/\d+\/website$/, '') }.uniq
   end
 
   

@@ -112,6 +112,9 @@ class Allocation < ApplicationRecord
   end
 
   def group_projects_by_funding_platform
-    # TODO
+    project_allocations.where('amount_cents >= 1').order('amount_cents desc').includes(:project)
+                       .group_by { |pa| pa.project.preferred_funding_platform }
+                       .transform_values { |pas| pas.sum(&:amount_cents) }
+                       .sort_by { |platform, amount| -amount }
   end
 end

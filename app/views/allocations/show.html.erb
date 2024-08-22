@@ -6,6 +6,23 @@
     Projects: <%= @project_allocations.count %>
   </p>
 
+  <table class="table w-auto">
+    <thead>
+      <tr>
+        <th>Platform</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @allocation.group_projects_by_funding_platform.each do |platform, total_cents| %>
+        <tr>
+          <td><%= platform %></td>
+          <td><%= number_to_currency(total_cents/100.0) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
   <table class="table">
     <thead>
       <tr>
@@ -16,6 +33,7 @@
         <th>Dependent Repos</th>
         <th>Dependent Pkgs</th>
         <th>Stars</th>
+        <th>Platform</th>
       </tr>
       </tr>
     </thead>
@@ -29,6 +47,9 @@
           <td><%= number_with_delimiter project_allocation.project.dependent_repos_count %></td>
           <td><%= number_with_delimiter project_allocation.project.dependent_packages_count %></td>
           <td><%= number_with_delimiter project_allocation.project.stars %></td>
+          <td title='<%= project_allocation.project.funding_links.join(', ') %>'>
+            <%= project_allocation.project.preferred_funding_platform %>
+          </td>
         </tr>
       <% end %>
     </tbody>
