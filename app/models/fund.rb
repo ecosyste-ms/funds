@@ -56,10 +56,13 @@ class Fund < ApplicationRecord
       packages = data['packages']
       break if packages.empty?
   
-      urls = packages.reject { |p| p['status'].present? }.map { |p| p['repository_url'] }.uniq.reject(&:blank?)
-      urls.each do |url|
-        puts url
-        project = Project.find_or_create_by(url: url)
+      packages = packages.reject { |p| p['status'].present? || p['repository_url'].blank? }
+      packages.each do |package|
+        puts package['repository_url']
+        project = Project.find_or_create_by(url: package['repository_url'])
+        project.repository = package['repo_metadata'] if project.repository.blank?
+        project.packages += [package] unless project.packages.map{|pkg| pkg['registry_url']}.include?(package['registry_url'])
+        project.save
         project.sync_async unless project.last_synced_at.present?
       end
   
