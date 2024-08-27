@@ -50,7 +50,7 @@ class Allocation < ApplicationRecord
     # TODO insert all allocations in a single transaction
     # TODO there should be a minimum allocation amount
     allocations.each do |allocation|
-      next if allocation[:allocation] < 1
+      next if allocation[:allocation] < minimum_allocation
 
       ProjectAllocation.create!(
         project_id: allocation[:project_id],
@@ -63,6 +63,11 @@ class Allocation < ApplicationRecord
     end
 
     update(funded_projects_count: project_allocations.count)
+  end
+
+  def minimum_allocation
+    # TODO make this configurable
+    100 # $1
   end
 
   def weights
