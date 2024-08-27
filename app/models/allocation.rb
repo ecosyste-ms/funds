@@ -20,6 +20,7 @@ class Allocation < ApplicationRecord
         stars: project.stars || 0,
         dependent_repos: project.dependent_repos_count || 0,
         dependent_packages: project.dependent_packages_count || 0,
+        funding_source_id: project.funding_source_id
       }
     end
 
@@ -37,24 +38,26 @@ class Allocation < ApplicationRecord
   
       total_score += score
   
-      { project_id: metric[:project_id], score: score }
+      { project_id: metric[:project_id], score: score, funding_source_id: metric[:funding_source_id] }
     end
 
     # allocate funds proportionally to scores
     allocations = scores.map do |score|
       allocation_amount = (score[:score] / total_score) * total_cents
-      { project_id: score[:project_id], allocation: allocation_amount, score: score[:score] }
+      { project_id: score[:project_id], allocation: allocation_amount, score: score[:score], funding_source_id: score[:funding_source_id] }
     end
 
     # save the project allocations
     # TODO insert all allocations in a single transaction
-    # TODO do we both to save allocations with a score of 0?
     # TODO there should be a minimum allocation amount
     allocations.each do |allocation|
+      next if allocation[:allocation] < 1
+
       ProjectAllocation.create!(
         project_id: allocation[:project_id],
         allocation_id: self.id,
         fund_id: fund.id,
+        funding_source_id: allocation[:funding_source_id],
         amount_cents: allocation[:allocation],
         score: allocation[:score]
       )
@@ -102,9 +105,8 @@ class Allocation < ApplicationRecord
 
   def find_possible_projects
     # TODO include aliases
-    Project.keyword(fund.primary_topic)
+    Project.keyword(fund.primary_topic).active
     # TODO project must have a license
-    # TODO project should not be archived or deleted
   end
 
   def export_to_csv
