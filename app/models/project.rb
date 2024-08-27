@@ -3,6 +3,9 @@ class Project < ApplicationRecord
   validates :url, presence: true, uniqueness: { case_sensitive: false }
 
   has_many :project_allocations
+  has_many :allocations, through: :project_allocations
+  has_many :funds, through: :allocations
+  has_many :funding_sources
 
   scope :active, -> { where("(repository ->> 'archived') = ?", 'false') }
   scope :archived, -> { where("(repository ->> 'archived') = ?", 'true') }
@@ -667,6 +670,10 @@ class Project < ApplicationRecord
     unique_funding_domains.find{|d| d == 'opencollective.com' } || unique_funding_domains.find{|d| d == 'github.com' } || unique_funding_domains.first || 'Unknown'
   end
 
+  def preferred_funding_link
+    funding_links.find{|u| u.include?(preferred_funding_platform) }
+  end
+
   def readme_funding_links
     urls = readme_urls.select{|u| funding_domains.any?{|d| u.include?(d) } || u.include?('github.com/sponsors') }.reject{|u| ['.svg', '.png'].include? File.extname(URI.parse(u).path) }
     # remove anchors
@@ -677,7 +684,17 @@ class Project < ApplicationRecord
     urls = urls.map{|u| u.gsub(/\/backer\/\d+\/website$/, '') }.uniq
   end
 
-  
+  def funding_source_id
+    return nil unless preferred_funding_link.present?
+    # find or create funding source 
+    find_or_create_funding_source.try(:id)
+  end
 
-
+  def find_or_create_funding_source
+    return nil unless preferred_funding_link.present?
+    funding_sources.find_or_initialize_by(url: preferred_funding_link).tap do |fs|
+      fs.platform = preferred_funding_platform
+      fs.save
+    end
+  end
 end
