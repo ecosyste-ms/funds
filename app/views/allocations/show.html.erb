@@ -3,25 +3,37 @@
 
   <p>
     Total: <%= number_to_currency(@allocation.total_cents/100) %><br/>
-    Projects: <%= @project_allocations.count %>
+    Projects: <%= @allocation.funded_projects_count %>
   </p>
 
-  <table class="table w-auto">
-    <thead>
-      <tr>
-        <th>Platform</th>
-        <th>Total</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @allocation.group_projects_by_funding_platform.each do |platform, total_cents| %>
-        <tr>
-          <td><%= platform %></td>
-          <td><%= number_to_currency(total_cents/100.0) %></td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
+  <div class='row'>
+    <% @allocation.group_projects_by_funding_source_and_platform.group_by{|i,j| i[0] }.each do |platform, sources| %>
+      <div class='col-3'>
+        <table class="table w-auto">
+          <thead>
+            <tr>
+              <th><%= platform %></th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% sources.each do |source, total_cents|%>
+              <tr>
+                <td><%= link_to source[1].split('/').last, source[1] %></td>
+                <td><%= number_to_currency(total_cents/100.0) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td>Total</td>
+              <td><%= number_to_currency(sources.sum{|source, total_cents| total_cents}/100.0) %></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    <% end %>
+  </div>
 
   <table class="table">
     <thead>
@@ -52,27 +64,4 @@
       <% end %>
     </tbody>
   </table>
-
-  <div class='row'>
-    <% @allocation.group_projects_by_funding_source_and_platform.group_by{|i,j| i[0] }.each do |platform, sources| %>
-      <div class='col-3'>
-        <table class="table w-auto">
-          <thead>
-            <tr>
-              <th><%= platform %> Funding Source</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% sources.each do |source, total_cents|%>
-              <tr>
-                <td><%= link_to source[1].split('/').last, source[1] %></td>
-                <td><%= number_to_currency(total_cents/100.0) %></td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
-    <% end %>
-  </div>
 </div>
