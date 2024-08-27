@@ -48,7 +48,7 @@
           <td><%= number_with_delimiter project_allocation.project.dependent_packages_count %></td>
           <td><%= number_with_delimiter project_allocation.project.stars %></td>
           <td title='<%= project_allocation.project.funding_links.join(', ') %>'>
-            <%= project_allocation.project.preferred_funding_platform %>
+            <%= link_to_unless project_allocation.project.preferred_funding_link.blank?, project_allocation.project.preferred_funding_platform, project_allocation.project.preferred_funding_link, target: :_blank %>
           </td>
         </tr>
       <% end %>
