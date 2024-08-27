@@ -61,6 +61,8 @@ class Allocation < ApplicationRecord
         score: allocation[:score]
       )
     end
+
+    update(funded_projects_count: project_allocations.count)
   end
 
   def weights
@@ -114,8 +116,22 @@ class Allocation < ApplicationRecord
   end
 
   def group_projects_by_funding_platform
-    project_allocations.where('amount_cents >= 1').order('amount_cents desc').includes(:project)
-                       .group_by { |pa| pa.project.preferred_funding_platform }
+    project_allocations.order('amount_cents desc').includes(:funding_source)
+                       .group_by { |pa| pa.funding_source.try(:platform) || 'Unknown' }
+                       .transform_values { |pas| pas.sum(&:amount_cents) }
+                       .sort_by { |platform, amount| -amount }
+  end
+
+  def group_projects_by_funding_source
+    project_allocations.order('amount_cents desc').includes(:funding_source)
+                       .group_by { |pa| pa.funding_source.try(:url) || 'Unknown' }
+                       .transform_values { |pas| pas.sum(&:amount_cents) }
+                       .sort_by { |platform, amount| -amount }
+  end
+
+  def group_projects_by_funding_source_and_platform
+    project_allocations.order('amount_cents desc').includes(:funding_source).with_funding_source
+                      .group_by { |pa| [pa.funding_source.platform, pa.funding_source.url] }
                        .transform_values { |pas| pas.sum(&:amount_cents) }
                        .sort_by { |platform, amount| -amount }
   end
