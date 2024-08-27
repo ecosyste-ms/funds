@@ -69,4 +69,12 @@ class Fund < ApplicationRecord
       page += 1
     end
   end
+
+  def allocate(total_cents)
+    allocations = Allocation.where(fund_id: id, year: Time.zone.now.year, month: Time.zone.now.month)
+    return if allocations.any?
+
+    allocations = Allocation.create!(fund_id: id, year: Time.zone.now.year, month: Time.zone.now.month, total_cents: total_cents)
+    allocations.calculate_funded_projects
+  end
 end

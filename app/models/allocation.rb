@@ -1,6 +1,6 @@
 class Allocation < ApplicationRecord
   belongs_to :fund
-  has_many :project_allocations
+  has_many :project_allocations, dependent: :destroy
 
   def name
     created_at.strftime('%Y-%m')
@@ -17,7 +17,6 @@ class Allocation < ApplicationRecord
       {
         project_id: project.id,
         downloads: project.downloads || 0,
-        stars: project.stars || 0,
         dependent_repos: project.dependent_repos_count || 0,
         dependent_packages: project.dependent_packages_count || 0,
         funding_source_id: project.funding_source_id
@@ -69,8 +68,7 @@ class Allocation < ApplicationRecord
     {
       dependent_repos: 0.2,
       dependent_packages: 0.2,
-      downloads: 0.2,
-      stars: 0.1,
+      downloads: 0.2
     }
   end
 
@@ -81,6 +79,7 @@ class Allocation < ApplicationRecord
 
     metrics.first.keys.each do |metric_name|
       next if metric_name == :project_id
+      next if metric_name == :funding_source_id
 
       values = metrics.map { |m| m[metric_name] }
       mins[metric_name] = values.min
@@ -93,6 +92,7 @@ class Allocation < ApplicationRecord
 
       normalized.each do |metric_name, value|
         next if metric_name == :project_id
+        next if metric_name == :funding_source_id
 
         min = mins[metric_name]
         max = maxs[metric_name]
