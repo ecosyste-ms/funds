@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_21_145853) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_27_123216) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "plpgsql"
@@ -21,6 +21,15 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_21_145853) do
     t.integer "month"
     t.integer "total_cents"
     t.integer "funded_projects_count"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "funding_sources", force: :cascade do |t|
+    t.integer "project_id"
+    t.string "url"
+    t.string "platform"
+    t.integer "current_balance_cents"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -46,6 +55,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_21_145853) do
     t.float "score"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "funding_source_id"
   end
 
   create_table "projects", force: :cascade do |t|
