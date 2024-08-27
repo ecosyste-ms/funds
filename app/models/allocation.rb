@@ -13,6 +13,7 @@ class Allocation < ApplicationRecord
     projects = find_possible_projects
 
     # Fetch all metrics for all projects
+    # TODO some kind of activity metric (recent commits, issues, etc)
     metrics = projects.map do |project|
       {
         project_id: project.id,
