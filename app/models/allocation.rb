@@ -7,13 +7,15 @@ class Allocation < ApplicationRecord
   end
 
   def calculate_funded_projects
-    # TODO only calculate if the fund has over a certain amount of money
+    # TODO: Only calculate if the fund has over a certain amount of money
+  
+    weights = (read_attribute(:weights) || default_weights).symbolize_keys
+    minimum_allocation = read_attribute(:minimum_allocation) || default_minimum_allocation
 
-    # get a list of all possible projects for this fund
+    # Get a list of all possible projects for this fund
     projects = find_possible_projects
-
+  
     # Fetch all metrics for all projects
-    # TODO some kind of activity metric (recent commits, issues, etc)
     metrics = projects.map do |project|
       {
         project_id: project.id,
@@ -23,11 +25,11 @@ class Allocation < ApplicationRecord
         funding_source_id: project.funding_source_id
       }
     end
-
-    # normalize each metric across all projects
-    normalized_metrics = normalize_metrics(metrics)
-
-    # calculate weighted scores for each project
+  
+    # Normalize metrics and explicitly return max values
+    normalized_metrics, maxs = normalize_metrics_with_max_storage(metrics)
+  
+    # Calculate weighted scores for each project
     total_score = 0
     scores = normalized_metrics.map do |metric|
       score = 0
@@ -40,19 +42,17 @@ class Allocation < ApplicationRecord
   
       { project_id: metric[:project_id], score: score, funding_source_id: metric[:funding_source_id] }
     end
-
-    # allocate funds proportionally to scores
+  
+    # Allocate funds proportionally to scores
     allocations = scores.map do |score|
       allocation_amount = (score[:score] / total_score) * total_cents
       { project_id: score[:project_id], allocation: allocation_amount, score: score[:score], funding_source_id: score[:funding_source_id] }
     end
-
-    # save the project allocations
-    # TODO insert all allocations in a single transaction
-    # TODO there should be a minimum allocation amount
+  
+    # Save the project allocations (ensuring minimum allocation is met)
     allocations.each do |allocation|
       next if allocation[:allocation] < minimum_allocation
-
+  
       ProjectAllocation.create!(
         project_id: allocation[:project_id],
         allocation_id: self.id,
@@ -62,53 +62,50 @@ class Allocation < ApplicationRecord
         score: allocation[:score]
       )
     end
-
-    update(funded_projects_count: project_allocations.count)
+  
+    # Store the maxs and weights used for this allocation
+    update!(max_values: maxs, weights: weights, minimum_allocation_cents: minimum_allocation, funded_projects_count: project_allocations.count)
   end
-
-  def minimum_allocation
-    # TODO make this configurable
-    100 # $1
-  end
-
-  def weights
-    # TODO these may need to be recorded in the database
-    {
-      dependent_repos: 0.2,
-      dependent_packages: 0.2,
-      downloads: 0.2
-    }
-  end
-
-  def normalize_metrics(metrics)
-    # Initialize min and max for each metric
-    mins = {}
+  
+  def normalize_metrics_with_max_storage(metrics)
     maxs = {}
 
+    # Calculate and store the max values for each metric
     metrics.first.keys.each do |metric_name|
       next if metric_name == :project_id
       next if metric_name == :funding_source_id
 
       values = metrics.map { |m| m[metric_name] }
-      mins[metric_name] = values.min
       maxs[metric_name] = values.max
     end
 
-    # Normalize each metric to a scale between 0 and 1
-    metrics.map do |metric|
+    # Normalize using zero as min and store the maxs
+    normalized_metrics = metrics.map do |metric|
       normalized = metric.dup
-
       normalized.each do |metric_name, value|
         next if metric_name == :project_id
         next if metric_name == :funding_source_id
 
-        min = mins[metric_name]
         max = maxs[metric_name]
-        normalized[metric_name] = (value - min).to_f / (max - min).to_f if max > min
+        normalized[metric_name] = (value.to_f / max) if max > 0
       end
-
       normalized
     end
+
+    # Return both the normalized metrics and the maxs
+    return normalized_metrics, maxs
+  end
+
+  def default_minimum_allocation
+    100 # cents
+  end
+
+  def default_weights
+    {
+      dependent_repos: 0.2,
+      dependent_packages: 0.2,
+      downloads: 0.2
+    }
   end
 
   def find_possible_projects

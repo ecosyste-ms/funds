@@ -687,7 +687,7 @@ class Project < ApplicationRecord
   def funding_source_id
     return nil unless preferred_funding_link.present?
     # find or create funding source 
-    find_or_create_funding_source.try(:id)
+    @find_or_create_funding_source ||= find_or_create_funding_source.try(:id)
   end
 
   def find_or_create_funding_source
