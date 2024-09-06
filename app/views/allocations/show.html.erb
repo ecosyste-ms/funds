@@ -3,8 +3,16 @@
 
   <p>
     Total: <%= number_to_currency(@allocation.total_cents/100) %><br/>
-    Projects: <%= @allocation.funded_projects_count %>
+    Projects: <%= @allocation.funded_projects_count %><br/>    
+    Minimum: <%= number_to_currency @allocation.minimum_allocation_cents/100.0 %><br/>
   </p>
+
+  <b>Weights</b>
+  <ul>
+    <% @allocation.weights.each do |name, weight| %>
+      <li><%= name.humanize %>: <%= weight %></li>
+    <% end %>
+  </ul>
 
   <div class='row'>
     <% @allocation.group_projects_by_funding_source_and_platform.group_by{|i,j| i[0] }.each do |platform, sources| %>
