@@ -14,6 +14,38 @@
     <% end %>
   </ul>
 
+  <table class="table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Project</th>
+        <th>Amount</th>
+        <th>Score</th>
+        <th>Downloads</th>
+        <th>Dependent Repos</th>
+        <th>Dependent Pkgs</th>
+        <th>Platform</th>
+      </tr>
+      </tr>
+    </thead>
+    <tbody>
+      <% @project_allocations.each_with_index do |project_allocation, i| %>
+        <tr>
+          <td><%= i+1 %></td>
+          <td><%= link_to project_allocation.project, project_allocation.project.url, target: :_blank %></td>
+          <td>$<%= project_allocation.amount_cents/100.0 %></td>
+          <td><%= project_allocation.score.round(4) %></td>
+          <td><%= number_with_delimiter project_allocation.project.downloads %></td>
+          <td><%= number_with_delimiter project_allocation.project.dependent_repos_count %></td>
+          <td><%= number_with_delimiter project_allocation.project.dependent_packages_count %></td>
+          <td title='<%= project_allocation.project.funding_links.join(', ') %>'>
+            <%= link_to_unless project_allocation.project.preferred_funding_link.blank?, project_allocation.project.preferred_funding_platform, project_allocation.project.preferred_funding_link, target: :_blank %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
   <div class='row'>
     <% @allocation.group_projects_by_funding_source_and_platform.group_by{|i,j| i[0] }.each do |platform, sources| %>
       <div class='col-3'>
@@ -42,34 +74,4 @@
       </div>
     <% end %>
   </div>
-
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Project</th>
-        <th>Amount</th>
-        <th>Score</th>
-        <th>Downloads</th>
-        <th>Dependent Repos</th>
-        <th>Dependent Pkgs</th>
-        <th>Platform</th>
-      </tr>
-      </tr>
-    </thead>
-    <tbody>
-      <% @project_allocations.each do |project_allocation| %>
-        <tr>
-          <td><%= link_to project_allocation.project, project_allocation.project.url, target: :_blank %></td>
-          <td>$<%= project_allocation.amount_cents/100.0 %></td>
-          <td><%= project_allocation.score.round(4) %></td>
-          <td><%= number_with_delimiter project_allocation.project.downloads %></td>
-          <td><%= number_with_delimiter project_allocation.project.dependent_repos_count %></td>
-          <td><%= number_with_delimiter project_allocation.project.dependent_packages_count %></td>
-          <td title='<%= project_allocation.project.funding_links.join(', ') %>'>
-            <%= link_to_unless project_allocation.project.preferred_funding_link.blank?, project_allocation.project.preferred_funding_platform, project_allocation.project.preferred_funding_link, target: :_blank %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
 </div>
