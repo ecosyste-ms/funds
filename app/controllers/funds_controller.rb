@@ -8,5 +8,7 @@ class FundsController < ApplicationController
     @fund = Fund.find_by(slug: params[:id])
     @allocations = @fund.allocations
     @pagy, @allocations = pagy(@allocations)
+    @projects = @fund.projects
+    @project_pagy, @projects = pagy(@projects)
   end
 end

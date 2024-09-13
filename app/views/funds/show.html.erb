@@ -7,7 +7,18 @@
     <%= @fund.description %>
   </p>
 
+  <h3>Allocations</h3>
+
   <%= render @allocations %>
   <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>  
+
+  <h3>Funded Projects</h3>
+
+  <%= render @projects %>
+  <%== pagy_bootstrap_nav(@project_pagy) if @pagy.pages > 1 %>
+
+  <p>
+    <%= link_to 'See all possible projects', fund_projects_path(@fund) %>
+  </p>
 </div>
 

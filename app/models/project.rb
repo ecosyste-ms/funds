@@ -149,8 +149,20 @@ class Project < ApplicationRecord
 
   def description
     return read_attribute(:description) if read_attribute(:description).present?
+    return repository["description"] if repository.present? && repository["description"].present?
+    return package_description if packages.present?
+  end
+
+  def package_description
+    return unless packages.present?
+    # select first non-empty description
+    packages.map{|p| p["description"] }.reject(&:blank?).first
+  end
+
+  def published_at
     return unless repository.present?
-    repository["description"]
+    return unless repository["created_at"].present?
+    Time.parse(repository["created_at"])
   end
 
   def repos_api_url
@@ -698,5 +710,10 @@ class Project < ApplicationRecord
       fs.platform = preferred_funding_platform
       fs.save
     end
+  end
+
+  def owner_html_url
+    return unless owner.present?
+    owner['html_url']
   end
 end

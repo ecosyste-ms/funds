@@ -1,0 +1,29 @@
+<% if @project.events %>
+  <hr>
+  <h2>
+    GitHub Events
+  </h2>
+  
+  <h5>Total</h5>
+  <ul>
+    <% @project.events['total'].sort_by{|k,v| k}.each do |k,v| %>
+      <li>
+        <%= k.underscore.humanize %>: <%= v %>
+      </li>
+    <% end %>
+    <li>
+      Total: <%= @project.events['total'].sum{|k,v| v} %>
+    </li>
+  </ul>
+  <h5>Last Year</h5>
+  <ul>
+    <% @project.events['last_year'].sort_by{|k,v| k}.each do |k,v| %>
+      <li>
+        <%= k.underscore.humanize %>: <%= v %>
+      </li>
+    <% end %>
+    <li>
+      Total: <%= @project.events['last_year'].sum{|k,v| v} %>
+    </li>
+  </ul>
+<% end %>

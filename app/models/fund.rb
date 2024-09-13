@@ -3,6 +3,8 @@ class Fund < ApplicationRecord
   validates :slug, presence: true, uniqueness: true
 
   has_many :allocations
+  has_many :project_allocations, through: :allocations
+  has_many :projects, through: :project_allocations
 
   def to_param
     slug

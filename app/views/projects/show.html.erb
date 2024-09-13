@@ -1,0 +1,39 @@
+<% @meta_title = "#{@project.url}" %>
+<% @meta_description = "Details of the open source software project at #{@project.url}" %>
+
+<div class="container-md">
+  <h1>
+    <%= @project.url %>
+  </h1>
+
+  <% if @project.last_synced_at %>
+  
+    <% if @project.keywords.any? %>
+      <p>
+        <% @project.keywords.each do |keyword| %>
+          <span class="badge bg-light text-dark">
+            <%= keyword %>
+          </span>
+        <% end %>
+      </p>
+    <% end %>
+
+    <p class="card-subtitle mb-2 text-muted"><i><small>
+        Last synced: <%= distance_of_time_in_words_to_now @project.last_synced_at %> ago <br>
+    </small></i></p>
+
+    <%= render 'repository' %>
+    <%= render 'owner' %>
+    <%= render 'events' %>
+    <%= render 'committers' %>
+    <%= render 'issues' %>
+    <%= render 'packages' %>
+    <%= render 'dependencies' %>
+
+  <% else %>
+    <p>
+      This project has not been synced yet. Check back in a few minutes.
+    </p>
+  <% end %>
+
+</div>
