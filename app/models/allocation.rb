@@ -109,13 +109,7 @@ class Allocation < ApplicationRecord
   end
 
   def find_possible_projects
-    if fund.primary_topic.present?
-      # TODO include aliases
-      Project.keyword(fund.primary_topic).active
-    elsif fund.registry_name.present?
-      Project.registry_name(fund.registry_name).active
-    end
-    # TODO project must have a license
+    fund.possible_projects
   end
 
   def export_to_csv

@@ -103,4 +103,14 @@ class Fund < ApplicationRecord
     allocations = Allocation.create!(fund_id: id, year: Time.zone.now.year, month: Time.zone.now.month, total_cents: total_cents)
     allocations.calculate_funded_projects
   end
+
+  def possible_projects
+    if primary_topic.present?
+      # TODO include aliases
+      Project.keyword(primary_topic).active
+    elsif registry_name.present?
+      Project.registry_name(registry_name).active
+    end
+    # TODO project must have a license
+  end
 end
