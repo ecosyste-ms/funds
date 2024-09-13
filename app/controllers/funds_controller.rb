@@ -6,7 +6,7 @@ class FundsController < ApplicationController
 
   def show
     @fund = Fund.find_by(slug: params[:id])
-    @allocations = @fund.allocations
+    @allocations = @fund.allocations.displayable
     @pagy, @allocations = pagy(@allocations)
     @projects = @fund.projects
     @project_pagy, @projects = pagy(@projects)

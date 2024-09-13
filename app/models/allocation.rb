@@ -2,6 +2,8 @@ class Allocation < ApplicationRecord
   belongs_to :fund
   has_many :project_allocations, dependent: :destroy
 
+  scope :displayable, -> { where('funded_projects_count > 0') }
+
   def name
     created_at.strftime('%Y-%m')
   end
