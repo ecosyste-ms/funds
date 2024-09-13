@@ -70,6 +70,32 @@ class Fund < ApplicationRecord
     end
   end
 
+  def import_projects_from_critical_packages(registry_name)
+    page = 1
+    loop do
+      puts "Fetching page #{page} of projects for #{name}"
+      resp = Faraday.get("https://packages.ecosyste.ms/api/v1/registries/#{registry_name}/packages?critical=true&per_page=100&page=#{page}")
+      break unless resp.status == 200
+
+      data = JSON.parse(resp.body)
+      packages = data
+      break if packages.empty?
+
+      packages = packages.reject { |p| p['repository_url'].blank? }
+      packages.each do |package|
+        puts package['repository_url']
+        project = Project.find_or_create_by(url: package['repository_url'])
+        project.repository = package['repo_metadata'] if project.repository.blank?
+        project.packages += [package] unless project.packages.map{|pkg| pkg['registry_url']}.include?(package['registry_url'])
+        project.registry_names += [registry_name] unless project.registry_names.include?(registry_name)
+        project.save
+        project.sync_async unless project.last_synced_at.present?
+      end
+
+      page += 1
+    end
+  end
+
   def allocate(total_cents)
     allocations = Allocation.where(fund_id: id, year: Time.zone.now.year, month: Time.zone.now.month)
     return if allocations.any?
