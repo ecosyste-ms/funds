@@ -1,5 +1,8 @@
 {
   "cron": [
-
+    {
+      "command": "bundle exec rake projects:sync_least_recent",
+      "schedule": "*/30 * * * *"
+    }
   ]
-} 
+}
