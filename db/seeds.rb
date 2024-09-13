@@ -1,9 +1,82 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
+funds = [
+  {
+    name: 'Ruby',
+    slug: 'ruby',
+    description: "Fund for the most critical ruby packages on rubygems.org",
+    registry_name: "rubygems.org"
+  },
+  {
+    name: 'JavaScript',
+    slug: 'javascript',
+    description: "Fund for the most critical javascript packages on npmjs.com",
+    registry_name: "npmjs.org",
+  },
+  {
+    name: 'Python',
+    slug: 'python',
+    description: "Fund for the most critical python packages on pypi.org",
+    registry_name: "pypi.org"
+  },
+  {
+    name: 'Java',
+    slug: 'java',
+    description: "Fund for the most critical java packages on maven.org",
+    registry_name: "repo1.maven.org"
+  },
+  {
+    name: 'PHP',
+    slug: 'php',
+    description: "Fund for the most critical php packages on packagist.org",
+    registry_name: "packagist.org"
+  },
+  {
+    name: 'Rust',
+    slug: 'rust',
+    description: "Fund for the most critical rust packages on crates.io",
+    registry_name: "crates.io"
+  },
+  {
+    name: 'Go',
+    slug: 'go',
+    description: "Fund for the most critical go packages on proxy.golang.org",
+    registry_name: "proxy.golang.org"
+  },
+  {
+    name: 'Swift',
+    slug: 'swift',
+    description: "Fund for the most critical swift packages on swiftpackageindex.com",
+    registry_name: "swiftpackageindex.com"
+  },
+  {
+    name: 'Dart',
+    slug: 'dart',
+    description: "Fund for the most critical dart packages on pub.dev",
+    registry_name: "pub.dev"
+  },
+  {
+    name: '.NET',
+    slug: 'dotnet',
+    description: "Fund for the most critical .Net packages on nuget.org",
+    registry_name: "nuget.org"
+  },
+  {
+    name: 'Elixir',
+    slug: 'elixir',
+    description: "Fund for the most critical elixir packages on hex.pm",
+    registry_name: "hex.pm"
+  },
+  {
+    name: 'Haskell',
+    slug: 'haskell',
+    description: "Fund for the most critical haskell packages on hackage.haskell.org",
+    registry_name: "hackage.haskell.org"
+  }
+]
+
+funds.each do |fund|
+  Fund.find_or_create_by(slug: fund[:slug]) do |f|
+    f.name = fund[:name]
+    f.description = fund[:description]
+    f.registry_name = fund[:registry_name]
+  end
+end

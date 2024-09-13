@@ -72,7 +72,8 @@ class Fund < ApplicationRecord
     end
   end
 
-  def import_projects_from_critical_packages(registry_name)
+  def import_projects_from_critical_packages
+    return unless registry_name.present?
     page = 1
     loop do
       puts "Fetching page #{page} of projects for #{name}"
