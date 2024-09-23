@@ -1,0 +1,16 @@
+<div class="card mb-3 project_allocation d-flex" id="project_allocation_<%= project_allocation.id %>">
+  <div class="card-body pb-1">
+    <div class="d-flex">
+      <div class="flex-grow-1 ms-3 text-break">
+        <h5 class='card-title'>
+          <%= link_to project_allocation.allocation.fund.name, fund_path(project_allocation.allocation.fund) %> - 
+          <%= link_to project_allocation.allocation.name, fund_allocation_path(project_allocation.allocation.fund, project_allocation.allocation) %>
+        </h5>
+      
+        <p class="card-subtitle mb-2 text-muted">
+          <%= number_to_currency project_allocation.amount_cents/100.0 %> - <%= link_to project_allocation.project, project_allocation.project %>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
