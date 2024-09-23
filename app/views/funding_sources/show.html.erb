@@ -1,12 +1,15 @@
-<h1><%= @funding_source.platform %>: <%= @funding_source.name %></h1>
+<div class="container-sm">
 
-<h3>Projects</h3>
+  <h1><%= @funding_source.platform %>: <%= @funding_source.name %></h1>
 
-<%= render @projects %>
-<%== pagy_bootstrap_nav(@project_pagy) if @pagy.pages > 1 %>
+  <h3>Projects</h3>
 
-<h3>Allocations</h3>
+  <%= render @projects %>
+  <%== pagy_bootstrap_nav(@project_pagy) if @pagy.pages > 1 %>
 
-<%= render @project_allocations %>
-<%== pagy_bootstrap_nav(@project_allocations_pagy) if @project_allocations_pagy.pages > 1 %>  
+  <h3>Allocations</h3>
 
+  <%= render @project_allocations %>
+  <%== pagy_bootstrap_nav(@project_allocations_pagy) if @project_allocations_pagy.pages > 1 %>  
+
+</div>
