@@ -21,9 +21,9 @@ class Allocation < ApplicationRecord
     metrics = projects.map do |project|
       {
         project_id: project.id,
-        downloads: project.downloads || 0,
-        dependent_repos: project.dependent_repos_count || 0,
-        dependent_packages: project.dependent_packages_count || 0,
+        downloads: project.downloads(fund.registry_name) || 0,
+        dependent_repos: project.dependent_repos_count(fund.registry_name) || 0,
+        dependent_packages: project.dependent_packages_count(fund.registry_name) || 0,
         funding_source_id: project.funding_source_id
       }
     end

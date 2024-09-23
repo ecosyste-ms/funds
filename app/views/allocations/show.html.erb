@@ -39,9 +39,9 @@
             <td><%= link_to project_allocation.project, project_allocation.project, target: :_blank %></td>
             <td>$<%= project_allocation.amount_cents/100.0 %></td>
             <td><%= project_allocation.score.round(4) %></td>
-            <td><%= number_with_delimiter project_allocation.project.downloads %></td>
-            <td><%= number_with_delimiter project_allocation.project.dependent_repos_count %></td>
-            <td><%= number_with_delimiter project_allocation.project.dependent_packages_count %></td>
+            <td><%= number_with_delimiter project_allocation.project.downloads(@fund.registry_name) %></td>
+            <td><%= number_with_delimiter project_allocation.project.dependent_repos_count(@fund.registry_name) %></td>
+            <td><%= number_with_delimiter project_allocation.project.dependent_packages_count(@fund.registry_name) %></td>
             <td>
               <% if project_allocation.funding_source %>
                 <%= link_to project_allocation.funding_source, project_allocation.funding_source %>

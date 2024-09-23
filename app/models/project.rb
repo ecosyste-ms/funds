@@ -411,19 +411,36 @@ class Project < ApplicationRecord
     packages.select{|p| p['downloads_period'] == 'last-month' }.map{|p| p["downloads"] || 0 }.sum
   end
 
-  def downloads
-    return 0 unless packages.present?
-    packages.map{|p| p["downloads"] || 0 }.sum
+  def packages_from_registry(registry_name)
+    return [] unless packages.present?
+    packages.select{|p| p['registry'].present? && p['registry']['name'] == registry_name }
   end
 
-  def dependent_repos_count
+  def downloads(registry_name = nil)
     return 0 unless packages.present?
-    packages.map{|p| p["dependent_repos_count"] || 0 }.sum
+    if registry_name.present?
+      packages_from_registry(registry_name).map{|p| p["downloads"] || 0 }.sum
+    else
+      packages.map{|p| p["downloads"] || 0 }.sum
+    end
   end
 
-  def dependent_packages_count
+  def dependent_repos_count(registry_name = nil)
     return 0 unless packages.present?
-    packages.map{|p| p["dependent_packages_count"] || 0 }.sum
+    if registry_name.present?
+      packages_from_registry(registry_name).map{|p| p["dependent_repos_count"] || 0 }.sum
+    else
+      packages.map{|p| p["dependent_repos_count"] || 0 }.sum
+    end
+  end
+
+  def dependent_packages_count(registry_name = nil)
+    return 0 unless packages.present?
+    if registry_name.present?
+      packages_from_registry(registry_name).map{|p| p["dependent_packages_count"] || 0 }.sum
+    else
+      packages.map{|p| p["dependent_packages_count"] || 0 }.sum
+    end
   end
 
   def issue_associations
