@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_09_23_102009) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_23_144345) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
+  enable_extension "pg_stat_statements"
   enable_extension "plpgsql"
 
   create_table "allocations", force: :cascade do |t|
@@ -26,6 +27,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_23_102009) do
     t.json "max_values"
     t.json "weights"
     t.integer "minimum_allocation_cents"
+    t.index ["fund_id"], name: "index_allocations_on_fund_id"
   end
 
   create_table "funding_sources", force: :cascade do |t|
@@ -59,6 +61,10 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_23_102009) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "funding_source_id"
+    t.index ["allocation_id"], name: "index_project_allocations_on_allocation_id"
+    t.index ["fund_id"], name: "index_project_allocations_on_fund_id"
+    t.index ["funding_source_id"], name: "index_project_allocations_on_funding_source_id"
+    t.index ["project_id"], name: "index_project_allocations_on_project_id"
   end
 
   create_table "projects", force: :cascade do |t|
@@ -79,5 +85,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_23_102009) do
     t.datetime "updated_at", null: false
     t.string "registry_names", default: [], array: true
     t.integer "funding_source_id"
+    t.index ["funding_source_id"], name: "index_projects_on_funding_source_id"
+    t.index ["url"], name: "index_projects_on_url", unique: true
   end
 end
