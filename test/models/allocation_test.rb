@@ -24,11 +24,7 @@ class AllocationTest < ActiveSupport::TestCase
     allocation = Allocation.create!(fund_id: fund.id, year: Time.zone.now.year, month: Time.zone.now.month, total_cents: 1000_00)
     allocation.calculate_funded_projects
 
-    
-
     assert_equal 3, allocation.funded_projects_count
-    # assert_equal 334, ProjectAllocation.where(project_id: project1.id).first.amount_cents
-    # assert_equal 333, ProjectAllocation.where(project_id: project2.id).first.amount_cents
-    # assert_equal 333, ProjectAllocation.where(project_id: project3.id).first.amount_cents
+
   end
 end
