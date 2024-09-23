@@ -110,7 +110,7 @@ class Allocation < ApplicationRecord
     }
   end
 
-  def total_allocated
+  def total_allocated_cents
     project_allocations.sum(:amount_cents)
   end
 
