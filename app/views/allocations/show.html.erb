@@ -7,6 +7,7 @@
       Total available: <%= number_to_currency(@allocation.total_cents/100) %><br/>
       Total allocated: <%= number_to_currency(@allocation.total_allocated_cents/100) %><br/>
       Projects: <%= @allocation.funded_projects_count %><br/>    
+      Projects with Funding Sources: <%= @allocation.project_allocations.with_funding_source.count %><br/>
       Minimum: <%= number_to_currency @allocation.minimum_allocation_cents/100.0 %><br/>
     </p>
 
