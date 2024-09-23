@@ -609,7 +609,7 @@ class Project < ApplicationRecord
   end
 
   def funding_links
-    @funding_links ||= (package_funding_links + repo_funding_links + owner_funding_links + readme_funding_links).uniq
+    @funding_links ||= (package_funding_links + repo_funding_links + owner_funding_links + repo_owner_funding_links + readme_funding_links).uniq
   end
 
   def package_funding_links
@@ -617,10 +617,16 @@ class Project < ApplicationRecord
     packages.map{|pkg| pkg['metadata']['funding'] }.compact.map{|f| f.is_a?(Hash) ? f['url'] : f }.flatten.compact
   end
 
-  def owner_funding_links
+  def repo_owner_funding_links
     return [] if repository.blank? || repository['owner_record'].blank? ||  repository['owner_record']["metadata"].blank?
     return [] unless repository['owner_record']["metadata"]['has_sponsors_listing']
     ["https://github.com/sponsors/#{repository['owner_record']['login']}"]
+  end
+
+  def owner_funding_links
+    return [] if owner.blank? || owner["metadata"].blank?
+    return [] unless owner["metadata"]['has_sponsors_listing']
+    ["https://github.com/sponsors/#{owner['login']}"]
   end
 
   def repo_funding_links
