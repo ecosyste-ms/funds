@@ -7,7 +7,8 @@ class FundsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get show" do
-    get fund_url(funds(:one))
+    fund = Fund.create!(name: 'Test Fund', slug: 'test', 'registry_name': 'npm')
+    get fund_url(fund)
     assert_response :success
   end
 end
