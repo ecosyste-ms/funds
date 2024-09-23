@@ -706,10 +706,12 @@ class Project < ApplicationRecord
 
   def find_or_create_funding_source
     return nil unless preferred_funding_link.present?
-    funding_sources.find_or_initialize_by(url: preferred_funding_link).tap do |fs|
+    source = FundingSource.find_or_initialize_by(url: preferred_funding_link).tap do |fs|
       fs.platform = preferred_funding_platform
       fs.save
     end
+    self.update(funding_source_id: source.id) if source.persisted?
+    source
   end
 
   def owner_html_url
