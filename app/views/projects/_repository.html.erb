@@ -102,7 +102,7 @@
         <% end %>
         <% if @project.repository['metadata']['funding'] %>
           <li>
-            Funding: 
+            Funding.yml: 
             <ul>
               <% @project.repository['metadata']['funding'].each do |k,v| %>
                 <% next if v.blank? %>
@@ -113,6 +113,18 @@
             </ul>
           </li>
         <% end %>
+      <% end %>
+      <% if @project.funding_links.any? %>
+        <li>
+          Funding Links:
+          <ul>
+            <% @project.funding_links.each do |link| %>
+              <li>
+                <%= link_to link, link %>
+              </li>
+            <% end %>
+          </ul>
+        </li>
       <% end %>
     </ul>
   <% end %>
