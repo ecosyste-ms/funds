@@ -99,7 +99,7 @@ class Allocation < ApplicationRecord
   end
 
   def default_minimum_allocation
-    100 # cents
+    1000 # cents
   end
 
   def default_weights
@@ -108,6 +108,10 @@ class Allocation < ApplicationRecord
       dependent_packages: 0.2,
       downloads: 0.2
     }
+  end
+
+  def total_allocated
+    project_allocations.sum(:amount_cents)
   end
 
   def find_possible_projects

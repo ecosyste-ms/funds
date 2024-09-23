@@ -2,7 +2,8 @@
   <h1><%= link_to @fund, fund_path(@fund) %>: <%= @allocation.name %></h1>
 
   <p>
-    Total: <%= number_to_currency(@allocation.total_cents/100) %><br/>
+    Total available: <%= number_to_currency(@allocation.total_cents/100) %><br/>
+    Total allocated: <%= number_to_currency(@allocation.total_allocated_cents/100) %><br/>
     Projects: <%= @allocation.funded_projects_count %><br/>    
     Minimum: <%= number_to_currency @allocation.minimum_allocation_cents/100.0 %><br/>
   </p>
