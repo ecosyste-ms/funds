@@ -15,5 +15,7 @@ class FundingSource < ApplicationRecord
     end
   end
 
-
+  def to_s
+    name
+  end
 end
