@@ -1,78 +1,85 @@
 <div class="container-sm">
   <h1><%= link_to @fund, fund_path(@fund) %>: <%= @allocation.name %></h1>
 
-  <p>
-    Total available: <%= number_to_currency(@allocation.total_cents/100) %><br/>
-    Total allocated: <%= number_to_currency(@allocation.total_allocated_cents/100) %><br/>
-    Projects: <%= @allocation.funded_projects_count %><br/>    
-    Minimum: <%= number_to_currency @allocation.minimum_allocation_cents/100.0 %><br/>
-  </p>
+  <% if @allocation.funded_projects_count > 0 %>
 
-  <b>Weights</b>
-  <ul>
-    <% @allocation.weights.each do |name, weight| %>
-      <li><%= name.humanize %>: <%= weight %></li>
-    <% end %>
-  </ul>
+    <p>
+      Total available: <%= number_to_currency(@allocation.total_cents/100) %><br/>
+      Total allocated: <%= number_to_currency(@allocation.total_allocated_cents/100) %><br/>
+      Projects: <%= @allocation.funded_projects_count %><br/>    
+      Minimum: <%= number_to_currency @allocation.minimum_allocation_cents/100.0 %><br/>
+    </p>
 
-  <table class="table">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Project</th>
-        <th>Amount</th>
-        <th>Score</th>
-        <th>Downloads</th>
-        <th>Dependent Repos</th>
-        <th>Dependent Pkgs</th>
-        <th>Platform</th>
-      </tr>
-      </tr>
-    </thead>
-    <tbody>
-      <% @project_allocations.each_with_index do |project_allocation, i| %>
-        <tr>
-          <td><%= i+1 %></td>
-          <td><%= link_to project_allocation.project, project_allocation.project.url, target: :_blank %></td>
-          <td>$<%= project_allocation.amount_cents/100.0 %></td>
-          <td><%= project_allocation.score.round(4) %></td>
-          <td><%= number_with_delimiter project_allocation.project.downloads %></td>
-          <td><%= number_with_delimiter project_allocation.project.dependent_repos_count %></td>
-          <td><%= number_with_delimiter project_allocation.project.dependent_packages_count %></td>
-          <td title='<%= project_allocation.project.funding_links.join(', ') %>'>
-            <%= link_to_unless project_allocation.project.preferred_funding_link.blank?, project_allocation.project.preferred_funding_platform, project_allocation.project.preferred_funding_link, target: :_blank %>
-          </td>
-        </tr>
+    <b>Weights</b>
+    <ul>
+      <% @allocation.weights.each do |name, weight| %>
+        <li><%= name.humanize %>: <%= weight %></li>
       <% end %>
-    </tbody>
-  </table>
+    </ul>
 
-  <div class='row'>
-    <% @allocation.group_projects_by_funding_source_and_platform.group_by{|i,j| i[0] }.each do |platform, sources| %>
-      <div class='col-3'>
-        <table class="table w-auto">
-          <thead>
-            <tr>
-              <th><%= platform %></th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% sources.each do |source, total_cents|%>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Project</th>
+          <th>Amount</th>
+          <th>Score</th>
+          <th>Downloads</th>
+          <th>Dependent Repos</th>
+          <th>Dependent Pkgs</th>
+          <th>Platform</th>
+        </tr>
+        </tr>
+      </thead>
+      <tbody>
+        <% @project_allocations.each_with_index do |project_allocation, i| %>
+          <tr>
+            <td><%= i+1 %></td>
+            <td><%= link_to project_allocation.project, project_allocation.project.url, target: :_blank %></td>
+            <td>$<%= project_allocation.amount_cents/100.0 %></td>
+            <td><%= project_allocation.score.round(4) %></td>
+            <td><%= number_with_delimiter project_allocation.project.downloads %></td>
+            <td><%= number_with_delimiter project_allocation.project.dependent_repos_count %></td>
+            <td><%= number_with_delimiter project_allocation.project.dependent_packages_count %></td>
+            <td title='<%= project_allocation.project.funding_links.join(', ') %>'>
+              <%= link_to_unless project_allocation.project.preferred_funding_link.blank?, project_allocation.project.preferred_funding_platform, project_allocation.project.preferred_funding_link, target: :_blank %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <div class='row'>
+      <% @allocation.group_projects_by_funding_source_and_platform.group_by{|i,j| i[0] }.each do |platform, sources| %>
+        <div class='col-3'>
+          <table class="table w-auto">
+            <thead>
               <tr>
-                <td><%= link_to source[1].split('/').last, source[1] %></td>
-                <td><%= number_to_currency(total_cents/100.0) %></td>
+                <th><%= platform %></th>
+                <th>Total</th>
               </tr>
-            <% end %>
-          </tbody>
-          <tfoot>
-            <tr>
-              <td>Total</td>
-              <td><%= number_to_currency(sources.sum{|source, total_cents| total_cents}/100.0) %></td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-    <% end %>
-  </div>
+            </thead>
+            <tbody>
+              <% sources.each do |source, total_cents|%>
+                <tr>
+                  <td><%= link_to source[1].split('/').last, source[1] %></td>
+                  <td><%= number_to_currency(total_cents/100.0) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td>Total</td>
+                <td><%= number_to_currency(sources.sum{|source, total_cents| total_cents}/100.0) %></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p>
+      This allocation has no funded projects.
+    </p>
+  <% end %>
 </div>
