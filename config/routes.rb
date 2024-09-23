@@ -15,6 +15,8 @@ Rails.application.routes.draw do
     resources :projects, only: [:index]
   end
 
+  resources :funding_sources, only: [:index, :show]
+
   resources :projects, only: [:show]
 
   root "funds#index"

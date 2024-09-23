@@ -1,0 +1,19 @@
+<div class="card mb-3 funding_source d-flex" id="funding_source_<%= funding_source.id %>">
+  <div class="card-body pb-1">
+    <div class="d-flex">
+      
+      <div class="flex-grow-1 ms-3 text-break">
+        <h5 class='card-title'>
+          <%= funding_source.platform %>: <%= link_to funding_source.name, funding_source %>
+        </h5>
+      
+        <p class="card-subtitle mb-2 text-muted">
+          <%#= fund.description %>
+        </p>
+      </div>
+      <div class="flex-shrink-0">
+        <img src="<%#= fund.logo_url %>" class="rounded" height='40' width='40' onerror="this.style.display='none'">
+      </div>  
+    </div>
+  </div>
+</div>

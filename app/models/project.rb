@@ -5,7 +5,7 @@ class Project < ApplicationRecord
   has_many :project_allocations
   has_many :allocations, through: :project_allocations
   has_many :funds, through: :allocations
-  has_many :funding_sources
+  belongs_to :funding_source, optional: true
 
   scope :active, -> { where("(repository ->> 'archived') = ?", 'false') }
   scope :archived, -> { where("(repository ->> 'archived') = ?", 'true') }
