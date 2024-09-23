@@ -10,6 +10,8 @@ class FundingSource < ApplicationRecord
     case platform
     when 'github.com'
       URI.parse(url).path.split('/')[2]
+    when 'tidelift.com'
+      URI.parse(url).path.split('/').last
     else
       URI.parse(url).path.sub(/\A\//, '')
     end
