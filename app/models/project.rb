@@ -72,6 +72,8 @@ class Project < ApplicationRecord
     fetch_events
     fetch_issue_stats
     fetch_readme
+    find_or_create_funding_source
+    search_for_collective
     update(last_synced_at: Time.now)
     ping
   end
@@ -583,9 +585,6 @@ class Project < ApplicationRecord
     "#{repository['html_url']}/blob/#{repository['default_branch']}/#{readme_file_name}"
   end
 
-
-
-
   def blob_url(path)
     return unless repository.present?
     "#{repository['html_url']}/blob/#{repository['default_branch']}/#{path}"
@@ -729,8 +728,12 @@ class Project < ApplicationRecord
 
   def find_or_create_funding_source
     return nil unless preferred_funding_link.present?
-    source = FundingSource.find_or_initialize_by(url: preferred_funding_link).tap do |fs|
-      fs.platform = preferred_funding_platform
+    set_funding_source(preferred_funding_link, preferred_funding_platform)
+  end
+
+  def set_funding_source(url, platform)
+    source = FundingSource.find_or_initialize_by(url: url).tap do |fs|
+      fs.platform = platform
       fs.save
     end
     self.update(funding_source_id: source.id) if source.persisted?
@@ -740,5 +743,25 @@ class Project < ApplicationRecord
   def owner_html_url
     return unless owner.present?
     owner['html_url']
+  end
+
+  def search_for_collective
+    return if funding_source.present?
+    oc_url = "https://opencollective.ecosyste.ms/api/v1/projects/lookup?url=#{url}"
+
+    conn = Faraday.new(url: oc_url) do |faraday|
+      faraday.response :follow_redirects
+      faraday.adapter Faraday.default_adapter
+    end
+
+    response = conn.get
+    return unless response.success?
+
+    json = JSON.parse(response.body)
+
+    if json.present?
+      collective_url = json['collective']['html_url']
+      set_funding_source(collective_url, 'opencollective.com')
+    end
   end
 end
