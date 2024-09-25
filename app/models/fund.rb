@@ -108,10 +108,9 @@ class Fund < ApplicationRecord
   def possible_projects
     if primary_topic.present?
       # TODO include aliases
-      Project.keyword(primary_topic).active
+      Project.keyword(primary_topic).active.with_license
     elsif registry_name.present?
-      Project.registry_name(registry_name).active
+      Project.registry_name(registry_name).active.with_license
     end
-    # TODO project must have a license
   end
 end

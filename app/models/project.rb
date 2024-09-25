@@ -22,6 +22,9 @@ class Project < ApplicationRecord
 
   scope :registry_name, ->(registry_name) { where("registry_names @> ARRAY[?]::varchar[]", registry_name) }
 
+  scope :with_license, -> { where.not(licenses: []) }
+  scope :without_license, -> { where(licenses: []) }
+
   def self.sync_least_recently_synced
     Project.where(last_synced_at: nil).or(Project.where("last_synced_at < ?", 1.day.ago)).order('last_synced_at asc nulls first').limit(500).each do |project|
       project.sync_async
@@ -74,6 +77,7 @@ class Project < ApplicationRecord
     fetch_readme
     find_or_create_funding_source
     search_for_collective
+    set_licenses
     update(last_synced_at: Time.now)
     ping
   end
@@ -467,6 +471,15 @@ class Project < ApplicationRecord
 
   def open_source_license?
     (packages_licenses + [repository_license] + [readme_license]).compact.uniq.any?
+  end
+
+  def licenses
+    ([repository_license] + packages_licenses).compact.uniq
+  end
+
+  def set_licenses
+    self.licenses = licenses
+    self.save
   end
 
   def past_year_total_commits

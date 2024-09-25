@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_09_23_144345) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_25_144902) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_stat_statements"
@@ -85,6 +85,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_23_144345) do
     t.datetime "updated_at", null: false
     t.string "registry_names", default: [], array: true
     t.integer "funding_source_id"
+    t.string "licenses", default: [], array: true
     t.index ["funding_source_id"], name: "index_projects_on_funding_source_id"
     t.index ["url"], name: "index_projects_on_url", unique: true
   end
