@@ -12,6 +12,8 @@ class FundingSource < ApplicationRecord
       URI.parse(url).path.split('/')[2]
     when 'tidelift.com'
       URI.parse(url).path.split('/').last
+    when 'opencollective.com'
+      URI.parse(url).path.split('/')[1]
     when 'paypal.com'
       'paypal'
     else
