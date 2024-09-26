@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_09_25_144902) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_26_095302) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_stat_statements"
@@ -36,6 +36,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_25_144902) do
     t.integer "current_balance_cents"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.json "collective", default: {}
+    t.datetime "last_synced_at"
   end
 
   create_table "funds", force: :cascade do |t|

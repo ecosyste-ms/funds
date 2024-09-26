@@ -3,6 +3,10 @@
     {
       "command": "bundle exec rake projects:sync_least_recent",
       "schedule": "*/30 * * * *"
+    },
+    {
+      "command": "bundle exec rake funding_sources:sync_least_recent",
+      "schedule": "*/30 * * * *"
     }
   ]
 }
