@@ -1,6 +1,7 @@
 class Allocation < ApplicationRecord
   belongs_to :fund
   has_many :project_allocations, dependent: :destroy
+  has_many :projects, through: :project_allocations
 
   scope :displayable, -> { where('funded_projects_count > 0') }
 
@@ -122,23 +123,9 @@ class Allocation < ApplicationRecord
     # TODO
   end
 
-  def group_projects_by_funding_platform
-    project_allocations.order('amount_cents desc').includes(:funding_source)
-                       .group_by { |pa| pa.funding_source.try(:platform) || 'Unknown' }
-                       .transform_values { |pas| pas.sum(&:amount_cents) }
-                       .sort_by { |platform, amount| -amount }
-  end
-
-  def group_projects_by_funding_source
-    project_allocations.order('amount_cents desc').includes(:funding_source)
-                       .group_by { |pa| pa.funding_source.try(:url) || 'Unknown' }
-                       .transform_values { |pas| pas.sum(&:amount_cents) }
-                       .sort_by { |platform, amount| -amount }
-  end
-
   def group_projects_by_funding_source_and_platform
     project_allocations.order('amount_cents desc').includes(:funding_source).with_funding_source
-                      .group_by { |pa| [pa.funding_source.platform, pa.funding_source.url] }
+                      .group_by { |pa| [pa.funding_source.platform, pa.funding_source] }
                        .transform_values { |pas| pas.sum(&:amount_cents) }
                        .sort_by { |platform, amount| -amount }
   end

@@ -18,6 +18,8 @@
       <% end %>
     </ul>
 
+    <h3>Projects</h3>
+
     <table class="table">
       <thead>
         <tr>
@@ -54,10 +56,11 @@
       </tbody>
     </table>
 
+    <h3>Funding Sources</h3>
+
     <div class='row'>
       <% @allocation.group_projects_by_funding_source_and_platform.group_by{|i,j| i[0] }.each do |platform, sources| %>
-        <div class='col-3'>
-          <table class="table w-auto">
+          <table class="table">
             <thead>
               <tr>
                 <th><%= platform %></th>
@@ -65,9 +68,15 @@
               </tr>
             </thead>
             <tbody>
-              <% sources.each do |source, total_cents|%>
+              <% sources.each do |platform_and_source, total_cents|%>
+                <% source = platform_and_source[1] %>
                 <tr>
-                  <td><%= link_to source[1].split('/').last, source[1] %></td>
+                  <td>
+                    <%= link_to source.name, source.url %>
+                    <% if source.platform == 'opencollective.com' && source.collective.present? %>
+                      (Host: <%= source.collective['host'] || 'Unknown' %>)
+                    <% end %>
+                  </td>
                   <td><%= number_to_currency(total_cents/100.0) %></td>
                 </tr>
               <% end %>
@@ -79,7 +88,6 @@
               </tr>
             </tfoot>
           </table>
-        </div>
       <% end %>
     </div>
   <% else %>
