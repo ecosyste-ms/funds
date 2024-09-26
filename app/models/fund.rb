@@ -14,6 +14,14 @@ class Fund < ApplicationRecord
     name
   end
 
+  def default_minimum_for_allocation_cents
+    100_00
+  end
+
+  def minimum_for_allocation_cents
+    super || default_minimum_for_allocation_cents
+  end
+
   def self.import_from_topic(topic)
     topic_url = "https://awesome.ecosyste.ms/api/v1/topics/#{topic}"
 
@@ -98,6 +106,8 @@ class Fund < ApplicationRecord
   end
 
   def allocate(total_cents)
+    return if total_cents < minimum_for_allocation_cents
+    
     allocations = Allocation.where(fund_id: id, year: Time.zone.now.year, month: Time.zone.now.month)
     return if allocations.any?
 
