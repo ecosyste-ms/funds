@@ -25,6 +25,8 @@ class Project < ApplicationRecord
   scope :with_license, -> { where.not(licenses: []) }
   scope :without_license, -> { where(licenses: []) }
 
+  scope :synced, -> { where.not(last_synced_at: nil) }
+
   def self.sync_least_recently_synced
     Project.where(last_synced_at: nil).or(Project.where("last_synced_at < ?", 1.day.ago)).order('last_synced_at asc nulls first').limit(500).each do |project|
       project.sync_async
@@ -776,5 +778,40 @@ class Project < ApplicationRecord
       collective_url = json['collective']['html_url']
       set_funding_source(collective_url, 'opencollective.com')
     end
+  end
+
+  def owner_email
+    return nil unless owner.present?
+    owner['email']
+  end
+
+  def maintainer_emails
+    return [] unless packages.present?
+    packages.map{|p| p['maintainers'] }.flatten.map{|m| m['email'] }.compact.uniq
+  end
+
+  def committers_without_bots
+    return [] unless commits.present?
+    return [] unless commits['committers'].present?
+    commits['committers'].reject{|c| c['name'].downcase.include?('bot') }
+  end
+
+  def top_committers
+    return [] unless commits.present?
+    c = committers_without_bots.sort_by{|c| c['count'] }.reverse
+    # reject invalid emails or github no-reply emails or email with no @
+    c = c.reject{|c| c['email'].blank? || c['email'].include?('noreply') || !c['email'].include?('@') }
+    c.first(3)
+  end
+
+  def committer_emails
+    top_committers.map{|c| c['email'] }.compact.uniq
+  end
+
+  def contact_email
+    return owner_email if owner_email.present?
+    return maintainer_emails.first if maintainer_emails.present?
+    return committer_emails.first if committer_emails.present?
+    return nil
   end
 end
