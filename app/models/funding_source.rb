@@ -21,6 +21,12 @@ class FundingSource < ApplicationRecord
     end
   end
 
+  def host
+    return nill unless platform == 'opencollective.com'
+
+    collective['host'] || name
+  end
+
   def to_s
     name
   end

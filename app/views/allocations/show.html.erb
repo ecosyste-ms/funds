@@ -63,7 +63,7 @@
           <table class="table">
             <thead>
               <tr>
-                <th><%= platform %></th>
+                <th><%= link_to platform, export_fund_allocation_path(@fund, @allocation, platform: platform) %></th>
                 <th>Total</th>
               </tr>
             </thead>
@@ -74,7 +74,7 @@
                   <td>
                     <%= link_to source.name, source.url %>
                     <% if source.platform == 'opencollective.com' && source.collective.present? %>
-                      (Host: <%= source.collective['host'] || 'Unknown' %>)
+                      (Host: <%= source.host %>)
                     <% end %>
                   </td>
                   <td><%= number_to_currency(total_cents/100.0) %></td>

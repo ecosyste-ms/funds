@@ -11,7 +11,11 @@ Rails.application.routes.draw do
   mount PgHero::Engine, at: "pghero"
   
   resources :funds, only: [:index, :show] do
-    resources :allocations, only: [:show]
+    resources :allocations, only: [:show] do |allocations|
+      member do
+        get :export
+      end
+    end
     resources :projects, only: [:index]
   end
 
