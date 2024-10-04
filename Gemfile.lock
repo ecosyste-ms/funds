@@ -273,7 +273,7 @@ GEM
     rswag-api (2.14.0)
       activesupport (>= 5.2, < 8.0)
       railties (>= 5.2, < 8.0)
-    rswag-ui (2.14.0)
+    rswag-ui (2.15.0)
       actionpack (>= 5.2, < 8.0)
       railties (>= 5.2, < 8.0)
     ruby2_keywords (0.0.5)
