@@ -1,4 +1,6 @@
 class WebhooksController < ApplicationController
+  skip_forgery_protection
+
   def receive
     
     # TODO handle various events
