@@ -59,3 +59,10 @@ You can also view the status of the workers and their queues from the web interf
 ## Deployment
 
 A container-based deployment is highly recommended, we use [dokku.com](https://dokku.com/).
+
+## Configuration
+
+Required environment variables:
+
+- `OPENCOLLECTIVE_TOKEN` - A token for the Open Collective API
+- `OPENCOLLECTIVE_PARENT_SLUG` - The parent collective id for the Open Collective API

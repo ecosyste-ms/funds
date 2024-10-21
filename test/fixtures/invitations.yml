@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  project_allocation_id: 1
+  email: MyString
+  status: MyString
+  member_invitation_id: MyString
+
+two:
+  project_allocation_id: 1
+  email: MyString
+  status: MyString
+  member_invitation_id: MyString

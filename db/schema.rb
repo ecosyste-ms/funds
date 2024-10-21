@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_10_21_134442) do
+ActiveRecord::Schema[7.2].define(version: 2024_10_21_143558) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_stat_statements"
@@ -55,6 +55,16 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_21_134442) do
     t.integer "minimum_for_allocation_cents"
     t.string "opencollective_project_id"
     t.json "opencollective_project", default: {}
+  end
+
+  create_table "invitations", force: :cascade do |t|
+    t.integer "project_allocation_id", null: false
+    t.string "email", null: false
+    t.string "status"
+    t.string "member_invitation_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_allocation_id"], name: "index_invitations_on_project_allocation_id"
   end
 
   create_table "project_allocations", force: :cascade do |t|

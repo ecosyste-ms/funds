@@ -123,4 +123,21 @@ class Fund < ApplicationRecord
       Project.registry_name(registry_name).active.with_license
     end
   end
+
+  def sync_opencollective_project
+    if opencollective_project_id.present?
+      # fetch opencollective project from graphql api
+      # update opencollective_project with data
+    else
+      setup_opencollective_project
+    end
+  end
+
+  def setup_opencollective_project
+    return if opencollective_project_id.present?
+    
+    # fetch opencollective parent via (ENV['OPENCOLLECTIVE_PARENT_SLUG'])
+    # create opencollective project via graphql api
+    # update opencollective_project_id
+  end
 end
