@@ -101,7 +101,7 @@ class Project < ApplicationRecord
   rescue ActiveRecord::RecordInvalid => e
     puts "Duplicate url #{url}"
     puts e.class
-    destroy
+    # destroy
     return nil
   rescue
     puts "Error checking url for #{url}"
