@@ -126,18 +126,103 @@ class Fund < ApplicationRecord
 
   def sync_opencollective_project
     if opencollective_project_id.present?
-      # fetch opencollective project from graphql api
-      # update opencollective_project with data
+      fetch_opencollective_project
     else
       setup_opencollective_project
     end
   end
 
+  def fetch_opencollective_project
+    return if opencollective_project_id.blank?
+    
+    query = <<~GRAPHQL
+      query($id: String!) {
+        project(id: $id) {
+          id
+          name
+          description
+          slug
+          tags
+          createdAt
+          updatedAt
+        }
+      }
+    GRAPHQL
+
+    variables = { id: opencollective_project_id }
+
+    payload = { query: query, variables: variables }.to_json
+
+    response = Faraday.post(
+      "https://staging.opencollective.com/api/graphql/v2?personalToken=#{ENV['OPEN_COLLECTIVE_API_KEY']}",
+      payload,
+      { 'Content-Type' => 'application/json' }
+    )
+
+    begin
+      response_data = JSON.parse(response.body)
+  
+      if response_data['data'] && response_data['data']['project']
+        project_data = response_data['data']['project']
+        update!(opencollective_project: project_data) # Save project data to your JSON field
+      else
+        puts "No project data found. Response: #{response.body}"
+      end
+    rescue JSON::ParserError => e
+      puts "Failed to parse response: #{e.message}"
+    end
+
+  end
+
   def setup_opencollective_project
     return if opencollective_project_id.present?
-    
-    # fetch opencollective parent via (ENV['OPENCOLLECTIVE_PARENT_SLUG'])
-    # create opencollective project via graphql api
-    # update opencollective_project_id
+
+    query = <<~GRAPHQL
+      mutation CreateProject($parent: AccountReferenceInput!, $project: ProjectCreateInput!) {
+        createProject(parent: $parent, project: $project) {
+          id
+          name
+          description
+          slug
+          tags
+          createdAt
+          updatedAt
+        }
+      }
+    GRAPHQL
+  
+    variables = {
+      parent: { slug: ENV['OPENCOLLECTIVE_PARENT_SLUG'] },
+      project: {
+        name: "#{name} Fund",
+        slug: "oc-#{slug}-fund",
+        description: "This is the Open Collective for the #{name} Fund. We support open-source projects in the #{name} ecosystem.",
+        tags: ["open-source", "community", "fund", slug],
+      }
+    }
+  
+    payload = { query: query, variables: variables }.to_json
+  
+    response = Faraday.post(
+      "https://staging.opencollective.com/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+      payload,
+      { 'Content-Type' => 'application/json' }
+    )
+  
+    puts "Response status: #{response.status}"
+    puts "Response body: #{response.body}"
+  
+    response_data = JSON.parse(response.body)
+  
+    if response_data['errors']
+      puts "GraphQL Errors: #{response_data['errors']}"
+    else
+      project_data = response_data['data']['createProject']
+      puts "Project created! ID: #{project_data['id']}, Name: #{project_data['name']}, Description: #{project_data['description']}"
+      self.opencollective_project_id = project_data['id']
+      self.opencollective_project = project_data
+      save
+      return project_data
+    end
   end
 end

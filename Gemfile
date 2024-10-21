@@ -29,6 +29,8 @@ gem 'sidekiq-unique-jobs'
 gem 'sidekiq-status'
 gem 'ostruct'
 gem 'appsignal'
+gem 'dotenv'
+gem 'csv'
 
 group :development, :test do
   gem "debug", platforms: %i[ mri mingw x64_mingw ]
