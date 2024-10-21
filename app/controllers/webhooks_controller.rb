@@ -1,5 +1,5 @@
 class WebhooksController < ApplicationController
-  def recieve
+  def receive
     
     # TODO handle various events
     p params
