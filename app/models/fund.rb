@@ -156,11 +156,9 @@ class Fund < ApplicationRecord
   end
 
   def fetch_opencollective_project
-    return if opencollective_project_id.blank?
-    
     query = <<~GRAPHQL
-      query($id: String!) {
-        project(id: $id) {
+      query($slug: String!) {
+        project(slug: $slug) {
           id
           legacyId
           name
@@ -169,18 +167,11 @@ class Fund < ApplicationRecord
           tags
           createdAt
           updatedAt
-          webhooks(limit: 5, offset: 0, account: { id: $id }) {
-            nodes {
-              id
-              activityType
-              webhookUrl
-  }
-          }
         }
       }
     GRAPHQL
 
-    variables = { id: opencollective_project_id }
+    variables = { slug: oc_project_slug }
 
     payload = { query: query, variables: variables }.to_json
 
@@ -195,7 +186,7 @@ class Fund < ApplicationRecord
   
       if response_data['data'] && response_data['data']['project']
         project_data = response_data['data']['project']
-        update!(opencollective_project: project_data) # Save project data to your JSON field
+        update!(opencollective_project: project_data, opencollective_project_id: project_data['id']) 
       else
         puts "No project data found. Response: #{response.body}"
       end
@@ -249,6 +240,7 @@ class Fund < ApplicationRecord
   
     if response_data['errors']
       puts "GraphQL Errors: #{response_data['errors']}"
+      # TODO if slug already exists, load the project and save the id
     else
       project_data = response_data['data']['createProject']
       puts "Project created! ID: #{project_data['id']}, Name: #{project_data['name']}, Description: #{project_data['description']}"
