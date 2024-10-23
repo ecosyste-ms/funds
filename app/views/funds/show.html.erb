@@ -7,6 +7,12 @@
     <%= @fund.description %>
   </p>
 
+  <% if @fund.open_collective_project_url.present? %>
+    <p>
+      Donate on Open Collective: <%= link_to @fund.open_collective_project_url, @fund.open_collective_project_url %>
+    </p>
+  <% end %>
+
   <h3>Allocations</h3>
 
   <%= render @allocations %>

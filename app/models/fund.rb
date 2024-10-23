@@ -132,6 +132,11 @@ class Fund < ApplicationRecord
     end
   end
 
+  def open_collective_project_url
+    return nil if opencollective_project_id.blank?
+    "https://staging.opencollective.com/#{ENV['OPENCOLLECTIVE_PARENT_SLUG']}/projects/#{oc_project_slug}"
+  end
+
   def oc_project_slug
     "oc-#{slug}-fund"
   end
