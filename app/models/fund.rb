@@ -8,6 +8,12 @@ class Fund < ApplicationRecord
 
   scope :project_legacy_id, ->(id) { where("opencollective_project->>'legacyId' = ?", id) }
 
+  def self.sync_least_recently_synced    
+    Fund.where(last_synced_at: nil).or(Fund.where("last_synced_at < ?", 1.day.ago)).order('last_synced_at asc nulls first').limit(500).each do |fund|
+      fund.sync_opencollective_project_async
+    end
+  end
+
   def to_param
     slug
   end
@@ -130,14 +136,18 @@ class Fund < ApplicationRecord
     "oc-#{slug}-fund"
   end
 
+  def sync_opencollective_project_async
+    SyncFundProjectWorker.perform_async(id)
+  end
+
   def sync_opencollective_project
     if opencollective_project_id.present?
       fetch_opencollective_project
-      setup_webhook
     else
       setup_opencollective_project
-      setup_webhook
     end
+    setup_webhook
+    update_column(:last_synced_at, Time.zone.now)
   end
 
   def fetch_opencollective_project
