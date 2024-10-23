@@ -6,6 +6,8 @@ class Fund < ApplicationRecord
   has_many :project_allocations, through: :allocations
   has_many :projects, through: :project_allocations
 
+  scope :project_legacy_id, ->(id) { where("opencollective_project->>'legacyId' = ?", id) }
+
   def to_param
     slug
   end
@@ -124,11 +126,17 @@ class Fund < ApplicationRecord
     end
   end
 
+  def oc_project_slug
+    "oc-#{slug}-fund"
+  end
+
   def sync_opencollective_project
     if opencollective_project_id.present?
       fetch_opencollective_project
+      setup_webhook
     else
       setup_opencollective_project
+      setup_webhook
     end
   end
 
@@ -139,12 +147,20 @@ class Fund < ApplicationRecord
       query($id: String!) {
         project(id: $id) {
           id
+          legacyId
           name
           description
           slug
           tags
           createdAt
           updatedAt
+          webhooks(limit: 5, offset: 0, account: { id: $id }) {
+            nodes {
+              id
+              activityType
+              webhookUrl
+  }
+          }
         }
       }
     GRAPHQL
@@ -181,9 +197,11 @@ class Fund < ApplicationRecord
       mutation CreateProject($parent: AccountReferenceInput!, $project: ProjectCreateInput!) {
         createProject(parent: $parent, project: $project) {
           id
+          legacyId
           name
           description
           slug
+          type
           tags
           createdAt
           updatedAt
@@ -195,7 +213,7 @@ class Fund < ApplicationRecord
       parent: { slug: ENV['OPENCOLLECTIVE_PARENT_SLUG'] },
       project: {
         name: "#{name} Fund",
-        slug: "oc-#{slug}-fund",
+        slug: oc_project_slug,
         description: "This is the Open Collective for the #{name} Fund. We support open-source projects in the #{name} ecosystem.",
         tags: ["open-source", "community", "fund", slug],
       }
@@ -224,5 +242,53 @@ class Fund < ApplicationRecord
       save
       return project_data
     end
+  end
+
+  def setup_webhook
+    return if opencollective_project_id.blank?
+    return if oc_webhook_id.present?
+
+    query = <<~GRAPHQL
+      mutation ($webhook: WebhookCreateInput!) {
+        createWebhook(webhook: $webhook) {
+          id
+          legacyId
+          activityType
+          webhookUrl
+        }
+      }
+    GRAPHQL
+
+    variables = {
+      webhook: {
+        account: { id: opencollective_project_id, slug: oc_project_slug },
+        activityType: "ACTIVITY_ALL",
+        webhookUrl: "https://funds.ecosyste.ms/webhooks"
+      }
+    } 
+
+    payload = { query: query, variables: variables }.to_json
+
+    response = Faraday.post(
+      "https://staging.opencollective.com/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+      payload,
+      { 'Content-Type' => 'application/json' }
+    )
+
+    puts "Response status: #{response.status}"
+    puts "Response body: #{response.body}"
+
+    response_data = JSON.parse(response.body)
+
+    if response_data['errors']
+      puts "GraphQL Errors: #{response_data['errors']}"
+    else
+      webhook_data = response_data['data']['createWebhook']
+      puts "Webhook created! ID: #{webhook_data['id']}, URL: #{webhook_data['webhookUrl']}"
+      self.oc_webhook_id = webhook_data['id']
+      save
+      return webhook_data
+    end
+
   end
 end
