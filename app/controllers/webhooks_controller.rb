@@ -9,17 +9,14 @@ class WebhooksController < ApplicationController
     when 'collective.edited'
       fund = Fund.project_legacy_id(params[:CollectiveId]).first
       if fund.present?
-        SyncFundProjectWorker.perform_async(fund.id)
+        fund.sync_opencollective_project_async
       end
-    else
-
+    when 'collective.expense.updated'
+      invitation = Invitation.find_by(member_invitation_id: params[:expense][:id])
+      if invitation.present?
+        invitation.sync_async
+      end
     end
-      
-    
-
-    # invite accepted (COLLECTIVE_EXPENSE_UPDATED)
-    # invite rejected (COLLECTIVE_EXPENSE_REJECTED)
-
 
     render json: {status: 'ok'}
   end
