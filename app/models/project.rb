@@ -40,7 +40,12 @@ class Project < ApplicationRecord
   end
 
   def to_s
-    name.presence || url
+    name.presence || repo_name.presence || url
+  end
+
+  def repo_name
+    return nil unless repository_url.present?
+    repository_url.split('/').last
   end
 
   def repository_url
