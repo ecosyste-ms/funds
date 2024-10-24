@@ -3,7 +3,6 @@ class SyncFundProjectWorker
   include Sidekiq::Status::Worker
 
   def perform(fund_id)
-    fund = Fund.find_by_id(fund_id)
-    fund.sync_opencollective_project
+    Fund.find_by_id(fund_id).try(:sync_opencollective_project)
   end
 end
