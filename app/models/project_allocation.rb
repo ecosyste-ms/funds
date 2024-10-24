@@ -54,7 +54,8 @@ class ProjectAllocation < ApplicationRecord
         items: [
           {
             description: "Allocation for #{project.to_s}",
-            amount: amount_cents
+            amount: amount_cents,
+            currency: "USD"
           }
         ]
       },
