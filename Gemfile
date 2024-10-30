@@ -31,6 +31,7 @@ gem 'ostruct'
 gem 'appsignal'
 gem 'dotenv'
 gem 'csv'
+gem 'after_commit_action'
 
 group :development, :test do
   gem "debug", platforms: %i[ mri mingw x64_mingw ]
@@ -47,3 +48,4 @@ group :test do
   gem "mocha"
   gem "rails-controller-testing"
 end
+
