@@ -300,6 +300,18 @@ class Fund < ApplicationRecord
 
   end
 
+  def total_donations
+    transactions.donations.sum(:net_amount) + transactions.host_fees.sum(:net_amount)
+  end
+
+  def total_expenses
+    transactions.expenses.sum(:net_amount)
+  end
+
+  def current_balance
+    transactions.sum(:net_amount)
+  end
+
   def sync_transactions
     first_page = fetch_transactions_from_graphql # TODO handle errors
     total_count = first_page['data']['transactions']['totalCount']
@@ -310,7 +322,7 @@ class Fund < ApplicationRecord
       page = fetch_transactions_from_graphql(offset: offset)
       transactions = page['data']['transactions']['nodes'].map do |node|
         {
-          collective_id: id,
+          fund_id: id,
           uuid: node['uuid'],
           amount: node['amount']['value'],
           net_amount: node['netAmount']['value'],
@@ -330,7 +342,7 @@ class Fund < ApplicationRecord
   end
 
   def fetch_transactions_from_graphql(offset: 0)
-    graphql_url = "https://opencollective.com/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}"
+    graphql_url = "https://staging.opencollective.com/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}"
 
     query = <<~GRAPHQL
       query Transactions(
@@ -381,9 +393,9 @@ class Fund < ApplicationRecord
 
     resp = conn.post do |req|
       req.headers['Content-Type'] = 'application/json'
-      req.body = { query: query, variables: { account: { slug: slug }, limit: 1000, offset: offset } }.to_json
+      req.body = { query: query, variables: { account: { slug: oc_project_slug }, limit: 1000, offset: offset } }.to_json
     end
 
-    json = JSON.parse(resp.body)
+    JSON.parse(resp.body)
   end
 end
