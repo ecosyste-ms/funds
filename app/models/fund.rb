@@ -299,4 +299,91 @@ class Fund < ApplicationRecord
     end
 
   end
+
+  def sync_transactions
+    first_page = fetch_transactions_from_graphql # TODO handle errors
+    total_count = first_page['data']['transactions']['totalCount']
+    puts "Total count: #{total_count}"
+    offset = 0
+    while offset < total_count
+      puts "Loading transactions #{offset}"
+      page = fetch_transactions_from_graphql(offset: offset)
+      transactions = page['data']['transactions']['nodes'].map do |node|
+        {
+          collective_id: id,
+          uuid: node['uuid'],
+          amount: node['amount']['value'],
+          net_amount: node['netAmount']['value'],
+          transaction_type: node['type'],
+          transaction_kind: node['kind'],
+          transaction_expense_type: node['expense'] ? node['expense']['type'] : nil,
+          currency: node['amount']['currency'],
+          account: node['type'] == 'DEBIT' ? node['toAccount']['slug'] : node['fromAccount']['slug'],
+          created_at: node['createdAt'],
+          description: node['description']
+        }
+      end
+      Transaction.upsert_all(transactions, unique_by: :uuid)
+      offset += 1000
+    end
+    update(balance: current_balance)
+  end
+
+  def fetch_transactions_from_graphql(offset: 0)
+    graphql_url = "https://opencollective.com/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}"
+
+    query = <<~GRAPHQL
+      query Transactions(
+        $account: [AccountReferenceInput!]
+        $limit: Int
+        $offset: Int
+      ) {
+        transactions(
+          account: $account
+          limit: $limit
+          offset: $offset
+        ) {
+          offset
+          limit
+          totalCount
+          nodes {
+            uuid
+            amount {
+              value
+              currency
+            }
+            description
+            netAmount {
+              value
+              currency
+            }            
+            createdAt
+            type
+            kind
+            expense {
+              type
+            }
+            toAccount {
+              slug
+            }
+            fromAccount {
+              slug
+            }
+          }
+        }
+      }
+    GRAPHQL
+
+    conn = Faraday.new(url: graphql_url) do |faraday|
+      faraday.response :follow_redirects
+      faraday.adapter Faraday.default_adapter
+    end
+
+    resp = conn.post do |req|
+      req.headers['Content-Type'] = 'application/json'
+      req.body = { query: query, variables: { account: { slug: slug }, limit: 1000, offset: offset } }.to_json
+    end
+
+    json = JSON.parse(resp.body)
+  end
 end
