@@ -5,6 +5,7 @@ class Fund < ApplicationRecord
   has_many :allocations
   has_many :project_allocations, through: :allocations
   has_many :projects, through: :project_allocations
+  has_many :transactions
 
   scope :project_legacy_id, ->(id) { where("opencollective_project->>'legacyId' = ?", id) }
 

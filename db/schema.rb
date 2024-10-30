@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_10_24_141548) do
+ActiveRecord::Schema[7.2].define(version: 2024_10_30_171812) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_stat_statements"
@@ -57,6 +57,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_24_141548) do
     t.json "opencollective_project", default: {}
     t.string "oc_webhook_id"
     t.datetime "last_synced_at"
+    t.integer "transactions_count", default: 0
   end
 
   create_table "invitations", force: :cascade do |t|
@@ -106,5 +107,22 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_24_141548) do
     t.string "licenses", default: [], array: true
     t.index ["funding_source_id"], name: "index_projects_on_funding_source_id"
     t.index ["url"], name: "index_projects_on_url", unique: true
+  end
+
+  create_table "transactions", force: :cascade do |t|
+    t.integer "fund_id"
+    t.string "uuid"
+    t.float "amount"
+    t.float "net_amount"
+    t.string "transaction_type"
+    t.string "currency"
+    t.string "account"
+    t.string "description"
+    t.string "transaction_kind"
+    t.string "transaction_expense_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["fund_id"], name: "index_transactions_on_fund_id"
+    t.index ["uuid"], name: "index_transactions_on_uuid", unique: true
   end
 end

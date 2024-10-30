@@ -1,0 +1,25 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  fund_id: 1
+  uuid: MyString
+  amount: 1.5
+  net_amount: 1.5
+  transaction_type: MyString
+  currency: MyString
+  account: MyString
+  description: MyString
+  transaction_kind: MyString
+  transaction_expense_type: MyString
+
+two:
+  fund_id: 1
+  uuid: MyString
+  amount: 1.5
+  net_amount: 1.5
+  transaction_type: MyString
+  currency: MyString
+  account: MyString
+  description: MyString
+  transaction_kind: MyString
+  transaction_expense_type: MyString
