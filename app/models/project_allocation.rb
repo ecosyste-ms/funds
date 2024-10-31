@@ -82,4 +82,205 @@ class ProjectAllocation < ApplicationRecord
       Invitation.create!(project_allocation: self, email: project.contact_email, status: 'DRAFT', member_invitation_id: response_body['data']['draftExpenseAndInviteUser']['legacyId'], data: response_body['data']['draftExpenseAndInviteUser'])
     end
   end
+
+  def send_to_osc_collective(collective_slug, amount_cents)
+    query = <<-GQL
+      mutation(
+        $fromAccount: AccountReferenceInput!,
+        $toAccount: AccountReferenceInput!,
+        $amount: AmountInput!,
+        $frequency: ContributionFrequency!,
+        $isBalanceTransfer: Boolean!,
+        $paymentMethodId: String!
+      ) {
+        createOrder(order: {
+          fromAccount: $fromAccount,
+          toAccount: $toAccount,
+          amount: $amount,
+          frequency: $frequency,
+          isBalanceTransfer: $isBalanceTransfer,
+          paymentMethod: { id: $paymentMethodId }
+        }) {
+          order {
+            id
+            status
+            amount {
+              value
+              currency
+            }
+          }
+        }
+      }
+    GQL
+
+    variables = {
+      fromAccount: { slug: fund.oc_project_slug },
+      toAccount: { slug: collective_slug },
+      amount: { currency: "USD", valueInCents: amount_cents }, 
+      frequency: "ONETIME",
+      isBalanceTransfer: true,
+      paymentMethodId: fund.osc_payment_method['id']
+    }
+    payload = { query: query, variables: variables }.to_json
+
+    response = Faraday.post(
+      "https://staging.opencollective.com/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+      payload,
+      { 'Content-Type' => 'application/json' }
+    )
+
+    response_body = JSON.parse(response.body)
+
+    if response_body['errors']
+      puts "Error: #{response_body['errors']}"
+    else
+      puts "Order created successfully:"
+      puts JSON.pretty_generate(response_body['data']['createOrder'])
+      response_body['data']['createOrder']
+    end
+  end
+
+  def send_draft_expense_invitation(collective_slug, amount_cents, description)
+    query = <<-GQL
+      mutation(
+        $account: AccountReferenceInput!,
+        $expense: ExpenseInviteDraftInput!
+      ) {
+        draftExpenseAndInviteUser(
+          account: $account,
+          expense: $expense
+        ) {
+          id
+          status
+          amount
+          currency
+          description
+          payee {
+            ... on Collective {
+              slug
+            }
+          }
+        }
+      }
+    GQL
+  
+    variables = {
+      account: { slug: fund.oc_project_slug },          # Collective initiating the expense draft
+      expense: {
+        description: description,
+        longDescription: description,
+        currency: "USD",
+        type: "INVOICE",
+        items: [{ amount: amount_cents, description: description }],
+        payee: {
+          slug: collective_slug,
+          isInvite: true                                # Marking as an invite for the payee collective
+        },
+        payoutMethod: { type: "ACCOUNT_BALANCE" }       # Specify payout method, adjust if needed
+      }
+    }
+    payload = { query: query, variables: variables }.to_json
+  
+    response = Faraday.post(
+      "https://staging.opencollective.com/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+      payload,
+      { 'Content-Type' => 'application/json' }
+    )
+  
+    response_body = JSON.parse(response.body)
+  
+    if response_body['errors']
+      puts "Error: #{response_body['errors']}"
+    else
+      puts "Draft expense created successfully and invitation sent:"
+      puts JSON.pretty_generate(response_body['data']['draftExpenseAndInviteUser'])
+      response_body['data']['draftExpenseAndInviteUser']
+    end
+  end
+
+  def check_collective_existence(slug)
+    query = <<-GQL
+      query($slug: String!) {
+        account(slug: $slug) {
+          id
+          slug
+        }
+      }
+    GQL
+  
+    variables = { slug: slug }
+    payload = { query: query, variables: variables }.to_json
+  
+    response = Faraday.post(
+      "https://staging.opencollective.com/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+      payload,
+      { 'Content-Type' => 'application/json' }
+    )
+  
+    response_body = JSON.parse(response.body)
+    
+    if response_body['data'] && response_body['data']['account']
+      puts "Collective exists with slug: #{slug}"
+      return response_body['data']['account']
+    elsif response_body['errors']
+      puts "Error checking collective existence: #{response_body['errors']}"
+      return nil
+    else
+      puts "No existing collective with slug: #{slug}"
+      return nil
+    end
+  end
+
+  def create_vendor_collective(name)
+    query = <<-GQL
+      mutation($vendor: VendorCreateInput!, $host: AccountReferenceInput!) {
+        createVendor(
+          vendor: $vendor,
+          host: $host
+        ) {
+          id
+          legacyId
+          slug
+          type
+          name
+        }
+      }
+    GQL
+  
+    variables = {
+      vendor: {
+        name: name 
+      },
+      host: { slug: 'opencollective' } 
+    }
+    payload = { query: query, variables: variables }.to_json
+  
+    response = Faraday.post(
+      "https://staging.opencollective.com/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+      payload,
+      { 'Content-Type' => 'application/json' }
+    )
+  
+    response_body = JSON.parse(response.body)
+  
+    if response_body['data'] && response_body['data']['createVendor']
+      puts "Vendor collective created successfully:"
+      puts JSON.pretty_generate(response_body['data']['createVendor'])
+      response_body['data']['createVendor']
+    elsif response_body['errors']
+      puts "Error creating vendor collective: #{response_body['errors']}"
+      nil
+    else
+      puts "Unexpected response format: #{response_body}"
+      nil
+    end
+  end
+
+  def find_or_create_vendor(name)
+    if vendor = check_collective_existence(name)
+      return vendor
+    else
+      return create_vendor_collective(name)
+    end
+  end
 end

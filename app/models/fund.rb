@@ -399,4 +399,43 @@ class Fund < ApplicationRecord
 
     JSON.parse(resp.body)
   end
+
+  def get_all_oc_payment_methods
+    query = <<-GQL
+      query($accountSlug: String!) {
+        account(slug: $accountSlug) {
+          paymentMethods {
+            id
+            service
+            type
+          }
+        }
+      }
+    GQL
+
+    variables = { accountSlug: oc_project_slug }
+
+    payload = { query: query, variables: variables }.to_json
+
+    response = Faraday.post(
+      "https://staging.opencollective.com/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+      payload,
+      { 'Content-Type' => 'application/json' }
+    )
+
+    puts "Response status: #{response.status}"
+    puts "Response body: #{response.body}"
+
+    response_data = JSON.parse(response.body)
+
+    if response_data['errors']
+      puts "GraphQL Errors: #{response_data['errors']}"
+    else
+      return response_data['data']['account']['paymentMethods']
+    end
+  end
+
+  def osc_payment_method
+    get_all_oc_payment_methods.find { |pm| pm['service'] == 'OPENCOLLECTIVE' }
+  end
 end
