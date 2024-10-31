@@ -153,6 +153,7 @@ class Fund < ApplicationRecord
       setup_opencollective_project
     end
     setup_webhook
+    sync_transactions
     update_column(:last_synced_at, Time.zone.now)
   end
 
