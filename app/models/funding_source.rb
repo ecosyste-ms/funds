@@ -6,8 +6,8 @@ class FundingSource < ApplicationRecord
 
   scope :platform, ->(platform) { where(platform: platform) }
 
-  APPROVED_PLATFORMS = ['opencollective.com', 'github.com', 'tidelift.com', 'patreon.com', 
-  'liberapay.com', 'paypal.com', 'ko-fi.com', 'funding.communitybridge.org', 'buymeacoffee.com']
+  APPROVED_PLATFORMS = ['opencollective.com', 'github.com', 'patreon.com', 
+  'liberapay.com', 'ko-fi.com', 'funding.communitybridge.org', 'buymeacoffee.com']
 
   def approved?
     APPROVED_PLATFORMS.include?(platform)
