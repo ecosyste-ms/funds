@@ -251,7 +251,7 @@ class ProjectAllocation < ApplicationRecord
       vendor: {
         name: name 
       },
-      host: { slug: 'opencollective' } 
+      host: { slug: 'opensource' } 
     }
     payload = { query: query, variables: variables }.to_json
   
