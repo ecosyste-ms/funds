@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_10_30_180025) do
+ActiveRecord::Schema[7.2].define(version: 2024_11_04_151800) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_stat_statements"
@@ -123,6 +123,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_30_180025) do
     t.string "transaction_expense_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "legacy_id"
+    t.jsonb "order", default: {}
     t.index ["fund_id"], name: "index_transactions_on_fund_id"
     t.index ["uuid"], name: "index_transactions_on_uuid", unique: true
   end

@@ -13,6 +13,15 @@
     </p>
   <% end %>
 
+  <p>Current balance: <%= number_to_currency @fund.current_balance %></p>
+  <p>Total donations: <%= number_to_currency @fund.total_donations %></p>
+  <p>Total expenses: <%= number_to_currency @fund.total_expenses %></p>
+  <p>Total transactions: <%= number_with_delimiter @fund.transactions.count %></p>
+
+  <h3>Transactions</h3>
+  <%= render @transactions %>
+  <%== pagy_bootstrap_nav(@transactions_pagy) if @transactions_pagy.pages > 1 %>  
+
   <h3>Allocations</h3>
 
   <%= render @allocations %>
@@ -21,7 +30,7 @@
   <h3>Funded Projects</h3>
 
   <%= render @projects %>
-  <%== pagy_bootstrap_nav(@project_pagy) if @pagy.pages > 1 %>
+  <%== pagy_bootstrap_nav(@project_pagy) if @project_pagy.pages > 1 %>
 
   <p>
     <%= link_to 'See all possible projects', fund_projects_path(@fund) %>

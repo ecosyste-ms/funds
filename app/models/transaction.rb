@@ -8,4 +8,19 @@ class Transaction < ApplicationRecord
   scope :expenses, -> { where(transaction_type: 'DEBIT') }
   scope :host_fees, -> { where(transaction_kind: ['PAYMENT_PROCESSOR_FEE', 'PAYMENT_PROCESSOR_COVER', 'HOST_FEE'])}
   scope :not_host_fees, -> { where.not(transaction_kind: ['PAYMENT_PROCESSOR_FEE', 'PAYMENT_PROCESSOR_COVER', 'HOST_FEE'])}  
+
+  def html_url
+    return unless order.present?
+
+    if transaction_kind == 'CONTRIBUTION'
+      "https://staging.opencollective.com/#{fund.oc_project_slug}/contributions/#{order['legacyId']}"  
+    elsif transaction_kind == 'BALANCE_TRANSFER'
+      "https://staging.opencollective.com/#{account}/contributions/#{order['legacyId']}"  
+    elsif transaction_kind == 'EXPENSE' 
+      "https://staging.opencollective.com/#{account}/expenses/#{order['legacyId']}"  
+    else
+      nil
+    end
+    
+  end
 end

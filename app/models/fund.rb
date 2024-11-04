@@ -211,6 +211,7 @@ class Fund < ApplicationRecord
           slug
           type
           tags
+          imageUrl
           createdAt
           updatedAt
         }
@@ -250,6 +251,48 @@ class Fund < ApplicationRecord
       self.opencollective_project = project_data
       save
       return project_data
+    end
+  end
+
+  def add_image_to_opencollective_project
+    return unless opencollective_project_id.present?
+
+    query = <<~GRAPHQL
+    mutation EditAccountSetting($account: AccountReferenceInput!, $key: String!, $value: JSON!) {
+      editAccountSetting(account: $account, key: $key, value: $value) {
+        id
+        name
+        settings
+      }
+    }
+  GRAPHQL
+  
+  variables = {
+    account: { id: opencollective_project_id },
+    key: "collective.image",
+    value: logo_url
+  }
+
+    payload = { query: query, variables: variables }.to_json
+  
+    response = Faraday.post(
+      "https://staging.opencollective.com/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+      payload,
+      { 'Content-Type' => 'application/json' }
+    )
+  
+    puts "Response status: #{response.status}"
+    puts "Response body: #{response.body}"
+  
+    response_data = JSON.parse(response.body)
+  
+    if response_data['errors']
+      puts "GraphQL Errors: #{response_data['errors']}"
+      # TODO if slug already exists, load the project and save the id
+    else
+      account_data = response_data['data']['editAccount']
+      puts "Account edited! ID: #{account_data['id']}, Name: #{account_data['name']}, Image URL: #{account_data['imageUrl']}"
+      return account_data
     end
   end
 
@@ -324,6 +367,7 @@ class Fund < ApplicationRecord
       transactions = page['data']['transactions']['nodes'].map do |node|
         {
           fund_id: id,
+          legacy_id: node['legacyId'],
           uuid: node['uuid'],
           amount: node['amount']['value'],
           net_amount: node['netAmount']['value'],
@@ -332,6 +376,7 @@ class Fund < ApplicationRecord
           transaction_expense_type: node['expense'] ? node['expense']['type'] : nil,
           currency: node['amount']['currency'],
           account: node['type'] == 'DEBIT' ? node['toAccount']['slug'] : node['fromAccount']['slug'],
+          order: node['order'],
           created_at: node['createdAt'],
           description: node['description']
         }
@@ -360,6 +405,7 @@ class Fund < ApplicationRecord
           limit
           totalCount
           nodes {
+            legacyId
             uuid
             amount {
               value
@@ -373,6 +419,25 @@ class Fund < ApplicationRecord
             createdAt
             type
             kind
+            order {
+              id
+              legacyId
+              description
+              quantity
+              status
+              frequency
+              nextChargeDate
+              createdAt
+              updatedAt
+              hostFeePercent
+              platformTipEligible
+              tags
+              data
+              customData
+              memo
+              processedAt
+              needsConfirmation
+            }
             expense {
               type
             }

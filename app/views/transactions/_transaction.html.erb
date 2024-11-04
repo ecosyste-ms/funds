@@ -1,0 +1,27 @@
+<div class="card mb-3 project d-flex">
+  <div class="card-body pb-1">
+    <div class="d-flex">
+      
+      <div class="flex-grow-1 ms-3 text-break">
+        <% if @fund.nil? %>
+        <h5 class='card-title'>
+          <%= link_to transaction.fund, fund_path(transaction.fund) %>
+        </h5>
+        <% end %>
+      
+        <p class="card-subtitle mb-2 text-muted">
+          <%= number_with_delimiter transaction.net_amount.round(2) %> <%= transaction.currency %> - 
+          <%= transaction.description %>
+        </p>
+        
+        <p class="card-subtitle mb-2 text-muted"><i><small>
+          <%= link_to transaction.created_at.strftime("%d %b %Y"), transaction.html_url, target: :_blank %>
+        </small></i></p>
+
+      </div>
+      <div class="flex-shrink-0">
+        <img src="<%= transaction.fund.logo_url %>" class="rounded" height='40' width='40' onerror="this.style.display='none'">
+      </div>  
+    </div>
+  </div>
+</div>
