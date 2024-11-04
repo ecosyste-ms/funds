@@ -645,12 +645,17 @@ class Project < ApplicationRecord
   end
 
   def funding_links
-    @funding_links ||= (package_funding_links + repo_funding_links + owner_funding_links + repo_owner_funding_links + readme_funding_links).uniq
+    @funding_links ||= clean_funding_links(package_funding_links + repo_funding_links + owner_funding_links + repo_owner_funding_links + readme_funding_links).uniq
+  end
+
+  def clean_funding_links(links)
+    # reject any github links that are not sponsors
+    links.reject{|l| l.include?('github.com') && !l.include?('github.com/sponsors') }
   end
 
   def package_funding_links
     return [] unless packages.present?
-    packages.map{|pkg| pkg['metadata']['funding'] }.compact.map{|f| f.is_a?(Hash) ? f['url'] : f }.flatten.compact
+    clean_funding_links packages.map{|pkg| pkg['metadata']['funding'] }.compact.flatten.map{|f| f.is_a?(Hash) ? f['url'] : f }.flatten.compact.uniq
   end
 
   def repo_owner_funding_links
