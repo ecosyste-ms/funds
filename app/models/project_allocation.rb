@@ -277,7 +277,8 @@ class ProjectAllocation < ApplicationRecord
   
     variables = {
       vendor: {
-        name: name 
+        name: name,
+        vendorInfo: {}
       },
       host: { slug: 'opensource' } 
     }
