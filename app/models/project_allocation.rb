@@ -312,4 +312,49 @@ class ProjectAllocation < ApplicationRecord
       return create_vendor_collective(name)
     end
   end
+
+  def add_funds_to_vendor(vendor_slug, amount_cents, description)
+    query = <<-GQL
+      mutation AddFunds($fromAccount: AccountReferenceInput!, $account: AccountReferenceInput!, $amount: AmountInput!, $description: String!) {
+        addFunds(
+          fromAccount: $fromAccount,
+          account: $account,
+          amount: $amount,
+          description: $description
+        ) {
+          id
+          amount {
+            value
+            currency
+          }
+          description
+        }
+      }
+    GQL
+
+    variables = {
+        "fromAccount": { "slug": fund.oc_project_slug },
+        "account": { "slug": vendor_slug },
+        "amount": { "valueInCents": amount_cents, "currency": "USD" },
+        "description": "Funding for vendor services"
+    }
+
+    payload = { query: query, variables: variables }.to_json
+
+    response = Faraday.post(
+      "https://staging.opencollective.com/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+      payload,
+      { 'Content-Type' => 'application/json' }
+    )
+  
+    response_body = JSON.parse(response.body)
+
+    if response_body['errors']
+      puts "Error adding funds to vendor: #{response_body['errors']}"
+    else
+      puts "Funds added to vendor successfully:"
+      puts JSON.pretty_generate(response_body['data']['addFunds'])
+      response_body['data']['addFunds']
+    end
+  end
 end
