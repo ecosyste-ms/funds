@@ -114,6 +114,20 @@ class Fund < ApplicationRecord
     end
   end
 
+  def current_balance_cents
+    current_balance * 100
+  end
+
+  def allocate_to_projects
+    return unless has_funds_for_allocation?
+    
+    allocate(current_balance_cents)
+  end
+
+  def has_funds_for_allocation?
+    current_balance_cents >= minimum_for_allocation_cents
+  end
+
   def allocate(total_cents)
     return if total_cents < minimum_for_allocation_cents
     
