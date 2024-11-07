@@ -22,13 +22,17 @@ class ProjectAllocation < ApplicationRecord
     funding_source && funding_source.platform == 'opencollective.com' && funding_source.host != 'opensource'
   end
 
+  def collective_slug
+    funding_source.platform == 'opencollective.com' ? funding_source.name : nil
+  end
+
   def choose_payout_method
     if is_osc_collective?
       puts "  Sending to OSC collective: #{funding_source.name}"
       send_to_osc_collective(collective_slug, amount_cents)
     elsif is_non_osc_collective?
       puts "  Sending to non-OSC collective: #{funding_source.name}"
-      # send_draft_expense_invitation(collective_slug, amount_cents, description)
+      send_draft_expense_invitation(collective_slug, amount_cents, description)
     elsif approved_funding_source?
       puts "  Sending to approved funding source: #{funding_source.url}"
       proxy_collective = find_or_create_proxy_collective(funding_source.url)

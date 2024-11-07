@@ -133,4 +133,8 @@ class Allocation < ApplicationRecord
                        .transform_values { |pas| pas.sum(&:amount_cents) }
                        .sort_by { |platform, amount| -amount }
   end
+
+  def payout
+    project_allocations.find_each(&:choose_payout_method)
+  end
 end
