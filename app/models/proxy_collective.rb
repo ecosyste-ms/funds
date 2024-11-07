@@ -47,8 +47,8 @@ class ProxyCollective < ApplicationRecord
   end
 
   def self.create_by_website(url)
-    # create on opencollective
-    query = <<~GRAPHQL
+    # Define the mutation to create the project
+    create_project_mutation = <<~GRAPHQL
       mutation CreateProject($parent: AccountReferenceInput!, $project: ProjectCreateInput!) {
         createProject(parent: $parent, project: $project) {
           id
@@ -64,20 +64,33 @@ class ProxyCollective < ApplicationRecord
         }
       }
     GRAPHQL
-
+  
+    # Define the query to load the project by slug if needed
+    load_project_query = <<~GRAPHQL
+      query LoadProjectBySlug($slug: String!) {
+        account(slug: $slug) {
+          id
+          legacyId
+          name
+        }
+      }
+    GRAPHQL
+  
+    # Set up variables for project creation
+    project_slug = slug_from_url(url)
     variables = {
       parent: { slug: PROXY_PARENT_COLLECTIVE_SLUG },
       project: {
         name: name_from_url(url),
-        slug: slug_from_url(url),
+        slug: project_slug,
         description: description_from_url(url),
         tags: tags_from_url(url),
         # website: url
       }
     }
-
-    payload = { query: query, variables: variables }.to_json
   
+    # Send the createProject mutation
+    payload = { query: create_project_mutation, variables: variables }.to_json
     response = Faraday.post(
       "https://staging.opencollective.com/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
       payload,
@@ -89,10 +102,44 @@ class ProxyCollective < ApplicationRecord
   
     response_data = JSON.parse(response.body)
   
+    # Check for errors
     if response_data['errors']
       puts "GraphQL Errors: #{response_data['errors']}"
-      # TODO if slug already exists, load the project and save the id
+      
+      # Check if the error is specifically about the slug being taken
+      if response_data['errors'].any? { |error| error['message'].include?("slug '#{project_slug}' is already taken") }
+        # If the slug is taken, attempt to load the existing project by slug
+        load_payload = { query: load_project_query, variables: { slug: project_slug } }.to_json
+        load_response = Faraday.post(
+          "https://staging.opencollective.com/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+          load_payload,
+          { 'Content-Type' => 'application/json' }
+        )
+        
+        load_response_data = JSON.parse(load_response.body)
+        if load_response_data['data'] && load_response_data['data']['account']
+          project = load_response_data['data']['account']
+          puts "Project with slug already exists. Loaded project ID: #{project['id']}"
+          ProxyCollective.create(
+            uuid: project['id'],
+            legacy_id: project['legacyId'],
+            slug: project['slug'],
+            name: project['name'],
+            description: project['description'],
+            tags: project['tags'],
+            website: project['website'] || url,
+            image_url: project['imageUrl']
+          )
+        else
+          puts "Error: Project exists but could not be loaded."
+        end
+      else
+        # Handle other errors
+        error_messages = response_data['errors'].map { |error| error['message'] }.join(', ')
+        puts "Error creating project: #{error_messages}"
+      end
     else
+      # Project created successfully
       project = response_data['data']['createProject']
       puts "Project created: #{project['name']} (#{project['slug']})"
       ProxyCollective.create(
@@ -102,7 +149,7 @@ class ProxyCollective < ApplicationRecord
         name: project['name'],
         description: project['description'],
         tags: project['tags'],
-        website: project['website'],
+        website: project['website'] || url,
         image_url: project['imageUrl']
       )
     end
