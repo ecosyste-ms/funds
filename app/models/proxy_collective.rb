@@ -56,7 +56,6 @@ class ProxyCollective < ApplicationRecord
           name
           description
           slug
-          type
           tags
           website
           imageUrl
@@ -67,7 +66,7 @@ class ProxyCollective < ApplicationRecord
     GRAPHQL
 
     variables = {
-      parent: { slug: ENV['PROXY_PARENT_COLLECTIVE_SLUG'] },
+      parent: { slug: PROXY_PARENT_COLLECTIVE_SLUG },
       project: {
         name: name_from_url(url),
         slug: slug_from_url(url),
@@ -102,7 +101,6 @@ class ProxyCollective < ApplicationRecord
         slug: project['slug'],
         name: project['name'],
         description: project['description'],
-        type: project['type'],
         tags: project['tags'],
         website: project['website'],
         image_url: project['imageUrl']

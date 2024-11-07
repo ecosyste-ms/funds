@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_11_06_131840) do
+ActiveRecord::Schema[7.2].define(version: 2024_11_07_114809) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_stat_statements"
@@ -116,7 +116,6 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_06_131840) do
     t.string "slug"
     t.string "name"
     t.string "description"
-    t.string "type"
     t.string "tags", default: [], array: true
     t.string "image_url"
     t.string "website"
