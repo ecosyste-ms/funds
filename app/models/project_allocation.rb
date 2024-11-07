@@ -31,7 +31,7 @@ class ProjectAllocation < ApplicationRecord
       # send_draft_expense_invitation(collective_slug, amount_cents, description)
     elsif approved_funding_source?
       puts "  Sending to approved funding source: #{funding_source.url}"
-      # find_or_create_vendor(name)
+      # find_or_create_proxy_collective(name)
       # send_to_osc_collective(name, amount_cents)
     elsif project && project.contact_email.present?
       puts "  Sending expense invite: #{project.contact_email}"
@@ -259,7 +259,7 @@ class ProjectAllocation < ApplicationRecord
     end
   end
 
-  def create_vendor_collective(name)
+  def create_proxy_collective(name)
     query = <<-GQL
       mutation($vendor: VendorCreateInput!, $host: AccountReferenceInput!) {
         createVendor(
@@ -297,7 +297,7 @@ class ProjectAllocation < ApplicationRecord
       puts JSON.pretty_generate(response_body['data']['createVendor'])
       response_body['data']['createVendor']
     elsif response_body['errors']
-      puts "Error creating vendor collective: #{response_body['errors']}"
+      puts "Error creating proxy collective: #{response_body['errors']}"
       nil
     else
       puts "Unexpected response format: #{response_body}"
@@ -305,15 +305,15 @@ class ProjectAllocation < ApplicationRecord
     end
   end
 
-  def find_or_create_vendor(name)
-    if vendor = check_collective_existence(name)
-      return vendor
+  def find_or_create_proxy_collective(name)
+    if proxy_collective = check_collective_existence(name)
+      return proxy_collective
     else
-      return create_vendor_collective(name)
+      return create_proxy_collective(name)
     end
   end
 
-  def add_funds_to_vendor(vendor_slug, amount_cents, description)
+  def add_funds_to_proxy_collective(proxy_collective_slug, amount_cents, description)
     query = <<-GQL
       mutation AddFunds($fromAccount: AccountReferenceInput!, $account: AccountReferenceInput!, $amount: AmountInput!, $description: String!) {
         addFunds(
@@ -334,9 +334,9 @@ class ProjectAllocation < ApplicationRecord
 
     variables = {
         "fromAccount": { "slug": fund.oc_project_slug },
-        "account": { "slug": vendor_slug },
+        "account": { "slug": proxy_collective_slug },
         "amount": { "valueInCents": amount_cents, "currency": "USD" },
-        "description": "Funding for vendor services"
+        "description": "Funding for proxy collective services"
     }
 
     payload = { query: query, variables: variables }.to_json
@@ -350,9 +350,9 @@ class ProjectAllocation < ApplicationRecord
     response_body = JSON.parse(response.body)
 
     if response_body['errors']
-      puts "Error adding funds to vendor: #{response_body['errors']}"
+      puts "Error adding funds to proxy collective: #{response_body['errors']}"
     else
-      puts "Funds added to vendor successfully:"
+      puts "Funds added to proxy collective successfully:"
       puts JSON.pretty_generate(response_body['data']['addFunds'])
       response_body['data']['addFunds']
     end

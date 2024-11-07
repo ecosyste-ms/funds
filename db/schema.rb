@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_11_04_151800) do
+ActiveRecord::Schema[7.2].define(version: 2024_11_06_131840) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_stat_statements"
@@ -108,6 +108,20 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_04_151800) do
     t.string "licenses", default: [], array: true
     t.index ["funding_source_id"], name: "index_projects_on_funding_source_id"
     t.index ["url"], name: "index_projects_on_url", unique: true
+  end
+
+  create_table "proxy_collectives", force: :cascade do |t|
+    t.string "uuid"
+    t.string "legacy_id"
+    t.string "slug"
+    t.string "name"
+    t.string "description"
+    t.string "type"
+    t.string "tags", default: [], array: true
+    t.string "image_url"
+    t.string "website"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "transactions", force: :cascade do |t|

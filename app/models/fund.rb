@@ -225,6 +225,7 @@ class Fund < ApplicationRecord
           slug
           type
           tags
+          website
           imageUrl
           createdAt
           updatedAt
