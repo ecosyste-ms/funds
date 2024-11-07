@@ -25,17 +25,20 @@ class ProjectAllocation < ApplicationRecord
   def choose_payout_method
     if is_osc_collective?
       puts "  Sending to OSC collective: #{funding_source.name}"
-      # send_to_osc_collective(collective_slug, amount_cents)
+      send_to_osc_collective(collective_slug, amount_cents)
     elsif is_non_osc_collective?
       puts "  Sending to non-OSC collective: #{funding_source.name}"
       # send_draft_expense_invitation(collective_slug, amount_cents, description)
     elsif approved_funding_source?
       puts "  Sending to approved funding source: #{funding_source.url}"
-      # find_or_create_proxy_collective(name)
-      # send_to_osc_collective(name, amount_cents)
+      proxy_collective = find_or_create_proxy_collective(funding_source.url)
+      if proxy_collective
+        puts "  Adding funds to proxy collective: #{proxy_collective.slug}" 
+        send_to_osc_collective(proxy_collective.slug, amount_cents)
+      end
     elsif project && project.contact_email.present?
       puts "  Sending expense invite: #{project.contact_email}"
-      # send_expense_invite
+      send_expense_invite
     else
       puts "  No valid payout method found for #{project.to_s}"
        # can't pay
@@ -259,58 +262,8 @@ class ProjectAllocation < ApplicationRecord
     end
   end
 
-  def create_proxy_collective(name)
-    query = <<-GQL
-      mutation($vendor: VendorCreateInput!, $host: AccountReferenceInput!) {
-        createVendor(
-          vendor: $vendor,
-          host: $host
-        ) {
-          id
-          legacyId
-          slug
-          type
-          name
-        }
-      }
-    GQL
-  
-    variables = {
-      vendor: {
-        name: name,
-        vendorInfo: {}
-      },
-      host: { slug: 'opensource' } 
-    }
-    payload = { query: query, variables: variables }.to_json
-  
-    response = Faraday.post(
-      "https://staging.opencollective.com/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
-      payload,
-      { 'Content-Type' => 'application/json' }
-    )
-  
-    response_body = JSON.parse(response.body)
-  
-    if response_body['data'] && response_body['data']['createVendor']
-      puts "Vendor collective created successfully:"
-      puts JSON.pretty_generate(response_body['data']['createVendor'])
-      response_body['data']['createVendor']
-    elsif response_body['errors']
-      puts "Error creating proxy collective: #{response_body['errors']}"
-      nil
-    else
-      puts "Unexpected response format: #{response_body}"
-      nil
-    end
-  end
-
-  def find_or_create_proxy_collective(name)
-    if proxy_collective = check_collective_existence(name)
-      return proxy_collective
-    else
-      return create_proxy_collective(name)
-    end
+  def find_or_create_proxy_collective(url)
+    ProxyCollective.find_or_create_by_website(url)
   end
 
   def add_funds_to_proxy_collective(proxy_collective_slug, amount_cents, description)
