@@ -36,6 +36,7 @@
       </thead>
       <tbody>
         <% @project_allocations.each_with_index do |project_allocation, i| %>
+          <% next if project_allocation.project.nil? %>
           <tr>
             <td><%= i+1 %></td>
             <td><%= link_to project_allocation.project, project_allocation.project, target: :_blank %></td>
