@@ -1,19 +1,14 @@
-<div class="card mb-3 fund d-flex" id="fund_<%= fund.id %>">
-  <div class="card-body pb-1">
-    <div class="d-flex">
-      
-      <div class="flex-grow-1 ms-3 text-break">
-        <h5 class='card-title'>
-          <%= link_to fund.name, fund_path(fund) %>
-        </h5>
-      
-        <p class="card-subtitle mb-2 text-muted">
-          <%= fund.description %>
-        </p>
-      </div>
-      <div class="flex-shrink-0">
-        <img src="<%= fund.logo_url %>" class="rounded" height='40' width='40' onerror="this.style.display='none'">
-      </div>  
+<div class="col">
+  <div class="card" >
+    <img src="<%= fund.logo_url %>" class="card-img-top" onerror="this.style.display='none'">
+    <div class="card-body">
+      <h5 class="card-title">
+        <%= link_to fund.name, fund_path(fund) %>
+      </h5>
+      <p class="card-text">
+        <%= fund.description %>
+      </p>
+      <%= link_to 'Explore', fund_path(fund), class: 'btn btn-primary' %>
     </div>
   </div>
 </div>
