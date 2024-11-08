@@ -7,14 +7,8 @@ class FundsController < ApplicationController
   def show
     @fund = Fund.find_by(slug: params[:id])
 
-    @allocations = @fund.allocations.displayable
-    @pagy, @allocations = pagy(@allocations)
-    
-    @projects = @fund.projects
-    @project_pagy, @projects = pagy(@projects)
-
-    @transactions = @fund.transactions
-    @transactions_pagy, @transactions = pagy(@transactions)
+    @allocation = @fund.allocations.order('created_at DESC').first
+    @project_allocations = @allocation.project_allocations.includes(:project, :funding_source).order('amount_cents desc').where('amount_cents >= 1')
   end
 
   def transactions

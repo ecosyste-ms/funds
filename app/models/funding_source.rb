@@ -28,6 +28,19 @@ class FundingSource < ApplicationRecord
     end
   end
 
+  def platform_name
+    return 'GitHub Sponsors' if platform == 'github.com'
+    platform.split('.').first
+  end
+
+  def full_name
+    if approved?
+    "#{name} (#{platform_name})"
+    else
+      platform
+    end
+  end
+
   def host
     return nill unless platform == 'opencollective.com'
 

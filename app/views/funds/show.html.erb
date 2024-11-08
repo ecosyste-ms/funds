@@ -1,39 +1,58 @@
-<div class="container-sm">
-  <h1>
+<div class="container">
+    <h1 class='float-start'>
     <%= @fund.name %>
   </h1>
+
+  <% if @fund.open_collective_project_url.present? %>
+    <div class="clearfix">
+      <%= link_to "Fund the #{@fund.name} Ecosystem on Open Collective", @fund.open_collective_project_url, class: 'btn btn-primary float-end' %>
+    </div>
+  <% end %>
 
   <p>
     <%= @fund.description %>
   </p>
 
-  <% if @fund.open_collective_project_url.present? %>
-    <p>
-      Donate on Open Collective: <%= link_to @fund.open_collective_project_url, @fund.open_collective_project_url %>
-    </p>
+  
+  <% if @allocation %>
+    
+        <table class="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Project</th>
+          <th>Amount</th>
+          <th>Score</th>
+          <th>Funding Platform</th>
+        </tr>
+        </tr>
+      </thead>
+      <tbody>
+        <% @project_allocations.each_with_index do |project_allocation, i| %>
+          <% next if project_allocation.project.nil? %>
+          <tr>
+            <td><%= i+1 %></td>
+            <td><%= link_to project_allocation.project, project_allocation.project.url, target: :_blank %></td>
+            <td>$<%= project_allocation.amount_cents/100.0 %></td>
+            <td><%= project_allocation.score.round(4) %></td>
+            <td>
+              <% if project_allocation.funding_source %>
+                <%= link_to project_allocation.funding_source.url, target: :_blank do %>
+                  <%= project_allocation.funding_source.full_name.truncate(40) %>
+                <% end %>
+              <% else %>
+                Pending
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+  <% else%>
+
+    <p>Coming soon...</p>
+
   <% end %>
-
-  <p>Current balance: <%= number_to_currency @fund.current_balance %></p>
-  <p>Total donations: <%= number_to_currency @fund.total_donations %></p>
-  <p>Total expenses: <%= number_to_currency @fund.total_expenses %></p>
-  <p>Total transactions: <%= number_with_delimiter @fund.transactions.count %></p>
-
-  <h3>Transactions</h3>
-  <%= render @transactions %>
-  <%== pagy_bootstrap_nav(@transactions_pagy) if @transactions_pagy.pages > 1 %>  
-
-  <h3>Allocations</h3>
-
-  <%= render @allocations %>
-  <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>  
-
-  <h3>Funded Projects</h3>
-
-  <%= render @projects %>
-  <%== pagy_bootstrap_nav(@project_pagy) if @project_pagy.pages > 1 %>
-
-  <p>
-    <%= link_to 'See all possible projects', fund_projects_path(@fund) %>
-  </p>
 </div>
 
