@@ -104,7 +104,7 @@ class Allocation < ApplicationRecord
   end
 
   def default_minimum_allocation
-    1000 # cents
+    50_00 # cents
   end
 
   def default_weights
