@@ -34,7 +34,7 @@
             <td><%= i+1 %></td>
             <td><%= link_to project_allocation.project, project_allocation.project.url, target: :_blank %></td>
             <td>$<%= project_allocation.amount_cents/100.0 %></td>
-            <td><%= project_allocation.score.round(4) %></td>
+            <td><%= project_allocation.score.round(3) %></td>
             <td>
               <% if project_allocation.funding_source %>
                 <%= link_to project_allocation.funding_source.url, target: :_blank do %>
