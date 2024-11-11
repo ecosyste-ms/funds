@@ -85,7 +85,7 @@ class ProxyCollective < ApplicationRecord
         slug: project_slug,
         description: description_from_url(url),
         tags: tags_from_url(url),
-        # website: url
+        # website: url # TOOD enable this once the website field is supported on OpenCollective.com
       }
     }
   
