@@ -17,8 +17,7 @@ Once you've got all of those installed, from the root directory of the project r
 
 ```
 bundle install
-bundle exec rake db:create
-bundle exec rake db:migrate
+bundle exec rake db:setup
 rails server
 ```
 
