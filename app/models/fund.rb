@@ -31,6 +31,24 @@ class Fund < ApplicationRecord
     super || default_minimum_for_allocation_cents
   end
 
+  def self.import_suggested_topics
+    url = "https://awesome.ecosyste.ms/api/v1/topics/suggestions?per_page=1000"
+
+    resp = Faraday.get url
+    return unless resp.status == 200
+
+    data = JSON.parse(resp.body)
+    data.each do |topic|
+      fund = Fund.find_or_create_by(name: topic['name'], slug: topic['slug'])
+      fund.primary_topic = topic['slug']
+      fund.secondary_topics = topic['aliases']
+      fund.description = topic['short_description']
+      fund.wikipedia_url = topic['wikipedia_url']
+      fund.github_url = topic['github_url']
+      fund.save!
+    end
+  end
+
   def self.import_from_topic(topic)
     topic_url = "https://awesome.ecosyste.ms/api/v1/topics/#{topic}"
 
