@@ -10,6 +10,7 @@ class Fund < ApplicationRecord
   scope :project_legacy_id, ->(id) { where("opencollective_project->>'legacyId' = ?", id) }
 
   scope :featured, -> { where(featured: true) }
+  scope :not_featured, -> { where(featured: false) }
 
   def self.sync_least_recently_synced    
     Fund.where(last_synced_at: nil).or(Fund.where("last_synced_at < ?", 1.day.ago)).order('last_synced_at asc nulls first').limit(500).each do |fund|
