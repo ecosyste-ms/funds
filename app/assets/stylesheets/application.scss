@@ -1,12 +1,3 @@
-@import "bootstrap"; 
-
-.text-decoration-hover{
-  text-decoration: none;
-  &:hover{
-    text-decoration: underline;
-  }
-}
-
 /* Variables */
 $color-purple: #7878EF;
 $color-purple-light: #BBBBFF;
@@ -23,6 +14,26 @@ $color-green-dark: #2EAF6B;
 $color-black: #1D1D28;
 $color-white: #FFFFFF;
 
+$font-family-base: "Inter", sans-serif;
+$font-size-base: 1.125rem; //18px
+$line-height-base: 1.3334;
+
+$body-font-weight: 400;
+
+@import "bootstrap"; 
+
+.text-decoration-hover{
+  text-decoration: none;
+  &:hover{
+    text-decoration: underline;
+  }
+}
+
+
+
+body {
+  font-optical-sizing: auto;
+}
 
 
 .site-logo {
