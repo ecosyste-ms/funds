@@ -30,7 +30,7 @@ $color-white: #FFFFFF;
   line-height: 0;
   color: transparent;
 
-  background-image: url('../assets/eco-systems-funds-logo.svg');
+  background-image: asset-url('eco-systems-funds-logo.svg');
   background-position: center;
   background-repeat: no-repeat;
   background-size: contain;
@@ -41,7 +41,7 @@ $color-white: #FFFFFF;
 }
 
 .site-logo--white {
-  background-image: url('../assets/eco-systems-funds-logo-white.svg');
+  background-image: asset-url('.eco-systems-funds-logo-white.svg');
 }
 
 
