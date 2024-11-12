@@ -13,7 +13,7 @@ class Fund < ApplicationRecord
   scope :not_featured, -> { where(featured: false) }
 
   def self.sync_least_recently_synced    
-    Fund.where(last_synced_at: nil).or(Fund.where("last_synced_at < ?", 1.day.ago)).order('last_synced_at asc nulls first').limit(500).each do |fund|
+    Fund.where(last_synced_at: nil).or(Fund.where("last_synced_at < ?", 1.day.ago)).order('last_synced_at asc nulls first').limit(10).each do |fund|
       fund.sync_async
     end
   end
