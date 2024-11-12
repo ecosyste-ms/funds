@@ -6,3 +6,22 @@
     text-decoration: underline;
   }
 }
+
+/*  Header */
+.header {
+  margin: 2em 0;
+}
+.site-logo {
+  font-size: 0;
+  line-height: 0;
+  color: transparent;
+
+  background-image: url('../assets/eco-systems-funds-logo.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  display: inline-block;
+
+  width: 350px;
+  height: 50px; 
+}
