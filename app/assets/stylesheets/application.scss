@@ -71,3 +71,9 @@ $color-white: #FFFFFF;
   margin-top: 4em;
 }
 
+.footer-links {
+ 
+  @include media-breakpoint-up(md) {
+    text-align: right;
+  }
+}
