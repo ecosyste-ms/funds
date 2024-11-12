@@ -72,10 +72,11 @@ funds = [
 ]
 
 funds.each do |fund|
-  Fund.find_or_create_by(slug: fund[:slug]) do |f|
-    f.name = fund[:name]
-    f.description = fund[:description]
-    f.registry_name = fund[:registry_name]
-    f.featured = fund[:featured] || false
-  end
+  f = Fund.find_or_create_by(slug: fund[:slug]) 
+  f.name = fund[:name]
+  f.description = fund[:description]
+  f.registry_name = fund[:registry_name]
+  f.featured = fund[:featured] || false
+  f.save
+
 end
