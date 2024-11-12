@@ -8,7 +8,9 @@ class FundsController < ApplicationController
     @fund = Fund.find_by(slug: params[:id])
 
     @allocation = @fund.allocations.order('created_at DESC').first
-    @project_allocations = @allocation.project_allocations.includes(:project, :funding_source).order('amount_cents desc').where('amount_cents >= 1')
+    if @allocation
+      @project_allocations = @allocation.project_allocations.includes(:project, :funding_source).order('amount_cents desc').where('amount_cents >= 1')
+    end
   end
 
   def transactions
