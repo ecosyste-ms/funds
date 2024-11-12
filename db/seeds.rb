@@ -3,19 +3,22 @@ funds = [
     name: 'Ruby',
     slug: 'ruby',
     description: "Fund for the most critical ruby packages on rubygems.org",
-    registry_name: "rubygems.org"
+    registry_name: "rubygems.org",
+    featured: true
   },
   {
     name: 'JavaScript',
     slug: 'javascript',
     description: "Fund for the most critical javascript packages on npmjs.com",
     registry_name: "npmjs.org",
+    featured: true
   },
   {
     name: 'Python',
     slug: 'python',
     description: "Fund for the most critical python packages on pypi.org",
-    registry_name: "pypi.org"
+    registry_name: "pypi.org",
+    featured: true
   },
   {
     name: 'Java',
@@ -33,7 +36,8 @@ funds = [
     name: 'Rust',
     slug: 'rust',
     description: "Fund for the most critical rust packages on crates.io",
-    registry_name: "crates.io"
+    registry_name: "crates.io",
+    featured: true
   },
   {
     name: 'Go',
@@ -54,12 +58,6 @@ funds = [
     registry_name: "pub.dev"
   },
   {
-    name: '.NET',
-    slug: 'dotnet',
-    description: "Fund for the most critical .Net packages on nuget.org",
-    registry_name: "nuget.org"
-  },
-  {
     name: 'Elixir',
     slug: 'elixir',
     description: "Fund for the most critical elixir packages on hex.pm",
@@ -78,5 +76,6 @@ funds.each do |fund|
     f.name = fund[:name]
     f.description = fund[:description]
     f.registry_name = fund[:registry_name]
+    f.featured = fund[:featured] || false
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_11_07_114809) do
+ActiveRecord::Schema[7.2].define(version: 2024_11_12_153831) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_stat_statements"
@@ -59,6 +59,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_07_114809) do
     t.datetime "last_synced_at"
     t.integer "transactions_count", default: 0
     t.float "balance", default: 0.0
+    t.boolean "featured", default: false
   end
 
   create_table "invitations", force: :cascade do |t|
