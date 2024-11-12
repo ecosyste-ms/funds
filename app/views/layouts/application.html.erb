@@ -16,8 +16,8 @@
     <div class="main">
       <div class="container">
         <header class="header">
-          <h1 class="site-logo">
-            <a href="/" class="text-decoration-hover link-dark">Ecosyste.ms: Funds</a>
+          <h1 >
+            <a class="site-logo" href="/" >Ecosyste.ms: Funds</a>
           </h1>
         </header>
       </div>
@@ -25,20 +25,30 @@
       <%= yield %>
     </div>
 
-    <footer class="py-5 container-sm text-muted text-center">
-      <%= link_to 'About', 'https://ecosyste.ms', class: 'link-dark', target: :_blank  %> — 
-      <%= link_to 'Blog', "https://blog.ecosyste.ms", class: 'link-dark', target: :_blank  %> — 
-      <%#= link_to 'API', rswag_ui_path, class: 'link-dark', target: :_blank  %> — 
-      <%#= link_to 'Open Data', exports_path, class: 'link-dark' %> — 
-      <%= link_to 'Status', 'https://ecosystems.appsignal-status.com/', class: 'link-dark', target: :_blank  %>
-      <br/>
-      <%= link_to 'GitHub', "https://github.com/ecosyste-ms/funds", class: 'link-dark', target: :_blank  %> —
-      <%= link_to 'Open Collective', "https://opencollective.com/ecosystems", class: 'link-dark', target: :_blank  %> —  
-      <%= link_to 'Twitter', "https://twitter.com/ecosyste_ms", class: 'link-dark', target: :_blank  %> —  
-      <%= link_to 'Mastodon', "https://mastodon.social/@ecosystems", class: 'link-dark', target: :_blank  %>
-      <br/>
-      Code: <%= link_to 'AGPL-3', 'https://github.com/ecosyste-ms/funds/blob/main/LICENSE', class: 'link-dark' %>  — 
-      Data: <%= link_to 'CC BY-SA 4.0', 'https://creativecommons.org/licenses/by-sa/4.0/', class: 'link-dark', target: :_blank %>
+    <footer class="footer dark-section">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-8">
+            <a class="site-logo site-logo--white" href="/">Ecosyste.ms: Funds</a>
+            <p>An open source funding solution from <a href="/">ecosyste.ms</a> &amp; <a href="https://oscollective.org">Open Source Collective</a>.</p>
+          </div>
+          <div class="col-md-4">
+            <%= link_to 'About', 'https://ecosyste.ms', target: :_blank  %> — 
+            <%= link_to 'Blog', "https://blog.ecosyste.ms", target: :_blank  %> — 
+            <%#= link_to 'API', rswag_ui_path, target: :_blank  %> — 
+            <%#= link_to 'Open Data', exports_pathn%> — 
+            <%= link_to 'Status', 'https://ecosystems.appsignal-status.com/', target: :_blank  %>
+            <br/>
+            <%= link_to 'GitHub', "https://github.com/ecosyste-ms/funds", target: :_blank  %> —
+            <%= link_to 'Open Collective', "https://opencollective.com/ecosystems", target: :_blank  %> —  
+            <%= link_to 'Twitter', "https://twitter.com/ecosyste_ms", target: :_blank  %> —  
+            <%= link_to 'Mastodon', "https://mastodon.social/@ecosystems", target: :_blank  %>
+            <br/>
+            Code: <%= link_to 'AGPL-3', 'https://github.com/ecosyste-ms/funds/blob/main/LICENSE' %>  — 
+            Data: <%= link_to 'CC BY-SA 4.0', 'https://creativecommons.org/licenses/by-sa/4.0/', target: :_blank %>
+          </div>
+        </div>
+      </div>
     </footer>
   </body>
 </html>
