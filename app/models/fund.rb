@@ -11,7 +11,7 @@ class Fund < ApplicationRecord
 
   def self.sync_least_recently_synced    
     Fund.where(last_synced_at: nil).or(Fund.where("last_synced_at < ?", 1.day.ago)).order('last_synced_at asc nulls first').limit(500).each do |fund|
-      fund.sync_opencollective_project_async
+      fund.sync_async
     end
   end
 
@@ -66,6 +66,19 @@ class Fund < ApplicationRecord
     fund.github_url = topic['github_url']
 
     fund.save!
+  end
+
+  def sync
+    sync_opencollective_project
+    if registry_name.present?
+      import_projects_from_critical_packages
+    else
+      import_projects
+    end
+  end
+
+  def sync_async
+    SyncFundWorker.perform_async(id)
   end
 
   def logo_url
