@@ -6,7 +6,10 @@
         <%= link_to fund.name, fund_path(fund) %>
       </h5>
       <p class="card-text">
-        <%= fund.description %>
+        Distributed: <%= number_to_currency fund.total_distributed_cents/100 %><br/>
+        From <%= pluralize fund.total_donors, 'Funder'%><br/>
+        To <%= pluralize fund.total_funded_projects, 'Projects' %> 
+
       </p>
       <%= link_to 'Explore', fund_path(fund), class: 'btn btn-primary' %>
     </div>

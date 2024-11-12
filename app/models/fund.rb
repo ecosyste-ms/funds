@@ -403,6 +403,18 @@ class Fund < ApplicationRecord
     transactions.sum(:net_amount)
   end
 
+  def total_donors
+    transactions.donations.distinct.count(:account)
+  end
+
+  def total_distributed_cents
+    allocations.sum(&:total_allocated_cents)
+  end
+
+  def total_funded_projects
+    allocations.sum{|a| a.funded_projects_count || 0 }
+  end
+
   def sync_transactions
     first_page = fetch_transactions_from_graphql # TODO handle errors
     total_count = first_page['data']['transactions']['totalCount']
