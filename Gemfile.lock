@@ -153,7 +153,7 @@ GEM
     google-protobuf (4.28.3-x86_64-linux)
       bigdecimal
       rake (>= 13)
-    hashdiff (1.1.1)
+    hashdiff (1.1.2)
     i18n (1.14.6)
       concurrent-ruby (~> 1.0)
     io-console (0.7.2)
