@@ -98,6 +98,7 @@ class Fund < ApplicationRecord
   def import_projects_from_packages(keyword)
     page = 1
     loop do
+      break if page > 30
       puts "Fetching page #{page} of projects for #{name}"
       resp = Faraday.get("https://packages.ecosyste.ms/api/v1/keywords/#{keyword}?per_page=100&page=#{page}")
       break unless resp.status == 200
