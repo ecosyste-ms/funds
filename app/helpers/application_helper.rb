@@ -12,4 +12,12 @@ module ApplicationHelper
       end
     end.join('@')
   end
+
+  def meta_title
+    [@meta_title, 'Ecosyste.ms: Funds'].compact.join(' | ')
+  end
+
+  def meta_description
+    @meta_description || 'An open source funding solution from ecosyste.ms & Open Source Collective.'
+  end
 end
