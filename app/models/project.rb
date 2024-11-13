@@ -650,7 +650,7 @@ class Project < ApplicationRecord
 
   def clean_funding_links(links)
     # reject any github links that are not sponsors
-    links.reject{|l| l.include?('github.com') && !l.include?('github.com/sponsors') }
+    links.reject { |l| l.is_a?(String) && l.include?('github.com') && !l.include?('github.com/sponsors') }
   end
 
   def package_funding_links
