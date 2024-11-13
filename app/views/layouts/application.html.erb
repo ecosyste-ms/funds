@@ -12,6 +12,9 @@
 
     <%= yield :head %>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <%= stylesheet_link_tag "application" %>
   </head>
 
@@ -33,8 +36,8 @@
         <div class="row">
           <div class="col-md-8">
             <a class="site-logo site-logo--white" href="/">Ecosyste.ms: Funds</a>
-            <p>An open source funding solution from <a href="/"><strong>ecosyste.ms</strong></a> &amp; <a href="https://oscollective.org"><strong>Open Source Collective</strong></a>.</p>
-            <p>
+            <p class="small">An open source funding solution from <a href="/"><strong>ecosyste.ms</strong></a> &amp; <a href="https://oscollective.org"><strong>Open Source Collective</strong></a>.</p>
+            <p class="small">
               Code: <%= link_to 'AGPL-3', 'https://github.com/ecosyste-ms/documentation/blob/main/LICENSE' %>  — 
               Data: <%= link_to 'CC BY-SA 4.0', 'https://creativecommons.org/licenses/by-sa/4.0/', target: :_blank %>
             </p>
@@ -54,7 +57,7 @@
             </p>
           </div>
           <div class="col-md-4">
-            <ul class="list-unstyled footer-links mt-3">
+            <ul class="list-unstyled footer-links small">
               <li><strong><%= link_to 'About', 'https://ecosyste.ms' %></strong></li>
               <li><strong><%= link_to 'Blog', 'https://blog.ecosyste.ms' %></strong></li>
               <li><strong><%= link_to 'Contact', 'https://twitter.com/ecosyste_ms' %></strong></li>
