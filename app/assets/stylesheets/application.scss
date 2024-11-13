@@ -15,6 +15,7 @@ $color-green-dark: #2EAF6B;
 
 $color-black: #1D1D28;
 $color-white: #FFFFFF;
+$color-grey: #D9D9D9;
 
 /* Typography */
 $font-family-base: "Inter", sans-serif;
@@ -22,7 +23,7 @@ $font-size-base: 1.125rem; //18px
 $font-size-small: 0.88889rem; //16px
 
 $line-height-base: 1.3334;
-$headings-line-height: 1.3334;
+$headings-line-height: 1.1;
 
 $h1-font-size: 2.9375rem; //47px
 $h2-font-size: 2.1875rem; //35px
@@ -31,6 +32,11 @@ $h4-font-size: 1.25rem; //20px
 
 $body-font-weight: 400;
 $headings-font-weight: 700;
+$display-font-weight: 900;
+$lead-font-weight: 400;
+
+
+
 
 @import "bootstrap"; 
 
@@ -41,12 +47,9 @@ $headings-font-weight: 700;
   }
 }
 
-
-
 body {
   font-optical-sizing: auto;
 }
-
 
 .site-logo {
   font-size: 0;
@@ -82,6 +85,9 @@ body {
     
   }
 }
+.extra-bold {
+  font-weight: 900;
+}
 
 /*  Header */
 .header {
@@ -114,3 +120,66 @@ body {
     text-decoration: none;
   }
 }
+.lead {
+  @include font-size(1.625rem);
+}
+
+/* Hero */
+.hero {
+  .lead {
+    max-width: 34rem;
+    margin: 0 auto;
+  }
+}
+
+/* Callout box used for link to announcement */
+.callout {
+  border: 1px solid $color-grey;
+  border-radius: 1.5rem;
+  line-height: 1em;
+  height: 7.5rem;
+  padding: 0 1.5em;
+ 
+  display: flex;
+  align-items: center; 
+  justify-content: center; 
+}
+
+.spesh-link {
+  color: $color-black;
+  text-decoration: none;
+  position: relative;
+  &::after {
+    content: '';                         
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 100%;
+    height: 4px;
+    background-color: $color-green;
+    z-index: -1;
+    border-radius: 4px;
+  }
+  &:hover {
+    &::after {
+      background-color: $color-orange;
+    }
+  }
+}
+
+.btn-primary {
+    background-color: $color-green-dark;
+    border-color: $color-green-dark;
+    padding: 0.5em 1em;
+  &:hover,
+  &:focus {
+    background-color: darken($color-green-dark, 10%);
+    border-color: darken($color-green-dark, 10%);
+  }
+  &:active {
+    background-color: $color-orange-dark !important;
+    border-color: $color-orange !important;
+  }
+
+}
+
