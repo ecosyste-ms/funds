@@ -149,6 +149,7 @@ body {
   color: $color-black;
   text-decoration: none;
   position: relative;
+  z-index: 1;
   &::after {
     content: '';                         
     position: absolute;
@@ -171,6 +172,7 @@ body {
     background-color: $color-green-dark;
     border-color: $color-green-dark;
     padding: 0.5em 1em;
+    font-weight: 600;
   &:hover,
   &:focus {
     background-color: darken($color-green-dark, 10%);
@@ -183,3 +185,53 @@ body {
 
 }
 
+.fund-card {
+  border: 0;
+  img {
+    border-radius: 0;
+  }
+  &:hover {
+    box-shadow: 0px 7px 24px rgba(187, 187, 255, 1);
+  }
+}
+
+.label {
+  display: block;
+  @include font-size(0.875rem);
+}
+
+.fund-card--small {
+  .card-title {
+    @include font-size(1rem);
+    margin-bottom: 0;
+  }
+  a {
+    text-decoration: none;
+    color: $color-black;
+  }
+  .card-img-top {
+    max-width: 100px;
+    max-height: 100px;
+    margin: 0 auto;
+  }
+}
+
+.purple-bg-grad {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F5F5FF 100%);
+}
+
+/* all the nasty code for the homepage funds section */
+.fund-promo-section {
+  position: relative;
+  margin-bottom: -100px;
+  &::after {
+    content: '';      
+    display: block;
+    width: 100%;
+    height: 254px;
+    background-image: linear-gradient(to bottom, #ffffff00 0%, #F5F5FF 70%);
+    z-index: 2;
+    position: absolute;
+    bottom: 0;
+  }
+}

@@ -17,49 +17,53 @@
   </div>
 
   </div>
-
-  <div class="row mt-5">
-    <h2 class="h1 col col-lg-10 col-xl-8 mb-5 extra-bold">Sponsor the technology you rely on, we'll do the rest.</h2>
-  </div>
-  
-  <div class="row row-cols-2 row-cols-md-4 row-cols-lg-4 g-4 mb-5">
+</div>
+<div class="purple-bg-grad fund-promo-section ">
+  <div class="container">
+    <div class="row mt-5">
+      <h2 class="h1 col col-lg-10 col-xl-8 mb-5 extra-bold">Sponsor the technology you rely on, we'll do the rest.</h2>
+    </div>
     
-    
-    <% @featured_funds.each do |fund| %>
-      <div class="col">
-        <div class="card" >
-          <img src="<%= fund.logo_url %>" class="card-img-top" onerror="this.style.display='none'">
-          <div class="card-body">
-            <h5 class="card-title">
-              <%= link_to fund.name, fund_path(fund) %>
-            </h5>
-            <p class="card-text">
-              Distributed: <%= number_to_currency fund.total_distributed_cents/100 %><br/>
-              From <%= pluralize fund.total_donors, 'Funder'%><br/>
-              To <%= pluralize fund.total_funded_projects, 'Projects' %>
-            </p>
+    <div class="row mb-5">
+      
+      
+      <% @featured_funds.each do |fund| %>
+        <div class="col-lg-3">
+          <div class="card fund-card p-4 mb-3 mb-md-0">
+            <div class="row align-items-center align-items-stretch">
+              <div class="col-8">
+                <h3 class="mb-3"><%= link_to fund.name, fund_path(fund), class: "spesh-link" %></h3>
+                <p><span class="label">Distributed</span><strong class="value"><%= number_to_currency fund.total_distributed_cents/100 %></strong></p>
+                <p><span class="label">From</span><strong class="value"><%= pluralize fund.total_donors, 'Funder'%></strong></p>
+                <p><span class="label">To</span><strong class="value"><%= pluralize fund.total_funded_projects, 'Projects' %></strong></p>
+              </div>
+              <div class="col-4 text-end">
+                <img src="<%= fund.logo_url %>" alt="" class="card-img-top img-fluid" onerror="this.style.display='none'" style="max-width: 60px;">
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    <% end %>
+      <% end %>
 
-  </div>
+    </div>
 
-  <div class="row row-cols-4 row-cols-md-6 row-cols-lg-6 g-2">
-    <% @funds.each do |fund| %>
-      <div class="col">
-        <div class="card" >
-          <img src="<%= fund.logo_url %>" class="card-img-top" onerror="this.style.display='none'">
-          <div class="card-body">
-            <h5 class="card-title">
-              <%= link_to fund.name, fund_path(fund) %>
-            </h5>
+    <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-5">
+      <% @funds.each do |fund| %>
+        <div class="col-lg">
+          <div class="fund-card fund-card--small card text-center  p-4">
+            <img src="<%= fund.logo_url %>" class="card-img-top" onerror="this.style.display='none'">
+            <div class="card-body">
+              <h3 class="card-title">
+                <%= link_to fund.name, fund_path(fund) %>
+              </h3>
+            </div>
           </div>
         </div>
-      </div>
-    <% end %>
+      <% end %>
+    </div>
   </div>
-
+</div>
+<div class="container">
 
   <div class="row my-5">
     <div class="text-center col-12 my-5">
