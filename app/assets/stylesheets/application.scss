@@ -1,4 +1,6 @@
 /* Variables */
+
+/* Colors */
 $color-purple: #7878EF;
 $color-purple-light: #BBBBFF;
 $color-purple-dark: #5C5CCF;
@@ -14,11 +16,21 @@ $color-green-dark: #2EAF6B;
 $color-black: #1D1D28;
 $color-white: #FFFFFF;
 
+/* Typography */
 $font-family-base: "Inter", sans-serif;
 $font-size-base: 1.125rem; //18px
+$font-size-small: 0.88889rem; //16px
+
 $line-height-base: 1.3334;
+$headings-line-height: 1.3334;
+
+$h1-font-size: 2.9375rem; //47px
+$h2-font-size: 2.1875rem; //35px
+$h3-font-size: 1.625rem; //26px
+$h4-font-size: 1.25rem; //20px
 
 $body-font-weight: 400;
+$headings-font-weight: 700;
 
 @import "bootstrap"; 
 
@@ -83,9 +95,15 @@ body {
 }
 
 .footer-links {
- 
+  margin-top: 1rem;
   @include media-breakpoint-up(md) {
     text-align: right;
+  }
+  a {
+    text-decoration: none;
+  }
+  li {
+    margin-bottom: 0.25rem;
   }
 }
 
