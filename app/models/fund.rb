@@ -85,7 +85,16 @@ class Fund < ApplicationRecord
   end
 
   def logo_url
-    "https://explore-feed.github.com/topics/#{slug}/#{slug}.png"
+    if github_owner_url.present?
+      github_owner_url + '.png'
+    else
+      "https://explore-feed.github.com/topics/#{slug}/#{slug}.png"
+    end
+  end
+
+  def github_owner_url
+    return nil if github_url.blank?
+    github_url.split('/')[0..3].join('/')
   end
 
   def all_keywords
