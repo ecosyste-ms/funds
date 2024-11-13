@@ -17,6 +17,7 @@ gem "pagy"
 gem "pghero"
 gem "pg_query"
 gem 'bootstrap'
+gem 'bootstrap-icons-helper'
 gem "rack-attack"
 gem "rack-attack-rate-limit", require: "rack/attack/rate-limit"
 gem 'rack-cors'

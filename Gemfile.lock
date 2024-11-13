@@ -91,6 +91,11 @@ GEM
     bootstrap (5.3.3)
       autoprefixer-rails (>= 9.1.0)
       popper_js (>= 2.11.8, < 3)
+    bootstrap-icons (1.0.14)
+      nokogiri (~> 1)
+    bootstrap-icons-helper (2.0.2)
+      bootstrap-icons (~> 1)
+      rails (>= 7.0)
     builder (3.3.0)
     chronic_duration (0.10.6)
       numerizer (~> 0.1.1)
@@ -348,6 +353,7 @@ DEPENDENCIES
   appsignal
   bootsnap
   bootstrap
+  bootstrap-icons-helper
   counter_culture
   csv
   debug
