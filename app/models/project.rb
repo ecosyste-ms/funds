@@ -758,9 +758,9 @@ class Project < ApplicationRecord
     urls = readme_urls.select{|u| funding_domains.any?{|d| u.include?(d) } || u.include?('github.com/sponsors') }.reject{|u| ['.svg', '.png'].include? File.extname(URI.parse(u).path) }
     # remove anchors
     urls = urls.map{|u| u.gsub(/#.*$/, '') }.uniq
-    # remove sponsor/9/website from open collective urls
+    # remove sponsor/9/website from Open Source Collective urls
     urls = urls.map{|u| u.gsub(/\/sponsor\/\d+\/website$/, '') }.uniq
-    # remove backer/9/website from open collective urls
+    # remove backer/9/website from Open Source Collective urls
     urls = urls.map{|u| u.gsub(/\/backer\/\d+\/website$/, '') }.uniq
   end
 

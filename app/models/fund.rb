@@ -295,7 +295,7 @@ class Fund < ApplicationRecord
       project: {
         name: "#{name} Fund",
         slug: oc_project_slug,
-        description: "This is the Open Collective for the #{name} Fund. We support open-source projects in the #{name} ecosystem.",
+        description: "This is the Open Source Collective for the #{name} Fund. We support open-source projects in the #{name} ecosystem.",
         tags: ["open-source", "community", "fund", slug],
       }
     }

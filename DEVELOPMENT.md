@@ -63,6 +63,6 @@ A container-based deployment is highly recommended, we use [dokku.com](https://d
 
 Required environment variables:
 
-- `OPENCOLLECTIVE_TOKEN` - A token for the Open Collective API
-- `OPENCOLLECTIVE_PARENT_SLUG` - The parent collective id for the Open Collective API (e.g. `opensource`)
+- `OPENCOLLECTIVE_TOKEN` - A token for the Open Source Collective API
+- `OPENCOLLECTIVE_PARENT_SLUG` - The parent collective id for the Open Source Collective API (e.g. `opensource`)
 - `PROXY_PARENT_COLLECTIVE_SLUG` - The parent collective slug for the proxy collectives (e.g. `ecosystem-funds`)
