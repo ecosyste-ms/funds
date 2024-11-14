@@ -45,7 +45,10 @@
                   <%= project_allocation.funding_source.full_name.truncate(40) %>
                 <% end %>
               <% else %>
-                Pending
+                Contacting Maintainer 
+                <% if project_allocation.project.contact_email.present? %>
+                  (<%= obfuscate_email(project_allocation.project.contact_email) %>)
+                <% end %>
               <% end %>
             </td>
           </tr>
