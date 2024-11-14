@@ -124,6 +124,14 @@ class Fund < ApplicationRecord
         project = Project.find_or_create_by(url: package['repository_url'])
         project.repository = package['repo_metadata'] if project.repository.blank?
         project.packages += [package] unless project.packages.map{|pkg| pkg['registry_url']}.include?(package['registry_url'])
+        if package['registry']
+          registry_name = package['registry']['name'] 
+          project.registry_names += [registry_name] unless project.registry_names.include?(registry_name)
+        end
+        all_keywords = []
+        all_keywords += Array(package['repo_metadata']["topics"]) if package['repo_metadata'].present?
+        all_keywords += Array(package["keywords"])
+        project.keywords = all_keywords.reject(&:blank?).uniq { |keyword| keyword.downcase }.dup
         project.save
         project.sync_async unless project.last_synced_at.present?
       end
@@ -185,9 +193,9 @@ class Fund < ApplicationRecord
   def possible_projects
     if primary_topic.present?
       # TODO include aliases
-      Project.keyword(primary_topic).active.with_license
+      Project.keyword(primary_topic)
     elsif registry_name.present?
-      Project.registry_name(registry_name).active.with_license
+      Project.registry_name(registry_name)
     end
   end
 

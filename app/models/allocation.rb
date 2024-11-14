@@ -120,7 +120,7 @@ class Allocation < ApplicationRecord
   end
 
   def find_possible_projects
-    fund.possible_projects
+    fund.possible_projects.active.with_license
   end
 
   def export_to_csv

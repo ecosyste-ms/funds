@@ -8,6 +8,6 @@ class FundTest < ActiveSupport::TestCase
     project2 = Project.create!(url: 'https://github.com/base62/archived', registry_names: ['npm'], repository: { 'archived' => true })
     project2 = Project.create!(url: 'https://github.com/base62/nolicense', registry_names: ['npm'], repository: { 'archived' => false })
 
-    assert_equal 1, fund.possible_projects.count
+    assert_equal 3, fund.possible_projects.count
   end
 end
