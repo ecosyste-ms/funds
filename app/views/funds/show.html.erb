@@ -29,15 +29,16 @@
           <th>Score</th>
           <th>Funding Platform</th>
         </tr>
-        </tr>
       </thead>
       <tbody>
         <% @project_allocations.each_with_index do |project_allocation, i| %>
           <% next if project_allocation.project.nil? %>
-          <tr>
-            <td><%= i+1 %></td>
+
+          <!-- Main Row -->
+          <tr class="clickable-row" data-bs-toggle="collapse" data-bs-target="#details-<%= i %>">
+            <td><%= i + 1 %></td>
             <td><%= link_to project_allocation.project, project_allocation.project.url, target: :_blank %></td>
-            <td><%= number_to_currency project_allocation.amount_cents/100.0 %></td>
+            <td><%= number_to_currency project_allocation.amount_cents / 100.0 %></td>
             <td><%= project_allocation.score.round(3) %></td>
             <td>
               <% if project_allocation.funding_source %>
@@ -47,6 +48,34 @@
               <% else %>
                 Contacting Maintainer
               <% end %>
+            </td>
+          </tr>
+
+          <!-- Expandable Row -->
+          <tr id="details-<%= i %>" class="collapse">
+            <td colspan="6">
+              <div class="p-3">
+                <ul class='list-unstyled'>
+                  <li>
+                    <strong>Repository:</strong> <%= link_to project_allocation.project.url, project_allocation.project.url, target: :_blank %>
+                  </li>
+                  <% if project_allocation.funding_source %>
+                    <li>
+                      <strong>Funding:</strong>
+                      <%= link_to project_allocation.funding_source.url, project_allocation.funding_source.url, target: :_blank %>
+                    </li>
+                  <% end %>
+                  <li>
+                    <strong>Downloads:</strong> <%= number_with_delimiter project_allocation.project&.downloads %>
+                  </li>
+                  <li>
+                    <strong>Dependent Repos:</strong> <%= number_with_delimiter project_allocation.project&.dependent_repos_count %>
+                  </li>
+                  <li>
+                    <strong>Dependent Packages:</strong> <%= number_with_delimiter project_allocation.project&.dependent_packages_count %>
+                  </li>
+                </ul>
+              </div>
             </td>
           </tr>
         <% end %>
