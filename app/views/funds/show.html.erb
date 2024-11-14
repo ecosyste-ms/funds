@@ -13,13 +13,13 @@
     <%= @fund.description %>
   </p>
 
-  <h2>Most Recent Allocation</h2>
-
-  <p>
-    <%= number_to_currency @allocation.total_cents/100.0 %> on <%= @allocation.created_at.strftime('%B %d, %Y') %>
-  </p>
-
   <% if @allocation %>
+    <h2>Most Recent Allocation</h2>
+
+    <p>
+      <%= number_to_currency @allocation.total_cents/100.0 %> on <%= @allocation.created_at.strftime('%B %d, %Y') %>
+    </p>
+
     <table class="table">
       <thead>
         <tr>
