@@ -44,24 +44,33 @@ class Allocation < ApplicationRecord
     # Calculate weighted scores for each project
     total_score = 0
     scores = normalized_metrics.map do |metric|
-      score = 0
-  
-      weights.each do |metric_name, weight|
-        score += metric[metric_name] * weight
-      end
-  
+      score = weights.sum { |metric_name, weight| metric[metric_name] * weight }
       total_score += score
-  
       { project_id: metric[:project_id], score: score, funding_source_id: metric[:funding_source_id] }
     end
   
-    # Allocate funds proportionally to scores
-    allocations = scores.map do |score|
+    # Initial allocation calculation
+    allocations = []
+    leftover_funds = 0
+  
+    scores.each do |score|
       allocation_amount = (score[:score] / total_score) * total_cents
-      { project_id: score[:project_id], allocation: allocation_amount, score: score[:score], funding_source_id: score[:funding_source_id] }
+  
+      if allocation_amount < minimum_allocation
+        leftover_funds += allocation_amount
+      else
+        allocations << { project_id: score[:project_id], allocation: allocation_amount, score: score[:score], funding_source_id: score[:funding_source_id] }
+      end
     end
   
-    # Save the project allocations (ensuring minimum allocation is met)
+    # Redistribute leftover funds
+    total_remaining_score = allocations.sum { |a| a[:score] }
+    allocations.each do |allocation|
+      additional_amount = (allocation[:score] / total_remaining_score) * leftover_funds
+      allocation[:allocation] += additional_amount
+    end
+  
+    # Save allocations meeting the minimum allocation
     allocations.each do |allocation|
       next if allocation[:allocation] < minimum_allocation
   
