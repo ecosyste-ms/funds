@@ -75,12 +75,12 @@ class Project < ApplicationRecord
     return if status.blank?
     fetch_repository
     fetch_owner
-    fetch_dependencies
+    # fetch_dependencies
     fetch_packages
     combine_keywords
-    fetch_commits
-    fetch_events
-    fetch_issue_stats
+    # fetch_commits
+    # fetch_events
+    # fetch_issue_stats
     fetch_readme
     find_or_create_funding_source
     search_for_collective
