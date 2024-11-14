@@ -172,6 +172,7 @@ class Fund < ApplicationRecord
 
   def allocate_to_projects
     return unless has_funds_for_allocation?
+    return unless possible_projects.any?
     
     allocate(current_balance_cents)
   end
@@ -181,6 +182,7 @@ class Fund < ApplicationRecord
   end
 
   def allocate(total_cents)
+    return unless possible_projects.any?
     return if total_cents < minimum_for_allocation_cents
     
     allocations = Allocation.where(fund_id: id, year: Time.zone.now.year, month: Time.zone.now.month)

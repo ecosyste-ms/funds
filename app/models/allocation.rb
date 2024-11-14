@@ -22,6 +22,11 @@ class Allocation < ApplicationRecord
     # Get a list of all possible projects for this fund
     projects = find_possible_projects
   
+    if projects.empty?
+      puts "No projects found for fund #{fund.id}"
+      return false
+    end
+
     # Fetch all metrics for all projects
     metrics = projects.map do |project|
       {
