@@ -201,6 +201,11 @@ body {
 }
 
 .fund-card--small {
+  padding-bottom: 1.5rem;
+  .card-body {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+  }
   .card-title {
     @include font-size(1rem);
     margin-bottom: 0;
@@ -212,7 +217,7 @@ body {
   .card-img-top {
     max-width: 100px;
     max-height: 100px;
-    margin: 0 auto;
+    margin: 1.5rem auto;
   }
 }
 
