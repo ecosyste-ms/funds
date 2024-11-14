@@ -69,6 +69,7 @@ class Fund < ApplicationRecord
     fund.github_url = topic['github_url']
 
     fund.save!
+    return fund
   end
 
   def sync
