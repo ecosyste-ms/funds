@@ -78,7 +78,7 @@ class Project < ApplicationRecord
     # fetch_dependencies
     fetch_packages
     combine_keywords
-    # fetch_commits
+    fetch_commits
     # fetch_events
     # fetch_issue_stats
     fetch_readme
