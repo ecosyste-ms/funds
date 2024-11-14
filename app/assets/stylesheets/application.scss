@@ -38,6 +38,13 @@ $lead-font-weight: 400;
 
 @import "bootstrap"; 
 
+.container {
+  @include media-breakpoint-down(md) {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
 .text-decoration-hover{
   text-decoration: none;
   &:hover{
