@@ -27,6 +27,24 @@ class Project < ApplicationRecord
 
   scope :synced, -> { where.not(last_synced_at: nil) }
 
+  def self.oc_github_sponsors_mapping
+    # key is github sponsors slug, value is opencollective slug
+    @oc_github_sponsors_mapping ||= begin
+      url = 'https://raw.githubusercontent.com/opencollective/opencollective-tools/refs/heads/main/github-sponsors/csv-import-mapping.json'
+
+      conn = Faraday.new(url: url) do |faraday|
+        faraday.response :follow_redirects
+        faraday.adapter Faraday.default_adapter
+      end
+
+      response = conn.get
+
+      return unless response.success?
+
+      json = JSON.parse(response.body)
+    end
+  end
+
   def self.sync_least_recently_synced
     Project.where(last_synced_at: nil).or(Project.where("last_synced_at < ?", 1.day.ago)).order('last_synced_at asc nulls first').limit(100).each do |project|
       project.sync_async
