@@ -68,6 +68,12 @@ funds = [
     slug: 'haskell',
     description: "Fund for the most critical haskell packages on hackage.haskell.org",
     registry_name: "hackage.haskell.org"
+  },
+  {
+    name: 'Django',
+    slug: 'django',
+    description: "Fund for the most critical django packages on pypi.org",
+    featured: true
   }
 ]
 
