@@ -6,6 +6,7 @@ class FundsController < ApplicationController
 
   def show
     @fund = Fund.find_by(slug: params[:id])
+    raise ActiveRecord::RecordNotFound unless @fund
 
     @allocation = @fund.allocations.order('created_at DESC').first
     if @allocation
