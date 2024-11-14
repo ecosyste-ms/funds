@@ -36,8 +36,6 @@ $display-font-weight: 900;
 $lead-font-weight: 400;
 
 
-
-
 @import "bootstrap"; 
 
 .text-decoration-hover{
@@ -148,9 +146,10 @@ body {
 
 .spesh-link {
   color: $color-black;
-  text-decoration: none;
+  text-decoration: none !important;
   position: relative;
   z-index: 1;
+  display: inline-block;
   &::after {
     content: '';                         
     position: absolute;
@@ -163,6 +162,7 @@ body {
     border-radius: 4px;
   }
   &:hover {
+    text-decoration: none !important;
     &::after {
       background-color: $color-orange;
     }
@@ -248,5 +248,23 @@ body {
   @include media-breakpoint-up(md) {
     margin-top: 8rem;
     margin-bottom: 8rem;
+  }
+}
+
+.block-link {
+  /* class to make cards fully clickable */
+  text-decoration: none;
+}
+
+.block-link--spesh {
+  /* if we have a .spesh-link in here, we need to attach thhe hover styles */
+  &:hover,
+  &:active,
+  &:focus {
+    .spesh-link {
+      &::after {
+        background-color: $color-orange;
+      }
+    }
   }
 }
