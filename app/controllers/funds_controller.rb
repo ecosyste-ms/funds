@@ -1,7 +1,7 @@
 class FundsController < ApplicationController
   def index
     @featured_funds = Fund.featured.limit(4)
-    @funds = Fund.not_featured.order('random()').limit(12)
+    @funds = Fund.not_featured.short_names.order('random()').limit(12)
   end
 
   def show
