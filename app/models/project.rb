@@ -668,8 +668,17 @@ class Project < ApplicationRecord
   end
 
   def clean_funding_links(links)
-    # reject any github links that are not sponsors
-    links.reject { |l| l.is_a?(String) && l.include?('github.com') && !l.include?('github.com/sponsors') }
+    links.reject do |link|
+      # Skip invalid URLs or GitHub links that are not sponsor links
+      begin
+        uri = URI.parse(link)
+        invalid_url = !(uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS))
+        non_sponsor_github_link = link.include?('github.com') && !link.include?('github.com/sponsors')
+        invalid_url || non_sponsor_github_link
+      rescue URI::InvalidURIError
+        true
+      end
+    end
   end
 
   def package_funding_links
@@ -710,7 +719,7 @@ class Project < ApplicationRecord
       when "liberapay"
         "https://liberapay.com/#{v}"
       when "custom"
-        v
+        Array(v)
       when "otechie"
         "https://otechie.com/#{v}"
       when "patreon"
