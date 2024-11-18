@@ -4,6 +4,13 @@ An open source funding solution from ecosyste.ms & Open Source Collective.
 
 This project is part of [Ecosyste.ms](https://ecosyste.ms): Tools and open datasets to support, sustain, and secure critical digital infrastructure.
 
+## Documentation
+
+- [Overview](docs/readme.md)
+- [Allocation Algorithm](docs/allocation.md)
+- [API](https://funds.ecosyste.ms/docs)
+- [Development](DEVELOPMENT.md)
+
 ## API
 
 Documentation for the REST API is available here: [https://funds.ecosyste.ms/docs](https://funds.ecosyste.ms/docs)
