@@ -27,9 +27,9 @@ We determine a score for each project using a weighted formula:
 
 For example:
 
-\[
-\text{Score} = (\text{Downloads} \times 0.2) + (\text{Dependent Repositories} \times 0.2) + (\text{Dependent Packages} \times 0.2)
-\]
+```
+Score = (Downloads × 0.2) + (Dependent Repositories × 0.2) + (Dependent Packages × 0.2)
+```
 
 This score represents the project’s importance and is used to determine its share of the funds.
 
@@ -37,9 +37,9 @@ This score represents the project’s importance and is used to determine its sh
 
 Each project receives a portion of the total available funds based on its score:
 
-\[
-\text{Funding Amount} = \left(\frac{\text{Project Score}}{\text{Total Score of All Projects}}\right) \times \text{Total Funds}
-\]
+```
+Funding Amount = (Project Score / Total Score of All Projects) × Total Funds
+```
 
 Projects with higher scores, indicating they are more critical, receive a larger share of the funds.
 
