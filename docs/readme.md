@@ -28,6 +28,8 @@ Each allocation has a default minimum amount, currently at $50.00, which is the 
 
 Results of the allocations are then displayed on the fund page, and the funds are distributed to the projects based on the allocations.
 
+More detailed information on the current allocation algorithm can be found in the [allocation documentation](docs/allocation.md).
+
 ## Payouts
 
 Once the funds have been allocated to the projects, we search for a funding source for each project. Starting with the funding urls we can find from the metadata of the open source project. These can be in the form of a donation link, a patreon link, or a link to a funding platform like Open Source Collective. 
