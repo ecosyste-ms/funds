@@ -132,7 +132,7 @@ body {
 /* Hero */
 .hero {
   .lead {
-    max-width: 34rem;
+    max-width: 38rem;
     margin: 0 auto;
   }
 }
@@ -177,14 +177,15 @@ body {
 }
 
 .btn-primary {
-    background-color: $color-green-dark;
-    border-color: $color-green-dark;
+    background-color: $color-orange-dark;
+    border-color: $color-orange-dark;
     padding: 0.5em 1em;
     font-weight: 600;
   &:hover,
   &:focus {
-    background-color: darken($color-green-dark, 10%);
-    border-color: darken($color-green-dark, 10%);
+    background-color: $color-orange;
+    border-color: $color-orange;
+    color: $color-black;
   }
   &:active {
     background-color: $color-orange-dark !important;
@@ -246,6 +247,14 @@ body {
     z-index: 2;
     position: absolute;
     bottom: 0;
+  }
+}
+
+.how-it-works {
+  > div {
+    @include media-breakpoint-up(xl) {
+      padding-right: 2.5em;
+    }
   }
 }
 
