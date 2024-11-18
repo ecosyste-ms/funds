@@ -34,8 +34,6 @@ class ProxyCollective < ApplicationRecord
     case platform
     when 'github-sponsors'
       path_parts[2]
-    when 'tidelift'
-      path_parts.last
     else
       path_parts.reject(&:empty?).join('/')
     end
