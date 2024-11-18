@@ -46,7 +46,7 @@
             <td><%= number_with_delimiter project_allocation.project.dependent_repos_count(@fund.registry_name) %></td>
             <td><%= number_with_delimiter project_allocation.project.dependent_packages_count(@fund.registry_name) %></td>
             <td>
-              <% if project_allocation.funding_source %>
+              <% if project_allocation.funding_source && project_allocation.funding_source.approved? %>
                 <%= link_to project_allocation.funding_source, project_allocation.funding_source %>
               <% else %>
                 Unknown
