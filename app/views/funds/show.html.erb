@@ -16,11 +16,46 @@
   </p>
 
   <% if @allocation %>
-    <h2>Most Recent Allocation</h2>
+    <h2><%= @allocation.created_at.strftime('%B %d, %Y') %></h2>
+
+    <strong>Allocation Details</strong>
 
     <p>
-      <%= number_to_currency @allocation.total_cents/100.0 %> on <%= @allocation.created_at.strftime('%B %d, %Y') %>
+      Total funded:
+      <%= number_to_currency @allocation.total_cents/100.0 %> 
     </p>
+
+    <p>
+      Funders:
+      <%= @allocation.funders_count %> 
+    </p>
+
+    <p>
+      Projects: <%= @allocation.funded_projects_count %>
+    </p>
+
+    <strong>Distribution Details</strong>
+
+    <p>
+      GitHub Sponsors:
+      <%= @allocation.github_sponsored_projects_count %>
+    </p>
+
+    <p>
+      Open Collective:
+      <%= @allocation.open_collective_projects_count %>
+    </p>
+
+    <p>
+      Other Sources:
+      <%= @allocation.other_projects_count %>
+    </p>
+
+    <p>
+      Projects Invited
+      <%= @allocation.invited_projects_count %>
+    </p>
+
 
     <table class="table">
       <thead>

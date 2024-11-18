@@ -2,6 +2,7 @@ class Allocation < ApplicationRecord
   belongs_to :fund
   has_many :project_allocations, dependent: :destroy
   has_many :projects, through: :project_allocations
+  has_many :funding_sources, through: :project_allocations
 
   scope :displayable, -> { where('funded_projects_count > 0') }
 
@@ -133,6 +134,10 @@ class Allocation < ApplicationRecord
     project_allocations.sum(:amount_cents)
   end
 
+  def funders_count
+    1 # TODO
+  end
+
   def find_possible_projects
     fund.possible_projects.active.with_license
   end
@@ -150,5 +155,21 @@ class Allocation < ApplicationRecord
 
   def payout
     project_allocations.find_each(&:choose_payout_method)
+  end
+
+  def github_sponsored_projects_count
+    funding_sources.select{|fs| fs.platform == 'github.com'}.length
+  end
+
+  def open_collective_projects_count
+    funding_sources.select{|fs| fs.platform == 'opencollective.com'}.length
+  end
+
+  def other_projects_count
+    funding_sources.approved.reject{|fs| ['opencollective.com', 'github.com'].include?(fs.platform) }.length
+  end
+
+  def invited_projects_count
+    project_allocations.select{|pa| pa.funding_source.blank?}.length
   end
 end

@@ -4,11 +4,12 @@ class FundingSource < ApplicationRecord
   has_many :projects
   has_many :project_allocations
 
-  scope :platform, ->(platform) { where(platform: platform) }
-
   APPROVED_PLATFORMS = ['opencollective.com', 'github.com', 'patreon.com', 
-  'liberapay.com', 'ko-fi.com', 'funding.communitybridge.org', 'buymeacoffee.com']
-
+  'liberapay.com', 'ko-fi.com', 'funding.communitybridge.org', 'buymeacoffee.com', 'paypal.com']
+  
+  scope :platform, ->(platform) { where(platform: platform) }
+  scope :approved, -> { where(platform: APPROVED_PLATFORMS) }
+  
   def approved?
     APPROVED_PLATFORMS.include?(platform)
   end
