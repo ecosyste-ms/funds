@@ -147,7 +147,7 @@ class Allocation < ApplicationRecord
   end
 
   def group_projects_by_funding_source_and_platform
-    project_allocations.order('amount_cents desc').includes(:funding_source).with_funding_source
+    project_allocations.order('amount_cents desc').includes(:funding_source).with_approved_funding_source
                       .group_by { |pa| [pa.funding_source.platform, pa.funding_source] }
                        .transform_values { |pas| pas.sum(&:amount_cents) }
                        .sort_by { |platform, amount| -amount }
