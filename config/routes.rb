@@ -17,6 +17,7 @@ Rails.application.routes.draw do
     resources :allocations, only: [:show] do |allocations|
       member do
         get :export
+        get :export_github_sponsors
       end
     end
     resources :projects, only: [:index]

@@ -32,4 +32,15 @@ class AllocationsController < ApplicationController
     send_data csv_data, filename: "#{filename}.csv", type: 'text/csv'
 
   end
+
+  def export_github_sponsors
+    @fund = Fund.find_by(slug: params[:fund_id])
+    @allocation = @fund.allocations.find(params[:id])
+
+    csv_data = @allocation.github_sponsors_csv_export
+
+    filename = "#{@fund}-#{@allocation}-github-sponsors"
+
+    send_data csv_data, filename: "#{filename}.csv", type: 'text/csv'
+  end
 end
