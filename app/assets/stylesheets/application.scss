@@ -94,6 +94,10 @@ body {
   font-weight: 900;
 }
 
+.extra-small {
+  @include font-size(0.778rem);
+}
+
 /*  Header */
 .header {
   padding: 2em 0;
@@ -283,4 +287,58 @@ body {
       }
     }
   }
+}
+
+.stat-card {
+  display: inline-block;
+  margin-right: 1.3334rem;
+}
+
+.stat-card-title,
+.stat-card-text {
+  display: block;
+}
+
+.stat-card-title {
+  @include font-size(2.1875rem);
+  font-weight: 800;
+}
+
+.fund-stat-bar--allocation-stat-bar {
+  .stat-card {
+    @include media-breakpoint-up(xl) {
+      display: block;
+      margin-right: 0;
+    }
+  }
+  .stat-card-title {
+    @include font-size(1.625rem);
+  }
+}
+
+.fund-section-header {
+  border-bottom: 1px solid $color-grey;
+  .badge {
+    @include font-size(0.875rem);
+    margin-left: 1rem;
+    position: relative;
+    top: -0.7rem;
+  }
+}
+
+.fund-header {
+  border-bottom: 1px solid $color-grey;
+}
+
+.fund-logo {
+  max-width: 100px;
+  @include media-breakpoint-up(md) {
+    max-width: 100%;
+  }
+}
+
+.badge {
+  background-color: $color-purple-light;
+  font-weight: normal;
+  color: $color-black;
 }
