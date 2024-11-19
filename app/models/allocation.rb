@@ -172,4 +172,13 @@ class Allocation < ApplicationRecord
   def invited_projects_count
     project_allocations.select{|pa| pa.funding_source.blank?}.length
   end
+
+  def github_sponsors_csv_export
+    CSV.generate do |csv|
+      csv << ['Maintainer username', 'Sponsorship amount in USD']
+      project_allocations.select{|pa| pa.funding_source && pa.funding_source.platform == 'github.com'}.each do |pa|
+        csv << [pa.funding_source.name, pa.amount_cents / 100.0]
+      end
+    end
+  end
 end
