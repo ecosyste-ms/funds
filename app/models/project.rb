@@ -728,6 +728,8 @@ class Project < ApplicationRecord
         "https://polar.sh/#{v}"
       when 'buy_me_a_coffee'
         "https://buymeacoffee.com/#{v}"
+      when 'thanks_dev'
+        "https://thanks.dev/#{v}"
       else
         v
       end
@@ -746,7 +748,7 @@ class Project < ApplicationRecord
   end
 
   def funding_domains
-    ['opencollective.com', 'ko-fi.com', 'liberapay.com', 'patreon.com', 'otechie.com', 'issuehunt.io', 
+    ['opencollective.com', 'ko-fi.com', 'liberapay.com', 'patreon.com', 'otechie.com', 'issuehunt.io', 'thanks.dev',
     'communitybridge.org', 'tidelift.com', 'buymeacoffee.com', 'paypal.com', 'paypal.me','givebutter.com', 'polar.sh']
   end
 
