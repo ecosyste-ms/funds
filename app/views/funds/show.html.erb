@@ -1,9 +1,17 @@
 <% @meta_title = @fund.name %>
 
 <div class="container">
-    <h1>
-    <%= @fund.name %>
-  </h1>
+  <div class="fund-header mb-5">
+    <div class="row">
+      <% if @fund.logo_url.present? %>
+        <div class="col-md-1 mb-3">
+          <img src="<%= @fund.logo_url %>" alt="" class="img-fluid fund-logo" onerror="this.style.display='none'">
+        </div>
+      <% end %>
+      <div class="<% if @fund.logo_url.present? %>col-md-11<% end %>">
+      <h1 class="display-1 extra-bold">
+      <%= @fund.name %>
+    </h1>
 
   <% if @fund.open_collective_project_url.present? %>
     <div >
@@ -11,52 +19,108 @@
     </div>
   <% end %>
 
-  <p>
-    <%= @fund.description %>
-  </p>
+    <p>
+      <%= @fund.description %>
+    </p>
+    <div class="fund-header-stats">
+      <div class="fund-stat-bar mb-2 mb-md-3">
+        <div class="stat-card mb-2">
+          <div class="stat-card-body">
+            <span class="stat-card-title"><%= number_to_currency @allocation.total_cents/100.0 %></span>
+            <span class="stat-card-text small">Total funded</span>
+          </div>
+        </div>
 
+        <div class="stat-card mb-2">
+          <div class="stat-card-body">
+            <span class="stat-card-title"><%= @allocation.funders_count %></span>
+            <span class="stat-card-text small">Funders</span>
+          </div>
+        </div>
+
+        <div class="stat-card mb-2">
+          <div class="stat-card-body">
+            <span class="stat-card-title"><%= @allocation.funded_projects_count %></span>
+            <span class="stat-card-text small">Projects</span>
+          </div>
+        </div>
+
+      </div> 
+    </div>
+      </div>
+    </div>
+    
+  </div>
   <% if @allocation %>
-    <h2><%= @allocation.created_at.strftime('%B %d, %Y') %></h2>
+  <div class="fund-section-header mb-3 mb-md-5">
+    <h2 class="h1 extra-bold"><%= @allocation.created_at.strftime('%B %d, %Y') %> <span class="badge badge-info">Latest</span></h2>
+  </div>
+    
+<div class="row">
+  <div class="col-xl-3">
+    <div class="row mt-md-3">
+      <div class="col-md-5 col-xl-12">
+        <h3 class="fw-normal fs-6">Allocation Details</h3>
+        <div class="fund-stat-bar fund-stat-bar--allocation-stat-bar mb-2 mb-md-3">
+          <div class="stat-card mb-2">
+            <div class="stat-card-body">
+              <span class="stat-card-title"><%= number_to_currency @allocation.total_cents/100.0 %></span>
+              <span class="stat-card-text extra-small">Total funded</span>
+            </div>
+          </div>
 
-    <strong>Allocation Details</strong>
+          <div class="stat-card mb-2">
+            <div class="stat-card-body">
+              <span class="stat-card-title"><%= @allocation.funders_count %></span>
+              <span class="stat-card-text extra-small">Funders</span>
+            </div>
+          </div>
 
-    <p>
-      Total funded:
-      <%= number_to_currency @allocation.total_cents/100.0 %> 
-    </p>
+          <div class="stat-card mb-2">
+            <div class="stat-card-body">
+              <span class="stat-card-title"><%= @allocation.funded_projects_count %></span>
+              <span class="stat-card-text extra-small">Projects</span>
+            </div>
+          </div>
+        </div> 
+      </div> 
+      
+      <div class="col-md-7 col-xl-12">
+        <h3 class="fw-normal fs-6">Distribution Details</h3>
+        <div class="fund-stat-bar fund-stat-bar--allocation-stat-bar mb-4 mb-md-5">
+          <div class="stat-card mb-2">
+            <div class="stat-card-body">
+              <span class="stat-card-title"><%= @allocation.github_sponsored_projects_count %></span>
+              <span class="stat-card-text extra-small">GitHub Sponsors</span>
+            </div>
+          </div>
 
-    <p>
-      Funders:
-      <%= @allocation.funders_count %> 
-    </p>
+          <div class="stat-card mb-2">
+            <div class="stat-card-body">
+              <span class="stat-card-title"><%= @allocation.open_collective_projects_count %></span>
+              <span class="stat-card-text extra-small">Open Collective</span>
+            </div>
+          </div>
+        
+          <div class="stat-card mb-2">
+            <div class="stat-card-body">
+              <span class="stat-card-title"><%= @allocation.other_projects_count %></span>
+              <span class="stat-card-text extra-small">Other sources <a href="#"><%= bootstrap_icon 'info-circle', width: 14, height: 14 %></a></span>
+            </div>
+          </div>
+        
+          <div class="stat-card mb-2">
+            <div class="stat-card-body">
+              <span class="stat-card-title"><%= @allocation.invited_projects_count %></span>
+              <span class="stat-card-text extra-small">Projects invited <a href="#"><%= bootstrap_icon 'info-circle', width: 14, height: 14 %></a></span>
+            </div>
+          </div>
+        </div> 
+      </div> 
+    </div> 
+  </div>
 
-    <p>
-      Projects: <%= @allocation.funded_projects_count %>
-    </p>
-
-    <strong>Distribution Details</strong>
-
-    <p>
-      GitHub Sponsors:
-      <%= @allocation.github_sponsored_projects_count %>
-    </p>
-
-    <p>
-      Open Collective:
-      <%= @allocation.open_collective_projects_count %>
-    </p>
-
-    <p>
-      Other Sources:
-      <%= @allocation.other_projects_count %>
-    </p>
-
-    <p>
-      Projects Invited
-      <%= @allocation.invited_projects_count %>
-    </p>
-
-
+  <div class="col-xl-9">
     <table class="table">
       <thead>
         <tr>
@@ -118,9 +182,9 @@
         <% end %>
       </tbody>
     </table>
-
   <% else%>
     <p>Coming soon...</p>
   <% end %>
+  </div>
 </div>
 
