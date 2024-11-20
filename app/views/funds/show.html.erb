@@ -150,27 +150,33 @@
           <!-- Expandable Row -->
           <tr id="details-<%= i %>" class="collapse">
             <td colspan="6">
-              <div class="p-3">
-                <ul class='list-unstyled'>
-                  <li>
-                    <strong>Repository:</strong> <%= link_to project_allocation.project.url, project_allocation.project.url, target: :_blank %>
-                  </li>
-                  <% if project_allocation.funding_source %>
-                    <li>
-                      <strong>Funding:</strong>
-                      <%= link_to project_allocation.funding_source.url, project_allocation.funding_source.url, target: :_blank %>
-                    </li>
-                  <% end %>
-                  <li>
-                    <strong>Downloads:</strong> <%= number_with_delimiter project_allocation.project&.downloads %>
-                  </li>
-                  <li>
-                    <strong>Dependent Repos:</strong> <%= number_with_delimiter project_allocation.project&.dependent_repos_count %>
-                  </li>
-                  <li>
-                    <strong>Dependent Packages:</strong> <%= number_with_delimiter project_allocation.project&.dependent_packages_count %>
-                  </li>
-                </ul>
+              <div class="p-4 well">
+                <p><%= bootstrap_icon 'github', width: 18, height: 18 %> <span class="visually-hidden">Repository:</span> <%= link_to project_allocation.project.url, project_allocation.project.url, target: :_blank %></p>
+                <% if project_allocation.funding_source %>
+                <p><%= bootstrap_icon 'wallet', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> <%= link_to project_allocation.funding_source.url, project_allocation.funding_source.url, target: :_blank %></p>
+                <% end %>  
+                <div class="fund-stat-bar mb-2 mb-md-3">
+                  <div class="stat-card mb-2">
+                    <div class="stat-card-body">
+                      <span class="stat-card-title"><%= number_with_delimiter project_allocation.project&.downloads %></span>
+                      <span class="stat-card-text small">Downloads</span>
+                    </div>
+                  </div>
+                  
+                  <div class="stat-card mb-2">
+                    <div class="stat-card-body">
+                      <span class="stat-card-title"><%= @allocation.funders_count %></span>
+                      <span class="stat-card-text small">Dependent Repos</span>
+                    </div>
+                  </div>
+          
+                  <div class="stat-card mb-2">
+                    <div class="stat-card-body">
+                      <span class="stat-card-title"><%= number_with_delimiter project_allocation.project&.dependent_packages_count %></span>
+                      <span class="stat-card-text small">Dependent Packages</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </td>
           </tr>

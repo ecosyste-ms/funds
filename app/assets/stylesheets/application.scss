@@ -15,7 +15,8 @@ $color-green-dark: #2EAF6B;
 
 $color-black: #1D1D28;
 $color-white: #FFFFFF;
-$color-grey: #D9D9D9;
+$color-light-grey: #F5F5FA;
+$color-grey: #DCDCE0;
 
 /* Typography */
 $font-family-base: "Inter", sans-serif;
@@ -34,6 +35,8 @@ $body-font-weight: 400;
 $headings-font-weight: 700;
 $display-font-weight: 900;
 $lead-font-weight: 400;
+
+$transition-collapse: height .35s ease;
 
 
 @import "bootstrap"; 
@@ -350,4 +353,9 @@ body {
   background-color: $color-purple-light;
   font-weight: normal;
   color: $color-black;
+}
+
+.well {
+  background-color: $color-light-grey;
+  border-radius: $border-radius;
 }
