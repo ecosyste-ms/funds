@@ -131,7 +131,7 @@
           <% next if project_allocation.project.nil? %>
 
           <!-- Main Row -->
-          <tr class="clickable-row" data-bs-toggle="collapse" data-bs-target="#details-<%= i %>">
+          <tr class="clickable-row" data-bs-toggle="collapse" data-bs-target="#details-<%= i %>" role="button" aria-controls="#details-<%= i %>">
             <td><%= i + 1 %></td>
             <td><%= link_to project_allocation.project, project_allocation.project.url, target: :_blank %></td>
             <td><%= number_to_currency project_allocation.amount_cents / 100.0 %></td>
