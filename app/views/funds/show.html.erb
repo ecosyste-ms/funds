@@ -20,21 +20,21 @@
       <div class="fund-stat-bar mb-2 mb-md-3">
         <div class="stat-card mb-2">
           <div class="stat-card-body">
-            <span class="stat-card-title"><%= number_to_currency @allocation.total_cents/100.0 %></span>
+            <span class="stat-card-title"><%= number_to_currency (@allocation.try(:total_cents) || 0)/100.0 %></span>
             <span class="stat-card-text small">Total funded</span>
           </div>
         </div>
 
         <div class="stat-card mb-2">
           <div class="stat-card-body">
-            <span class="stat-card-title"><%= @allocation.funders_count %></span>
+            <span class="stat-card-title"><%= @allocation.try(:funders_count) || 0 %></span>
             <span class="stat-card-text small">Funders</span>
           </div>
         </div>
 
         <div class="stat-card mb-2">
           <div class="stat-card-body">
-            <span class="stat-card-title"><%= @allocation.funded_projects_count %></span>
+            <span class="stat-card-title"><%= @allocation.try(:funded_projects_count) || 0 %></span>
             <span class="stat-card-text small">Projects</span>
           </div>
         </div>

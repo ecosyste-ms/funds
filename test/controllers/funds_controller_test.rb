@@ -12,4 +12,10 @@ class FundsControllerTest < ActionDispatch::IntegrationTest
     get fund_url(fund)
     assert_response :success
   end
+
+  test "should get show with no allocation" do
+    fund = Fund.create!(name: 'Test Fund', slug: 'test', 'registry_name': 'npm')
+    get fund_url(fund)
+    assert_response :success
+  end
 end
