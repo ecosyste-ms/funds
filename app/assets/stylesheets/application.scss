@@ -328,6 +328,15 @@ body {
 
 .fund-header {
   border-bottom: 1px solid $color-grey;
+  position: relative;
+}
+
+.btn-fund-header-cta {
+  @include media-breakpoint-up(xl) {
+    position: absolute;
+    right: 0;
+    top: 1rem;
+  }
 }
 
 .fund-logo {

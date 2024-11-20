@@ -13,12 +13,6 @@
       <%= @fund.name %>
     </h1>
 
-  <% if @fund.open_collective_project_url.present? %>
-    <div >
-      <%= link_to "Fund the #{@fund.name} Ecosystem on Open Source Collective", @fund.open_collective_project_url, class: 'btn btn-primary' %>
-    </div>
-  <% end %>
-
     <p>
       <%= @fund.description %>
     </p>
@@ -44,13 +38,14 @@
             <span class="stat-card-text small">Projects</span>
           </div>
         </div>
-
       </div> 
     </div>
-      </div>
-    </div>
-    
+    <% if @fund.open_collective_project_url.present? %>
+      <%= link_to "Fund the #{@fund.name} Ecosystem on Open Source Collective", @fund.open_collective_project_url, class: 'btn btn-primary btn-fund-header-cta mb-3' %>
+    <% end %>
   </div>
+</div>
+</div>
   <% if @allocation %>
   <div class="fund-section-header mb-3 mb-md-5">
     <h2 class="h1 extra-bold"><%= @allocation.created_at.strftime('%B %d, %Y') %> <span class="badge badge-info">Latest</span></h2>
