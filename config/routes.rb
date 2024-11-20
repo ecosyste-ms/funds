@@ -27,6 +27,11 @@ Rails.application.routes.draw do
 
   resources :projects, only: [:show]
 
+  get '/about', to: 'pages#about'
+  get '/faq', to: 'pages#faq'
+  get '/privacy', to: 'pages#privacy'
+  get '/overview', to: 'pages#overview'
+
   post '/webhooks', to: 'webhooks#receive'
 
   root "funds#index"
