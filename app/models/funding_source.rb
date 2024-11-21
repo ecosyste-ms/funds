@@ -10,20 +10,45 @@ class FundingSource < ApplicationRecord
   scope :platform, ->(platform) { where(platform: platform) }
   scope :approved, -> { where(platform: APPROVED_PLATFORMS) }
   
+  def self.open_collective_github_sponsors_mapping
+    @open_collective_github_sponsors_mapping ||= begin
+      url = 'https://raw.githubusercontent.com/opencollective/opencollective-tools/refs/heads/main/github-sponsors/csv-import-mapping.json'
+      response = Faraday.get(url)
+      JSON.parse(response.body)
+    rescue
+      {}
+    end
+  end
+
+  def self.has_open_collective_alternative?(name)
+    FundingSource.open_collective_github_sponsors_mapping[name]
+  end
+
+  def has_open_collective_alternative?
+    return unless platform == 'github.com'
+      
+    oc_alt = FundingSource.open_collective_github_sponsors_mapping[name]
+    oc_alt.present?
+  end
+
   def approved?
     APPROVED_PLATFORMS.include?(platform)
+  end
+
+  def clean_url
+    url.strip.chomp
   end
 
   def name
     case platform
     when 'github.com'
-      URI.parse(url).path.split('/')[2]
+      URI.parse(clean_url).path.split('/')[2]
     when 'opencollective.com'
-      URI.parse(url).path.split('/')[1]
+      URI.parse(clean_url).path.split('/')[1]
     when 'paypal.com'
       'paypal'
     else
-      URI.parse(url).path.sub(/\A\//, '')
+      URI.parse(clean_url).path.sub(/\A\//, '')
     end
   end
 
