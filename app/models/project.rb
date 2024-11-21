@@ -671,6 +671,9 @@ class Project < ApplicationRecord
     links.reject do |link|
       # Skip invalid URLs or GitHub links that are not sponsor links
       begin
+        # Ensure the link has a valid scheme; add https:// if missing
+        link.strip!
+        link = "https://#{link}" unless link =~ /\Ahttps?:\/\//
         uri = URI.parse(link)
         invalid_url = !(uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS))
         non_sponsor_github_link = link.include?('github.com') && !link.include?('github.com/sponsors')
@@ -787,7 +790,7 @@ class Project < ApplicationRecord
   end
 
   def set_funding_source(url, platform)
-    source = FundingSource.find_or_initialize_by(url: url).tap do |fs|
+    source = FundingSource.find_or_initialize_by(url: url.strip.chomp).tap do |fs|
       fs.platform = platform
       fs.save
     end
