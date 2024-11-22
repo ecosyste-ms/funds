@@ -24,7 +24,7 @@ $font-size-base: 1.125rem; //18px
 $font-size-small: 0.88889rem; //16px
 
 $line-height-base: 1.3334;
-$headings-line-height: 1.1;
+$headings-line-height: 1.25;
 
 $h1-font-size: 2.9375rem; //47px
 $h2-font-size: 2.1875rem; //35px
@@ -57,6 +57,19 @@ $transition-collapse: height .35s ease;
 
 body {
   font-optical-sizing: auto;
+}
+
+.header {
+  h1 {
+    font-size: 1em;
+    line-height: 1;
+  }
+}
+
+.navigation-bar {
+  a {
+    color: $color-black;
+  }
 }
 
 .site-logo {
@@ -359,3 +372,29 @@ body {
   background-color: $color-light-grey;
   border-radius: $border-radius;
 }
+
+.page-content {
+  h2, h3, h4, h5 {
+    margin-top: 2rem;
+    margin-bottom: 0.6667rem;
+  }
+}
+
+.page-content__title {
+  margin-bottom: 3rem;
+  
+}
+
+.page-content__title + .lead {
+  margin-top: -1rem;
+  margin-bottom: 1rem;
+}
+
+.ecosystems-pattern {
+  background-color: lighten($color-purple-light, 8%);
+  background-image: asset-url('ecosystems-pattern.svg');
+  background-repeat: repeat;
+  background-size: calc(696px/2) calc(238px/2);
+  background-attachment: fixed;
+}
+

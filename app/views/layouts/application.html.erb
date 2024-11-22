@@ -23,9 +23,28 @@
     <div class="main">
       <div class="container">
         <header class="header">
-          <h1 >
-            <a class="site-logo" href="/" >Ecosyste.ms: Funds</a>
-          </h1>
+        <div class="row align-items-center">
+          <div class="col-md-4"> 
+            <h1><a class="site-logo" href="/" >Ecosyste.ms: Funds</a></h1>
+          </div>
+          <div class="col-md-8 justify-content-end">
+            <nav class="navigation-bar">
+              <ul class="nav justify-content-end">
+                <li class="nav-item">
+                  <%= link_to 'About', 'https://ecosyste.ms/about', class:'nav-link' %>
+                </li>
+                <li class="nav-item">
+                  <%= link_to 'How it works', 'https://ecosyste.ms/overview', class:'nav-link' %>
+                </li>
+                <li class="nav-item">
+                   <%= link_to 'FAQ', 'https://ecosyste.ms/faq', class:'nav-link' %>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+         
+          
         </header>
       </div>
 
@@ -59,10 +78,10 @@
           </div>
           <div class="col-md-4">
             <ul class="list-unstyled footer-links small">
-              <li><strong><%= link_to 'About', 'https://ecosyste.ms' %></strong></li>
+              <li><strong><%= link_to 'About', 'https://ecosyste.ms/about' %></strong></li>
               <li><strong><%= link_to 'Blog', 'https://blog.ecosyste.ms' %></strong></li>
               <li><strong><%= link_to 'Contact', 'https://twitter.com/ecosyste_ms' %></strong></li>
-              <li><strong><%= link_to 'Privacy', 'https://ecosyste.ms' %></strong></li>
+              <li><strong><%= link_to 'Privacy', 'https://ecosyste.ms/privacy' %></strong></li>
               <li><strong><%= link_to 'Status', 'https://ecosystems.appsignal-status.com/' %></strong></li>
             </ul>
           </div>
