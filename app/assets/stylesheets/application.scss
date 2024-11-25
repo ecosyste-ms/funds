@@ -48,7 +48,7 @@ $transition-collapse: height .35s ease;
   }
 }
 
-.text-decoration-hover{
+.text-decoration-hover {
   text-decoration: none;
   &:hover{
     text-decoration: underline;
@@ -67,7 +67,6 @@ body {
 }
 
 .navigation-bar {
-
   a {
     color: $color-black;
   }
@@ -106,7 +105,7 @@ body {
     color: $color-white;
     &:hover,
     &:active,
-    &:focus 
+    &:focus, 
     &:visited {
       color: $color-white;
     }
@@ -181,26 +180,17 @@ body {
 .spesh-link {
   color: $color-black;
   text-decoration: none !important;
-  position: relative;
-  z-index: 1;
-  display: inline-block;
-  &::after {
-    content: '';                         
-    position: absolute;
-    left: 0;
-    bottom: -2px;
-    width: 100%;
-    height: 4px;
-    background-color: $color-green;
-    z-index: -1;
-    border-radius: 4px;
+  box-shadow: inset 0 -0.3em 0 $color-green;
+  transition: 250ms;
+  &:hover,
+  &:active,
+  &:focus {
+    box-shadow: inset 0 -1em 0 $color-green;
   }
-  &:hover {
-    text-decoration: none !important;
-    &::after {
-      background-color: $color-orange;
-    }
-  }
+}
+
+.spesh-link--hover-only {
+  box-shadow: inset 0 -0.3em 0 transparentize($color-green, 1);
 }
 
 .btn-primary {
@@ -300,14 +290,15 @@ body {
 }
 
 .block-link--spesh {
+  .spesh-link {
+    display: inline-block;
+  }
   /* if we have a .spesh-link in here, we need to attach thhe hover styles */
   &:hover,
   &:active,
   &:focus {
     .spesh-link {
-      &::after {
-        background-color: $color-orange;
-      }
+      box-shadow: inset 0 -1em 0 $color-green;
     }
   }
 }
@@ -388,6 +379,19 @@ body {
     margin-top: 2rem;
     margin-bottom: 0.6667rem;
   }
+
+a {
+  color: $color-black;
+  text-decoration: none;
+  box-shadow: inset 0 -0.3em 0 $color-green;
+  transition: 250ms;
+  &:hover,
+  &:active,
+  &:focus  {
+    box-shadow: inset 0 -1em 0 $color-green;
+  }
+}
+  
 }
 
 .page-content__title {
