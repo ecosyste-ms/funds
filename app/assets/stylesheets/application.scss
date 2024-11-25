@@ -364,6 +364,9 @@ body {
 
 .fund-logo {
   max-width: 100px;
+  border-radius: 8px;
+  padding: 0.5rem;
+  background-color: $color-white;
   @include media-breakpoint-up(md) {
     max-width: 100%;
   }
@@ -405,3 +408,9 @@ body {
   background-attachment: fixed;
 }
 
+.purple-section {
+  background-color: $color-purple-dark;
+  background: linear-gradient(0deg, $color-purple-dark 50%, $color-purple 100%);
+
+  color: $color-white;
+}
