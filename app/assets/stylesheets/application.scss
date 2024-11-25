@@ -67,8 +67,15 @@ body {
 }
 
 .navigation-bar {
+
   a {
     color: $color-black;
+  }
+}
+
+.nav {
+  @include media-breakpoint-up(md) {
+    justify-content: end;
   }
 }
 
