@@ -59,6 +59,15 @@ $transition-collapse: height .35s ease;
   }
 }
 
+/* Global selection style */
+::selection {
+  background-color: $color-purple-light;
+}
+
+::-moz-selection {
+  background-color: $color-purple-light;
+}
+
 .container {
   @include media-breakpoint-down(md) {
     padding-left: 1.5rem;
