@@ -38,7 +38,6 @@ $lead-font-weight: 400;
 
 $transition-collapse: height .35s ease;
 
-
 @import "bootstrap"; 
 
 @mixin spesh-link (
@@ -189,7 +188,7 @@ body {
 /* Hero */
 .hero {
   .lead {
-    max-width: 38rem;
+    max-width: 42rem;
     margin: 0 auto;
   }
 }
