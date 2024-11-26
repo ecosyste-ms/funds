@@ -65,14 +65,14 @@
               <%= link_to "https://github.com/ecosyste-ms", target: :_blank do %>
                 <%= bootstrap_icon 'github', width: 20, height: 20 %>
               <% end %>
-              <%= link_to "https://twitter.com/ecosyste_ms", target: :_blank do %>
-                <%= bootstrap_icon 'twitter', width: 20, height: 20 %>
-              <% end %>
               <%= link_to "https://mastodon.social/@ecosystems", target: :_blank do %>
                 <%= bootstrap_icon 'mastodon', width: 20, height: 20 %>
               <% end %>
               <%= link_to "https://opencollective.com/ecosystems", target: :_blank do %>
                 <%= bootstrap_icon 'opencollective', width: 20, height: 20 %>
+              <% end %>
+              <%= link_to "mailto:funds@ecosyte.ms", target: :_blank do %>
+                <%= bootstrap_icon 'envelope', width: 20, height: 20 %>
               <% end %>
             </p>
           </div>
@@ -80,7 +80,6 @@
             <ul class="list-unstyled footer-links small">
               <li><strong><%= link_to 'About', about_path %></strong></li>
               <li><strong><%= link_to 'Blog', 'https://blog.ecosyste.ms' %></strong></li>
-              <li><strong><%= link_to 'Contact', 'https://twitter.com/ecosyste_ms' %></strong></li>
               <li><strong><%= link_to 'Privacy', privacy_path %></strong></li>
               <li><strong><%= link_to 'Status', 'https://ecosystems.appsignal-status.com/' %></strong></li>
             </ul>
