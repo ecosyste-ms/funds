@@ -41,6 +41,24 @@ $transition-collapse: height .35s ease;
 
 @import "bootstrap"; 
 
+@mixin spesh-link (
+  $text-color: $color-black, 
+  $hover-color: $color-green, 
+  $transition-duration: 250ms
+  ) {
+    color: $text-color;
+    text-decoration: none !important;
+    box-shadow: inset 0 -0.3em 0 $hover-color;
+    transition: $transition-duration;
+
+  &:hover,
+  &:active,
+  &:focus {
+    box-shadow: inset 0 -1em 0 $hover-color;
+    color: $text-color;
+  }
+}
+
 .container {
   @include media-breakpoint-down(md) {
     padding-left: 1.5rem;
@@ -68,7 +86,11 @@ body {
 
 .navigation-bar {
   a {
-    color: $color-black;
+    @include spesh-link();
+    padding: 0;
+  }
+  li {
+    padding: var(--bs-nav-link-padding-y) var(--bs-nav-link-padding-x);
   }
 }
 
@@ -178,15 +200,7 @@ body {
 }
 
 .spesh-link {
-  color: $color-black;
-  text-decoration: none !important;
-  box-shadow: inset 0 -0.3em 0 $color-green;
-  transition: 250ms;
-  &:hover,
-  &:active,
-  &:focus {
-    box-shadow: inset 0 -1em 0 $color-green;
-  }
+  @include spesh-link();
 }
 
 .spesh-link--hover-only {
@@ -293,7 +307,7 @@ body {
   .spesh-link {
     display: inline-block;
   }
-  /* if we have a .spesh-link in here, we need to attach thhe hover styles */
+  /* if we have a .spesh-link in here, we need to attach the hover styles */
   &:hover,
   &:active,
   &:focus {
@@ -383,15 +397,7 @@ body {
   }
 
 a {
-  color: $color-black;
-  text-decoration: none;
-  box-shadow: inset 0 -0.3em 0 $color-green;
-  transition: 250ms;
-  &:hover,
-  &:active,
-  &:focus  {
-    box-shadow: inset 0 -1em 0 $color-green;
-  }
+  @include spesh-link();
 }
   
 }
