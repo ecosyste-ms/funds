@@ -342,7 +342,9 @@ body {
 
 .fund-header {
   border-bottom: 1px solid $color-grey;
-  position: relative;
+  .container {
+    position: relative;
+  }
 }
 
 .btn-fund-header-cta {
