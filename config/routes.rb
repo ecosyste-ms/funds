@@ -31,6 +31,7 @@ Rails.application.routes.draw do
   get '/faq', to: 'pages#faq'
   get '/privacy', to: 'pages#privacy'
   get '/overview', to: 'pages#overview'
+  get '/terms', to: 'pages#terms'
 
   post '/webhooks', to: 'webhooks#receive'
 
