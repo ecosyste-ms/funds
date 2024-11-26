@@ -38,8 +38,34 @@ $lead-font-weight: 400;
 
 $transition-collapse: height .35s ease;
 
-
 @import "bootstrap"; 
+
+@mixin spesh-link (
+  $text-color: $color-black, 
+  $hover-color: $color-green, 
+  $transition-duration: 250ms
+  ) {
+    color: $text-color;
+    text-decoration: none !important;
+    box-shadow: inset 0 -0.3em 0 $hover-color;
+    transition: $transition-duration;
+
+  &:hover,
+  &:active,
+  &:focus {
+    box-shadow: inset 0 -1em 0 $hover-color;
+    color: $text-color;
+  }
+}
+
+/* Global selection style */
+::selection {
+  background-color: $color-purple-light;
+}
+
+::-moz-selection {
+  background-color: $color-purple-light;
+}
 
 .container {
   @include media-breakpoint-down(md) {
@@ -48,7 +74,7 @@ $transition-collapse: height .35s ease;
   }
 }
 
-.text-decoration-hover{
+.text-decoration-hover {
   text-decoration: none;
   &:hover{
     text-decoration: underline;
@@ -67,9 +93,12 @@ body {
 }
 
 .navigation-bar {
-
   a {
-    color: $color-black;
+    @include spesh-link();
+    padding: 0;
+  }
+  li {
+    padding: var(--bs-nav-link-padding-y) var(--bs-nav-link-padding-x);
   }
 }
 
@@ -106,7 +135,7 @@ body {
     color: $color-white;
     &:hover,
     &:active,
-    &:focus 
+    &:focus, 
     &:visited {
       color: $color-white;
     }
@@ -159,7 +188,7 @@ body {
 /* Hero */
 .hero {
   .lead {
-    max-width: 38rem;
+    max-width: 42rem;
     margin: 0 auto;
   }
 }
@@ -179,28 +208,11 @@ body {
 }
 
 .spesh-link {
-  color: $color-black;
-  text-decoration: none !important;
-  position: relative;
-  z-index: 1;
-  display: inline-block;
-  &::after {
-    content: '';                         
-    position: absolute;
-    left: 0;
-    bottom: -2px;
-    width: 100%;
-    height: 4px;
-    background-color: $color-green;
-    z-index: -1;
-    border-radius: 4px;
-  }
-  &:hover {
-    text-decoration: none !important;
-    &::after {
-      background-color: $color-orange;
-    }
-  }
+  @include spesh-link();
+}
+
+.spesh-link--hover-only {
+  box-shadow: inset 0 -0.3em 0 transparentize($color-green, 1);
 }
 
 .btn-primary {
@@ -300,14 +312,15 @@ body {
 }
 
 .block-link--spesh {
-  /* if we have a .spesh-link in here, we need to attach thhe hover styles */
+  .spesh-link {
+    display: inline-block;
+  }
+  /* if we have a .spesh-link in here, we need to attach the hover styles */
   &:hover,
   &:active,
   &:focus {
     .spesh-link {
-      &::after {
-        background-color: $color-orange;
-      }
+      box-shadow: inset 0 -1em 0 $color-green;
     }
   }
 }
@@ -351,7 +364,9 @@ body {
 
 .fund-header {
   border-bottom: 1px solid $color-grey;
-  position: relative;
+  .container {
+    position: relative;
+  }
 }
 
 .btn-fund-header-cta {
@@ -388,6 +403,11 @@ body {
     margin-top: 2rem;
     margin-bottom: 0.6667rem;
   }
+
+a {
+  @include spesh-link();
+}
+  
 }
 
 .page-content__title {
