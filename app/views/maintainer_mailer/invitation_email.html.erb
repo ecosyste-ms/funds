@@ -1,0 +1,25 @@
+<h1>Hi,</h1>
+
+<p><%= @funders %> would like to donate <%= @amount %> to <%= @package %>. If you’d like to accept this invitation, read on…</p>
+
+<p>Open Source Collective is a non-profit organisation committed to supporting those who create and use open-source software. We’ve created a way to fund the most critical open source projects within their respective ecosystems. <a href="<%= overview_url %>">Read more here.</a></p>
+
+<p>You’re receiving this message because this email address is publicly linked to <%= @package %>.</p>
+
+<h2>Accepting this invitation personally</h2>
+<p>If you complete the enclosed invitation, we will pay you <%= @amount %> directly within the next two weeks for your work maintaining <%= @package %>:</p>
+<p><a href="<%= @invite_url %>"><%= @invite_url %></a></p>
+
+<h2>Accepting as part of a community</h2>
+<p>If you or your community already accept financial support for <%= @package %>, add this information to your funding.yaml file in your repository, and we’ll direct this and future contributions there. For more information on formats, see <a href="<%= 'https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/displaying-a-sponsor-button-in-your-repository' %>">GitHub’s documentation</a> — your repository does not have to be on GitHub.</p>
+
+<h2>Not thought about funding yet?</h2>
+<p>Many open-source communities accept donations and sponsorships to support their work. Whether it’s paying for hosting, tools, hardware, travel, or paying contributors for their time, money is an essential resource for modern open-source projects. <a href="<%= faq_url %>">Read more about funding platforms here.</a></p>
+
+<h2>Declining this invitation (and future participation)</h2>
+<p>This invitation will remain open until <%= @decline_deadline %>. If you wish to decline this invitation, and future invitations, please indicate so using the invitation itself:</p>
+<p><a href="<%= @invite_url %>"><%= @invite_url %></a></p>
+
+<p>If you decline this invitation, we will not contact you again concerning <%= @package %>.</p>
+
+<p>Thanks,</p>

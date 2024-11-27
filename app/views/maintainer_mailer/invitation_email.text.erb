@@ -1,0 +1,27 @@
+Hi,
+
+<%= @funders %> would like to donate <%= @amount %> to <%= @package %>. If you’d like to accept this invitation, read on…
+
+Open Source Collective is a non-profit organisation committed to supporting those who create and use open-source software. We’ve created a way to fund the most critical open source projects within their respective ecosystems. Read more at <%= overview_url %>.
+
+You’re receiving this message because this email address is publicly linked to <%= @package %>.
+
+Accepting this invitation personally:
+If you complete the enclosed invitation, we will pay you <%= @amount %> directly within the next two weeks for your work maintaining <%= @package %>:
+
+<%= @invite_url %>
+
+Accepting as part of a community:
+If you or your community already accept financial support for <%= @package %>, add this information to your funding.yaml file in your repository, and we’ll direct this and future contributions there. For more information on formats, see GitHub’s documentation <%= 'https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/displaying-a-sponsor-button-in-your-repository' %> — your repository does not have to be on GitHub.
+
+Not thought about funding yet?
+Many open-source communities accept donations and sponsorships to support their work. Whether it’s paying for hosting, tools, hardware, travel, or paying contributors for their time, money is an essential resource for modern open-source projects. Read more about funding platforms here: <%= faq_url %>.
+
+Declining this invitation (and future participation):
+This invitation will remain open until <%= @decline_deadline %>. If you wish to decline this invitation, and future invitations, please indicate so using the invitation itself:
+
+<%= @invite_url %>
+
+If you decline this invitation, we will not contact you again concerning <%= @package %>.
+
+Thanks,
