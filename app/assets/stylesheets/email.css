@@ -1,15 +1,74 @@
 /* app/assets/stylesheets/email.css */
 body {
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-  color: #333;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-size: 18px;
+  line-height: 1.334;
+  color: #1D1D28;
 }
 
 a {
-  color: #007bff;
+  color: #5C5CCF;
+  text-decoration: underline;
+}
+
+h2 {
+  font-size: 18px;
+}
+
+.ecosystems-mail-wrapper {]
+  background: #F5F5FF;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F5F5FF 100%);
+  padding-bottom: 54px;
+}
+
+.ecosystems-mail-body {
+  margin: 1em auto;
+  max-width: 42em;
+}
+
+.header {
+  text-align: center;
+}
+
+.bullet-image {
+  margin-top: 14px;
+}
+
+.explanation {
+  font-size: 14px;
+  color: #43435C;
+}
+
+.orange {
+  color: #E6433F;
+}
+
+.green {
+  color: #2EAF6B;
+}
+
+.mb {
+  margin-bottom: 36px;
+}
+
+.button {
+  border-radius: 9999px;
+  background-color: #2EAF6B;
+  display: inline-block;
+  padding: 0.8em 1.8em;
+  color: #fff;
   text-decoration: none;
 }
 
-h1, h2 {
-  color: #000;
+.button--red {
+  background-color: #E6433F;
+}
+
+.footer {
+  text-align: center;
+}
+
+.footer img {
+  position: relative;
+  top: -60px;
 }
