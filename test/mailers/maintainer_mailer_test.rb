@@ -38,7 +38,7 @@ class MaintainerMailerTest < ActionMailer::TestCase
     assert_includes email.text_part.body.to_s, invite_url
     assert_includes email.text_part.body.to_s, decline_deadline
 
-    assert_includes email.html_part.body.to_s, "font-family: Arial"
-    assert_includes email.html_part.body.to_s, "color: #007bff"
+    assert_includes email.html_part.body.to_s, "font-family: system-ui"
+    assert_includes email.html_part.body.to_s, "color: #1D1D28"
   end
 end
