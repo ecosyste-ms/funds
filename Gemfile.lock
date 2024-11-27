@@ -108,6 +108,8 @@ GEM
       bigdecimal
       rexml
     crass (1.0.6)
+    css_parser (1.19.1)
+      addressable
     csv (3.3.0)
     date (3.4.0)
     debug (1.9.2)
@@ -156,6 +158,7 @@ GEM
       bigdecimal
       rake (>= 13)
     hashdiff (1.1.2)
+    htmlentities (4.3.4)
     i18n (1.14.6)
       concurrent-ruby (~> 1.0)
     io-console (0.7.2)
@@ -218,6 +221,14 @@ GEM
     pghero (3.6.1)
       activerecord (>= 6.1)
     popper_js (2.11.8)
+    premailer (1.27.0)
+      addressable
+      css_parser (>= 1.19.0)
+      htmlentities (>= 4.0.0)
+    premailer-rails (1.12.0)
+      actionmailer (>= 3)
+      net-smtp
+      premailer (~> 1.7, >= 1.7.9)
     psych (5.2.0)
       stringio
     public_suffix (6.0.1)
@@ -369,6 +380,7 @@ DEPENDENCIES
   pg (~> 1.5)
   pg_query
   pghero
+  premailer-rails
   puma (~> 6.3)
   rack-attack
   rack-attack-rate-limit
