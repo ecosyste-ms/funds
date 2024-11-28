@@ -48,5 +48,7 @@ group :test do
   gem "webmock"
   gem "mocha"
   gem "rails-controller-testing"
+  gem "factory_bot_rails"
+  gem 'faker'
 end
 
