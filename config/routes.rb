@@ -23,6 +23,13 @@ Rails.application.routes.draw do
     resources :projects, only: [:index]
   end
 
+  resource :invitation do
+    member do
+      post :accept
+      post :reject
+    end
+  end
+
   resources :funding_sources, only: [:index, :show]
 
   resources :projects, only: [:show]

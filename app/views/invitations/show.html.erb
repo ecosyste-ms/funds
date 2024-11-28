@@ -1,17 +1,29 @@
-<h1>Accept or reject the invitation!</h1>
+<div class="container">
+  <div class="row">
+    <div class="col-lg-8 page-content">
+      <h1 class="page-content__title display-2">Accept or reject the invitation!</h1>
 
-<% if @invitation.expired? %>
+      <% if @invitation.expired? %>
 
-  <p>This invitation has expired</p>
+        <p>This invitation has expired</p>
 
-<% else %>
+      <% else %>
 
-  <p>Accept confirmation button</p>
+        <% if @invitation.accepted? %>
+          <p>This invitation has already been accepted</p>
+        <% end %>
 
-  <p>or they can update their funding.yml and we'll check it again</p>
+        <% if @invitation.rejected? %>
+          <p>This invitation has already been rejected</p>
+        <% end %>
 
-  <p>also an option to reject</p>
+        <%= button_to 'Accept Invitation', accept_invitation_path(token: @invitation.token) %>
 
-  <p>if it's been accepted/rejected already then show a message</p>
+        <p>or they can update their funding.yml and we'll check it again</p>
 
-<% end %>
+        <%= button_to 'Reject Invitation', reject_invitation_path(token: @invitation.token) %>
+
+      <% end %>
+    </div>
+  </div>
+</div>
