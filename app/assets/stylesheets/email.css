@@ -17,7 +17,7 @@ h2 {
 
 .ecosystems-mail-wrapper {
   background: #F5F5FF;
-  background: linear-gradient(180deg, #FFFFFF 0%, #F5F5FF 100%);
+  border-bottom: 8px solid #E0E0FB;
   padding-bottom: 54px;
   padding-left: 16px;
   padding-right: 16px;
