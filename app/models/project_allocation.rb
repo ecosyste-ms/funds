@@ -27,6 +27,20 @@ class ProjectAllocation < ApplicationRecord
     funding_source.platform == 'opencollective.com' ? funding_source.name : nil
   end
 
+  def payout_method_name
+    if is_osc_collective?
+      "Open Source Collective: #{funding_source.name}"
+    elsif is_non_osc_collective?
+      "Open Collective (non-OSC): #{funding_source.name} (#{funding_source.host})"
+    elsif approved_funding_source?
+      funding_source.url
+    elsif project && project.contact_email.present?
+      "Email invite: #{project.contact_email}"
+    else
+      "No valid payout method"
+    end
+  end
+
   def choose_payout_method
     if is_osc_collective?
       puts "  Sending to OSC collective: #{funding_source.name}"
