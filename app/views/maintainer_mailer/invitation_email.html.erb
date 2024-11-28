@@ -36,7 +36,6 @@
                                 <td class="explanation">
                                     <h3>What’s this all about?</h3>
                                     <p>Open Source Collective is a non-profit organisation committed to supporting those who create and use open-source software. We’ve created a way to fund the most critical open source projects within their respective ecosystems. <a href="<%= overview_url %>">Read more here</a>.</p>
-            
                                     <p class="mb">You’re receiving this message because this email address is publicly linked to <%= @package %>.</p>
                                 </td>
                             </tr>
@@ -49,7 +48,7 @@
                             <tr>
                                 <td>
                                     <h2 class="green">Accepting this invitation personally</h2>
-                                    <p>If you complete the enclosed invitation, we will pay you <b><%= @amount %></b> directly within the next two weeks for your work maintaining <b><%= @package %></b>:</p>
+                                    <p>If you complete <a href="<%= @invite_url %>">the enclosed invitation</a>, we will pay you <b><%= @amount %></b> directly within the next two weeks for your work maintaining <b><%= @package %></b>:</p>
                                     <p class="mb"><a href="<%= @invite_url %>" class="button">Respond to the invite</a></p>
                                     
                                     <h2  class="green">Accepting as part of a community</h2>
@@ -80,11 +79,9 @@
                             <tr>
                                 <td>
                                     <h2  class="orange">Declining this invitation (and future participation)</h2>
-                                    <p>This invitation will remain open until <b><%= @decline_deadline %></b>. If you wish to decline this invitation, and future invitations, please indicate so using the invitation itself:</p>
+                                    <p>This invitation will remain open until <b><%= @decline_deadline %></b>. If you wish to decline this invitation, and future invitations, please indicate so using <a href="<%= @invite_url %>">the invitation itself</a>:</p>
                                     <p class="mb"><a href="<%= @invite_url %>" class="button button--red">Respond to the invite</a></p>
-                                    
                                     <p>If you decline this invitation, we will not contact you again concerning <b><%= @package %></b>.</p>
-                                    
                                     <p class="mb">Thanks,</p>
                                 </td>
                             </tr>
