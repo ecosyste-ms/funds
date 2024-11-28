@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_11_28_130251) do
+ActiveRecord::Schema[8.0].define(version: 2024_11_28_150023) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -71,6 +71,8 @@ ActiveRecord::Schema[8.0].define(version: 2024_11_28_130251) do
     t.datetime "updated_at", null: false
     t.json "data"
     t.string "token"
+    t.datetime "accepted_at"
+    t.datetime "rejected_at"
     t.index ["project_allocation_id"], name: "index_invitations_on_project_allocation_id"
     t.index ["token"], name: "index_invitations_on_token", unique: true
   end
@@ -109,6 +111,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_11_28_130251) do
     t.string "registry_names", default: [], array: true
     t.integer "funding_source_id"
     t.string "licenses", default: [], array: true
+    t.boolean "funding_rejected", default: false
     t.index ["funding_source_id"], name: "index_projects_on_funding_source_id"
     t.index ["url"], name: "index_projects_on_url", unique: true
   end

@@ -351,4 +351,8 @@ class ProjectAllocation < ApplicationRecord
       decline_deadline.strftime("%B %d, %Y")
     )
   end
+
+  def reject_funding!
+    project.update!(funding_rejected: true)
+  end
 end

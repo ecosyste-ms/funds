@@ -13,6 +13,15 @@ class Invitation < ApplicationRecord
     end
   end
 
+  def accept
+    update!(accepted_at: Time.zone.now)
+  end
+
+  def reject
+    update!(rejected_at: Time.zone.now)
+    project_allocation.reject_funding!
+  end
+
   def html_url
     "https://staging.opencollective.com/#{ENV['OPENCOLLECTIVE_PARENT_SLUG']}/projects/#{project_allocation.fund.oc_project_slug}/expenses/#{member_invitation_id}"
   end
