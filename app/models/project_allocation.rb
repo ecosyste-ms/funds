@@ -341,18 +341,16 @@ class ProjectAllocation < ApplicationRecord
     created_at + 14.days
   end
 
-  def send_invitation_email
-    MaintainerMailer.invitation_email(
-      project.contact_email,
-      project.to_s,
-      funder_names,
-      "$#{amount_cents / 100.0}",
-      "https://example.com/invite",
-      decline_deadline.strftime("%B %d, %Y")
-    )
+  def send_invitation
+    # create invitation record
+    # send email
   end
 
   def reject_funding!
     project.update!(funding_rejected: true)
+  end
+
+  def accept_funding!
+    project.update!(funding_rejected: false)
   end
 end

@@ -13,13 +13,43 @@ class Invitation < ApplicationRecord
     end
   end
 
-  def accept
-    update!(accepted_at: Time.zone.now)
+  def decline_deadline
+    project_allocation.decline_deadline
   end
 
-  def reject
-    update!(rejected_at: Time.zone.now)
+  def expired?
+    Time.zone.now > decline_deadline
+  end
+
+  def accept!
+    return if expired?
+    update!(accepted_at: Time.zone.now, rejected_at: nil)
+    project_allocation.accept_funding!
+  end
+
+  def reject!
+    return if expired?
+    update!(rejected_at: Time.zone.now, accepted_at: nil)
     project_allocation.reject_funding!
+  end
+
+  def accepted?
+    accepted_at.present?
+  end
+
+  def rejected?
+    rejected_at.present?
+  end
+
+  def send_email
+    MaintainerMailer.invitation_email(
+      project.contact_email,
+      project.to_s,
+      funder_names,
+      "$#{amount_cents / 100.0}",
+      "https://example.com/invite",
+      decline_deadline.strftime("%B %d, %Y")
+    ).deliver_now
   end
 
   def html_url
