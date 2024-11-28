@@ -3,7 +3,7 @@
     <div class="col-lg-8 page-content">
       <h1 class="page-content__title display-2">Accept or reject the invitation!</h1>
 
-      <% if @invitation.expired? %>
+      <% if Rails.env.development? && params[:expired] || Rails.env.production? && @invitation.expired? %>
 
         <p>This invitation has expired</p>
 
