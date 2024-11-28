@@ -1,5 +1,17 @@
 class Invitation < ApplicationRecord
+
+  validates :token, presence: true, uniqueness: true
+
   belongs_to :project_allocation
+
+  before_validation :generate_token, on: :create
+
+  def generate_token
+    loop do
+      self.token = SecureRandom.hex(16)
+      break unless Invitation.exists?(token: token)
+    end
+  end
 
   def html_url
     "https://staging.opencollective.com/#{ENV['OPENCOLLECTIVE_PARENT_SLUG']}/projects/#{project_allocation.fund.oc_project_slug}/expenses/#{member_invitation_id}"
