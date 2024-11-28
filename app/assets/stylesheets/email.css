@@ -19,6 +19,8 @@ h2 {
   background: #F5F5FF;
   background: linear-gradient(180deg, #FFFFFF 0%, #F5F5FF 100%);
   padding-bottom: 54px;
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
 .ecosystems-mail-body {
