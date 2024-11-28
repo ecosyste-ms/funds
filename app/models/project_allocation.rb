@@ -332,4 +332,23 @@ class ProjectAllocation < ApplicationRecord
       response_body['data']['addFunds']
     end
   end
+
+  def funder_names
+    allocation.funder_names
+  end
+
+  def decline_deadline
+    created_at + 14.days
+  end
+
+  def send_invitation_email
+    MaintainerMailer.invitation_email(
+      project.contact_email,
+      project.to_s,
+      funder_names,
+      "$#{amount_cents / 100.0}",
+      "https://example.com/invite",
+      decline_deadline.strftime("%B %d, %Y")
+    )
+  end
 end

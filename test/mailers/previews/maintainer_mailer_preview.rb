@@ -4,8 +4,8 @@ class MaintainerMailerPreview < ActionMailer::Preview
     MaintainerMailer.invitation_email(
       "maintainer@example.com",
       "example-package",
-      "Open Source Collective",
-      "$500",
+      "Sentry",
+      "$500.00",
       "https://example.com/invite",
       (Time.now + 14.days).strftime("%B %d, %Y")
     )

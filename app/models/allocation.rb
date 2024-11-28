@@ -181,4 +181,12 @@ class Allocation < ApplicationRecord
       end
     end
   end
+
+  def funder_names
+    'Sentry' # TODO this should be based on transactions to the fund in the period of the allocation
+  end
+
+  def decline_deadline
+    created_at + 14.days
+  end
 end

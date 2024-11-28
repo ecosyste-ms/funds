@@ -5,8 +5,8 @@ class MaintainerMailerTest < ActionMailer::TestCase
     # Set up email parameters
     maintainer_email = "maintainer@example.com"
     package = "example-package"
-    funders = "Open Source Collective"
-    amount = "$500"
+    funders = "Sentry"
+    amount = "$500.00"
     invite_url = "https://example.com/invite"
     decline_deadline = (Time.now + 14.days).strftime("%B %d, %Y")
 
@@ -30,11 +30,11 @@ class MaintainerMailerTest < ActionMailer::TestCase
     assert_equal "Thank you for your work maintaining #{package}", email.subject
 
     # Assert email body contains expected content
-    assert_includes email.html_part.body.to_s, "Open Source Collective"
+    assert_includes email.html_part.body.to_s, "Sentry"
     assert_includes email.html_part.body.to_s, invite_url
     assert_includes email.html_part.body.to_s, decline_deadline
 
-    assert_includes email.text_part.body.to_s, "Open Source Collective"
+    assert_includes email.text_part.body.to_s, "Sentry"
     assert_includes email.text_part.body.to_s, invite_url
     assert_includes email.text_part.body.to_s, decline_deadline
 
