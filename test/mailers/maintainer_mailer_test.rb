@@ -4,7 +4,7 @@ class MaintainerMailerTest < ActionMailer::TestCase
   test "invitation_email" do
     # Set up email parameters
     maintainer_email = "maintainer@example.com"
-    package = "example-package"
+    package = "example-project"
     funders = "Sentry"
     amount = "$500.00"
     invite_url = "https://example.com/invite"

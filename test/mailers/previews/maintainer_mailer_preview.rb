@@ -3,7 +3,7 @@ class MaintainerMailerPreview < ActionMailer::Preview
   def invitation_email
     MaintainerMailer.invitation_email(
       "maintainer@example.com",
-      "example-package",
+      "example-project",
       "Sentry",
       "$500.00",
       "https://example.com/invite",
