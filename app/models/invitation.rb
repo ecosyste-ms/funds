@@ -70,6 +70,8 @@ class Invitation < ApplicationRecord
           description
           amount
           currency
+          draft
+          lockedFields
           payee {
             ... on Individual {
               id
