@@ -271,7 +271,10 @@ class Fund < ApplicationRecord
 
   def setup_opencollective_project
     return if opencollective_project_id.present?
-
+  
+    file = download_image(logo_url)
+    return unless file
+  
     query = <<~GRAPHQL
       mutation CreateProject($parent: AccountReferenceInput!, $project: ProjectCreateInput!) {
         createProject(parent: $parent, project: $project) {
@@ -280,9 +283,7 @@ class Fund < ApplicationRecord
           name
           description
           slug
-          type
           tags
-          website
           imageUrl
           createdAt
           updatedAt
@@ -290,23 +291,40 @@ class Fund < ApplicationRecord
       }
     GRAPHQL
   
-    variables = {
-      parent: { slug: ENV['OPENCOLLECTIVE_PARENT_SLUG'] },
-      project: {
-        name: "#{name} Fund",
-        slug: oc_project_slug,
-        description: "This is the Open Source Collective for the #{name} Fund. We support open-source projects in the #{name} ecosystem.",
-        tags: ["open-source", "community", "fund", slug],
+    operations = {
+      query: query,
+      variables: {
+        parent: { slug: ENV['OPENCOLLECTIVE_PARENT_SLUG'] },
+        project: {
+          name: "#{name} Fund",
+          slug: oc_project_slug,
+          description: "This is the Open Source Collective for the #{name} Fund. We support open-source projects in the #{name} ecosystem.",
+          tags: ["open-source", "community", "fund", slug],
+          image: nil # Placeholder for the file reference
+        }
       }
+    }.to_json
+  
+    map = {
+      "1" => ["variables.project.image"]
+    }.to_json
+  
+    payload = {
+      operations: Faraday::Multipart::ParamPart.new(operations, 'application/json'),
+      map: Faraday::Multipart::ParamPart.new(map, 'application/json'),
+      "1" => Faraday::Multipart::FilePart.new(file.path, 'image/png', 'logo.png')
     }
   
-    payload = { query: query, variables: variables }.to_json
+    connection = Faraday.new(url: "https://staging.opencollective.com") do |faraday|
+      faraday.request :multipart
+      faraday.adapter Faraday.default_adapter
+    end
   
-    response = Faraday.post(
-      "https://staging.opencollective.com/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
-      payload,
-      { 'Content-Type' => 'application/json' }
-    )
+    response = connection.post do |req|
+      req.url "/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}"
+      req.headers['Authorization'] = "Bearer #{ENV['OPENCOLLECTIVE_TOKEN']}" # Authorization header
+      req.body = payload
+    end
   
     puts "Response status: #{response.status}"
     puts "Response body: #{response.body}"
@@ -315,56 +333,37 @@ class Fund < ApplicationRecord
   
     if response_data['errors']
       puts "GraphQL Errors: #{response_data['errors']}"
-      # TODO if slug already exists, load the project and save the id
     else
-      project_data = response_data['data']['createProject']
-      puts "Project created! ID: #{project_data['id']}, Name: #{project_data['name']}, Description: #{project_data['description']}"
-      self.opencollective_project_id = project_data['id']
-      self.opencollective_project = project_data
-      save
-      return project_data
+      project_data = response_data.dig('data', 'createProject')
+      if project_data
+        puts "Project created! ID: #{project_data['id']}, Name: #{project_data['name']}, Description: #{project_data['description']}"
+        self.opencollective_project_id = project_data['id']
+        self.opencollective_project = project_data
+        save
+        return project_data
+      else
+        raise "Project creation failed"
+      end
     end
+  ensure
+    file.close if file
+    file.unlink if file
   end
 
-  def add_image_to_opencollective_project
-    return unless opencollective_project_id.present?
-
-    query = <<~GRAPHQL
-    mutation EditAccountSetting($account: AccountReferenceInput!, $key: String!, $value: JSON!) {
-      editAccountSetting(account: $account, key: $key, value: $value) {
-        id
-        name
-        settings
-      }
-    }
-  GRAPHQL
+  def download_image(url)
+    return nil if url.blank?
   
-  variables = {
-    account: { id: opencollective_project_id },
-    key: "collective.image",
-    value: logo_url
-  }
-
-    payload = { query: query, variables: variables }.to_json
-  
-    response = Faraday.post(
-      "https://staging.opencollective.com/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
-      payload,
-      { 'Content-Type' => 'application/json' }
-    )
-  
-    puts "Response status: #{response.status}"
-    puts "Response body: #{response.body}"
-  
-    response_data = JSON.parse(response.body)
-  
-    if response_data['errors']
-      puts "GraphQL Errors: #{response_data['errors']}"
-      # TODO if slug already exists, load the project and save the id
-    else
-      account_data = response_data['data']['editAccount']
-      puts "Account edited! ID: #{account_data['id']}, Name: #{account_data['name']}, Image URL: #{account_data['imageUrl']}"
-      return account_data
+    begin
+      tempfile = Tempfile.new(['logo', '.png'])
+      URI.open(url) do |image|
+        tempfile.binmode
+        tempfile.write(image.read)
+      end
+      tempfile.rewind
+      tempfile
+    rescue => e
+      puts "Failed to download image: #{e.message}"
+      nil
     end
   end
 

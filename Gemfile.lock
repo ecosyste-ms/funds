@@ -132,6 +132,8 @@ GEM
       logger
     faraday-follow_redirects (0.3.0)
       faraday (>= 1, < 3)
+    faraday-multipart (1.0.4)
+      multipart-post (~> 2)
     faraday-net_http (3.4.0)
       net-http (>= 0.5.0)
     faraday-retry (2.2.1)
@@ -195,6 +197,7 @@ GEM
     mocha (2.6.1)
       ruby2_keywords (>= 0.0.5)
     msgpack (1.7.5)
+    multipart-post (2.4.1)
     net-http (0.5.0)
       uri
     net-imap (0.5.1)
@@ -380,6 +383,7 @@ DEPENDENCIES
   faker
   faraday
   faraday-follow_redirects
+  faraday-multipart
   faraday-retry
   jbuilder
   jquery-rails
