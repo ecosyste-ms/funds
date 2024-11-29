@@ -150,18 +150,11 @@
               <div class="collapse" id="details-<%= i %>">
                 <div class="p-4 well">
                   <p><%= bootstrap_icon 'github', width: 18, height: 18 %> <span class="visually-hidden">Repository:</span> <%= link_to project_allocation.project.url, project_allocation.project.url, target: :_blank %></p>
-                  <% if project_allocation.funding_source %>
-                  <p><%= bootstrap_icon 'wallet', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> <%= link_to project_allocation.funding_source.url, project_allocation.funding_source.url, target: :_blank %></p>
-                  <% end %>  
-
                   <% if project_allocation.funding_source && project_allocation.funding_source.approved? %>
-                    <%= link_to project_allocation.funding_source.url, target: :_blank do %>
-                      <%= project_allocation.funding_source.full_name.truncate(40) %>
-                    <% end %>
+                    <p><%= bootstrap_icon 'wallet', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> <%= link_to project_allocation.funding_source.url, project_allocation.funding_source.url, target: :_blank %></p>
                   <% else %>
-                    Contacting Maintainer
-                  <% end %>
-
+                    <p><%= bootstrap_icon 'wallet', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> Contacting Maintainer</p>
+                  <% end %>  
                 </div>
               </div>
             </td>
