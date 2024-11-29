@@ -35,7 +35,7 @@
           </div> 
         </div>
         <% if @fund.open_collective_project_url.present? %>
-          <%= link_to "Fund the #{@fund.name} Ecosystem on Open Source Collective", @fund.open_collective_project_url, class: 'btn btn-primary btn-fund-header-cta mb-3' %>
+          <%= link_to "Fund the #{@fund.name} Ecosystem on Open Source Collective", @fund.open_collective_project_url, class: 'btn btn-success btn-fund-header-cta rounded-pill mb-3' %>
         <% end %>
       </div>
     </div>

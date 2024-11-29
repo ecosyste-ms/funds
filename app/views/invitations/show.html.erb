@@ -1,27 +1,36 @@
 <div class="container">
   <div class="row">
     <div class="col-lg-8 page-content">
-      <h1 class="page-content__title display-2">Accept or reject the invitation!</h1>
-
+      <h1 class="page-content__title display-2">Respond to a funding invitation</h1>
+      <p class="lead"><strong><%= @project_allocation.funder_names %></strong> would like to donate <strong>£<%= @project_allocation.amount_cents / 100.0 %></strong> to <strong><%= @invitation.project_allocation.project %></strong></p>
       <% if Rails.env.development? && params[:expired] || Rails.env.production? && @invitation.expired? %>
-
-        <p>This invitation has expired</p>
-
+        <div class="alert alert-info" role="alert">
+          <p class="mb-0"><%= bootstrap_icon 'exclamation-triangle-fill', width: 18, height: 18, class: "flex-shrink-0 me-2" %> This invitation has expired</p>
+        </div>
       <% else %>
-
+        <h2>Accept the invitation personally</h2>
+        <p>If you accept this funding invitation, we will pay you <strong>£<%= @project_allocation.amount_cents / 100.0 %></strong> directly within the next two weeks for your work maintaining <strong><%= @invitation.project_allocation.project %></strong></p> 
         <% if @invitation.accepted? %>
-          <p>This invitation has already been accepted</p>
+          <div class="alert alert-success" role="alert">
+            <p class="mb-0"><%= bootstrap_icon 'check-circle-fill', width: 18, height: 18, class: "flex-shrink-0 me-2" %> This invitation has already been accepted</p>
+          </div>
         <% end %>
-
+          
         <% if @invitation.rejected? %>
-          <p>This invitation has already been rejected</p>
+          <div class="alert alert-danger" role="alert">
+            <p class="mb-0"><%= bootstrap_icon 'exclamation-triangle-fill', width: 18, height: 18, class: "flex-shrink-0 me-2" %> This invitation has been rejected. You have until <strong><%= @invitation.decline_deadline.strftime("%B %d, %Y") %></strong> to change your mind</p>
+          </div>
         <% end %>
+            
+        <%= button_to 'Accept Invitation', accept_invitation_path(token: @invitation.token), class: 'btn btn-success rounded-pill' %>
 
-        <%= button_to 'Accept Invitation', accept_invitation_path(token: @invitation.token) %>
+        <h2>Accept the invitation as a community</h2>
+        <p>Add your funding information to your <code>funding.yml</code> file in your repository, and we’ll direct this and future contributions there. For more information on formats, see <a href="<%= 'https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/displaying-a-sponsor-button-in-your-repository' %>">GitHub’s documentation</a></p>
+        <hr class="mt-5" />
+        <h2>Decline the invitation</h2>
+        <p>This invitation will remain open until <strong><%= @invitation.decline_deadline.strftime("%B %d, %Y") %></strong> If you to decline this invitation you have until then to change your mind. We will not contact you again concerning <strong><%= @invitation.project_allocation.project %></strong>.</p>
 
-        <p>or they can update their funding.yml and we'll check it again</p>
-
-        <%= button_to 'Reject Invitation', reject_invitation_path(token: @invitation.token) %>
+        <%= button_to 'Reject Invitation', reject_invitation_path(token: @invitation.token), class: 'btn btn-danger rounded-pill' %>
 
       <% end %>
     </div>
