@@ -7,16 +7,51 @@ $color-purple-dark: #5C5CCF;
 
 $color-orange: #FF807D;
 $color-orange-light: #FEBDB9;
-$color-orange-dark: #C65568;
+$color-orange-dark: #DE5858;
 
 $color-green: #45E56E;
-$color-green-light: #75D293;
+$color-green-light: #87F5AA;
 $color-green-dark: #2EAF6B;
+$color-green-darker: #189654;
 
 $color-black: #1D1D28;
 $color-white: #FFFFFF;
-$color-light-grey: #F5F5FA;
+$color-grey-light: #F5F5FA;
 $color-grey: #DCDCE0;
+$color-grey-dark: #4C4C61;
+
+/* Tokens to override bootstrap colours */
+$bootstrap-primary: $color-purple;
+$bootstrap-secondary: $color-grey;
+$bootstrap-success: $color-green;
+$bootstrap-info: $color-purple-light;
+$bootstrap-warning: $color-orange;
+$bootstrap-danger: $color-orange-dark;
+$bootstrap-light: $color-grey-light;
+$bootstrap-dark: $color-black;
+
+/* Bootstrap SCSS colour variables */
+$theme-colors: (
+  "primary":    $bootstrap-primary,
+  "secondary":  $bootstrap-secondary,
+  "success":    $bootstrap-success,
+  "info":       $bootstrap-info,
+  "warning":    $bootstrap-warning,
+  "danger":     $bootstrap-danger,
+  "light":      $bootstrap-light,
+  "dark":       $bootstrap-dark
+);
+
+/* Bootstrap CSS colour variables */
+:root {
+  --bs-primary: $bootstrap-primary;
+  --bs-success: $bootstrap-success;
+  --bs-danger:  $bootstrap-danger;
+  --bs-warning: $bootstrap-warning;
+  --bs-info:    $bootstrap-info;
+  --bs-light:   $bootstrap-light;
+  --bs-dark:    $bootstrap-dark;
+}
 
 /* Typography */
 $font-family-base: "Inter", sans-serif;
@@ -38,7 +73,14 @@ $lead-font-weight: 400;
 
 $transition-collapse: height .35s ease;
 
+$btn-padding-y: 0.5em;
+$btn-padding-x: 1em;
+$btn-font-weight: 600;
+$btn-color: $color-white;
+
+
 @import "bootstrap"; 
+
 
 @mixin spesh-link (
   $text-color: $color-black, 
@@ -65,6 +107,96 @@ $transition-collapse: height .35s ease;
 
 ::-moz-selection {
   background-color: $color-purple-light;
+}
+
+.btn-primary {
+  background: linear-gradient(180deg, $color-purple 0%, $color-purple-dark 100%);
+  color: $color-white;
+  &:hover,
+  &:active,
+  &:focus {
+    color: $color-white;
+    background: linear-gradient(180deg, $color-purple 0%, $color-purple-dark 33%);
+  }
+}
+
+.btn-secondary {
+  background: linear-gradient(180deg, $color-grey-light 0%, $color-grey 100%);
+  &:hover,
+  &:active,
+  &:focus {
+    background: linear-gradient(180deg, $color-grey-light 0%, $color-grey 33%);
+  }
+}
+
+.btn-success {
+  background: linear-gradient(180deg, $color-green-dark 0%, $color-green-darker 100%);
+  color: $color-white;
+  &:hover,
+  &:active,
+  &:focus {
+    color: $color-white;
+    background: linear-gradient(180deg, $color-green-dark 0%, $color-green-darker 33%);
+  }
+}
+
+.btn-danger {
+  background: linear-gradient(180deg, $color-orange 0%, $color-orange-dark 100%);
+  color: $color-white;
+  &:hover,
+  &:active,
+  &:focus {
+    color: $color-white;
+    background: linear-gradient(180deg, $color-orange 0%, $color-orange-dark 33%);
+  }
+}
+
+.btn-warning {
+  background: linear-gradient(180deg, $color-orange-light 0%, $color-orange 100%);
+  &:hover,
+  &:active,
+  &:focus {
+    background: linear-gradient(180deg, $color-orange-light 0%, $color-orange 33%);
+
+  }
+}
+
+.btn-info {
+  background: linear-gradient(180deg, $color-grey-light 0%, $color-purple-light 100%);
+  &:hover,
+  &:active,
+  &:focus {
+    background: linear-gradient(180deg, $color-grey-light 0%, $color-purple-light 33%);
+  }
+}
+
+.btn-light {
+  background: linear-gradient(180deg, $color-grey-light 0%, $color-grey 100%);
+  &:hover,
+  &:active,
+  &:focus {
+    background: linear-gradient(180deg, $color-grey-light 0%, $color-grey 33%);
+  }
+}
+
+.btn-dark {
+  background: linear-gradient(180deg, $color-grey-dark 0%, $color-black 100%);
+  &:hover,
+  &:active,
+  &:focus {
+    background: linear-gradient(180deg, $color-grey-dark 0%, $color-black 33%);
+  }
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-success,
+.btn-danger,
+.btn-warning,
+.btn-info,
+.btn-light,
+.btn-dark {
+  border: 0;
 }
 
 .container {
@@ -215,23 +347,6 @@ body {
   box-shadow: inset 0 -0.3em 0 transparentize($color-green, 1);
 }
 
-.btn-primary {
-    background-color: $color-orange-dark;
-    border-color: $color-orange-dark;
-    padding: 0.5em 1em;
-    font-weight: 600;
-  &:hover,
-  &:focus {
-    background-color: $color-orange;
-    border-color: $color-orange;
-    color: $color-black;
-  }
-  &:active {
-    background-color: $color-orange-dark !important;
-    border-color: $color-orange !important;
-  }
-
-}
 
 .fund-card {
   border: 0;
@@ -394,7 +509,7 @@ body {
 }
 
 .well {
-  background-color: $color-light-grey;
+  background-color: $color-grey-light;
   border-radius: $border-radius;
 }
 
