@@ -163,7 +163,7 @@
                     
                     <div class="stat-card mb-2">
                       <div class="stat-card-body">
-                        <span class="stat-card-title"><%= @allocation.funders_count %></span>
+                        <span class="stat-card-title"><%= number_with_delimiter project_allocation.project&.dependent_repos_count %></span>
                         <span class="stat-card-text small">Dependent Repos</span>
                       </div>
                     </div>
