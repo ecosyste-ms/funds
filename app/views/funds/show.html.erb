@@ -119,8 +119,9 @@
           <th>#</th>
           <th>Project</th>
           <th>Amount</th>
-          <th>Score</th>
-          <th>Funding Platform</th>
+          <th>Downloads</th>
+          <th>Dependent Repos</th>
+          <th>Dependent Packages</th>
         </tr>
       </thead>
       <tbody>
@@ -132,15 +133,14 @@
             <td><%= i + 1 %></td>
             <td><%= link_to project_allocation.project, project_allocation.project.url, target: :_blank %></td>
             <td><%= number_to_currency project_allocation.amount_cents / 100.0 %></td>
-            <td><%= project_allocation.score.round(3) %></td>
             <td>
-              <% if project_allocation.funding_source && project_allocation.funding_source.approved? %>
-                <%= link_to project_allocation.funding_source.url, target: :_blank do %>
-                  <%= project_allocation.funding_source.full_name.truncate(40) %>
-                <% end %>
-              <% else %>
-                Contacting Maintainer
-              <% end %>
+              <%= number_to_human(project_allocation.project&.downloads, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %>
+            </td>
+            <td>
+              <%= number_to_human(project_allocation.project&.dependent_repos_count, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %>
+            </td>
+            <td>
+              <%= number_to_human(project_allocation.project&.dependent_packages_count, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %>
             </td>
           </tr>
 
@@ -153,28 +153,15 @@
                   <% if project_allocation.funding_source %>
                   <p><%= bootstrap_icon 'wallet', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> <%= link_to project_allocation.funding_source.url, project_allocation.funding_source.url, target: :_blank %></p>
                   <% end %>  
-                  <div class="fund-stat-bar mb-2 mb-md-3">
-                    <div class="stat-card mb-2">
-                      <div class="stat-card-body">
-                        <span class="stat-card-title"><%= number_with_delimiter project_allocation.project&.downloads %></span>
-                        <span class="stat-card-text small">Downloads</span>
-                      </div>
-                    </div>
-                    
-                    <div class="stat-card mb-2">
-                      <div class="stat-card-body">
-                        <span class="stat-card-title"><%= number_with_delimiter project_allocation.project&.dependent_repos_count %></span>
-                        <span class="stat-card-text small">Dependent Repos</span>
-                      </div>
-                    </div>
-            
-                    <div class="stat-card mb-2">
-                      <div class="stat-card-body">
-                        <span class="stat-card-title"><%= number_with_delimiter project_allocation.project&.dependent_packages_count %></span>
-                        <span class="stat-card-text small">Dependent Packages</span>
-                      </div>
-                    </div>
-                  </div>
+
+                  <% if project_allocation.funding_source && project_allocation.funding_source.approved? %>
+                    <%= link_to project_allocation.funding_source.url, target: :_blank do %>
+                      <%= project_allocation.funding_source.full_name.truncate(40) %>
+                    <% end %>
+                  <% else %>
+                    Contacting Maintainer
+                  <% end %>
+
                 </div>
               </div>
             </td>
