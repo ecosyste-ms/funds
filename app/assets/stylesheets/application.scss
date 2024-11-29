@@ -78,9 +78,7 @@ $btn-padding-x: 1em;
 $btn-font-weight: 600;
 $btn-color: $color-white;
 
-
 @import "bootstrap"; 
-
 
 @mixin spesh-link (
   $text-color: $color-black, 
@@ -197,6 +195,54 @@ $btn-color: $color-white;
 .btn-light,
 .btn-dark {
   border: 0;
+}
+
+.alert {
+  border: 0;
+}
+
+.alert-primary {
+  background-color: lighten($color-purple-light, 4%);
+  color: $color-black;
+}
+
+.alert-secondary {
+  background-color: $color-grey-light;
+  color: $color-black;
+}
+
+.alert-success {
+  background-color: lighten($color-green-light, 8%);
+  color: darken( $color-green-dark, 25%);
+}
+
+.alert-danger {
+  background-color: lighten($color-orange-light, 4%);
+  color: darken( $color-orange-dark, 45%);
+}
+
+.alert-warning {
+  background-color: lighten($color-orange-light, 12%);
+  color: darken( $color-orange-dark, 23%);
+}
+
+.alert-info {
+  background-color: lighten($color-purple-light, 12%);
+  color: darken( $color-purple-dark, 33%);
+}
+
+.alert-light {
+  background-color: $color-grey-light;
+  color: lighten( $color-black, 33%);
+}
+
+.alert-dark {
+  background-color: $color-grey-dark;
+  color: $color-white;
+}
+
+hr {
+  border-top: 3px solid $color-purple-light;
 }
 
 .container {
