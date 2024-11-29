@@ -47,7 +47,7 @@ class Invitation < ApplicationRecord
       project_allocation.project.to_s,
       project_allocation.funder_names,
       "$#{project_allocation.amount_cents / 100.0}",
-      "https://example.com/invite",
+      token,
       decline_deadline.strftime("%B %d, %Y")
     ).deliver_now
   end

@@ -7,7 +7,7 @@ class MaintainerMailerTest < ActionMailer::TestCase
     package = "example-project"
     funders = "Sentry"
     amount = "$500.00"
-    invite_url = "https://example.com/invite"
+    invite_token = "123456"
     decline_deadline = (Time.now + 14.days).strftime("%B %d, %Y")
 
     # Send the email
@@ -16,7 +16,7 @@ class MaintainerMailerTest < ActionMailer::TestCase
       package,
       funders,
       amount,
-      invite_url,
+      invite_token,
       decline_deadline
     )
 
@@ -31,11 +31,11 @@ class MaintainerMailerTest < ActionMailer::TestCase
 
     # Assert email body contains expected content
     assert_includes email.html_part.body.to_s, "Sentry"
-    assert_includes email.html_part.body.to_s, invite_url
+    assert_includes email.html_part.body.to_s, invite_token
     assert_includes email.html_part.body.to_s, decline_deadline
 
     assert_includes email.text_part.body.to_s, "Sentry"
-    assert_includes email.text_part.body.to_s, invite_url
+    assert_includes email.text_part.body.to_s, invite_token
     assert_includes email.text_part.body.to_s, decline_deadline
 
     assert_includes email.html_part.body.to_s, "font-family: system-ui"

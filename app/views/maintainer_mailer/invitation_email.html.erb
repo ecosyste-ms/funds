@@ -50,9 +50,9 @@
                                 <td>
                                     <h2 class="green">Accepting this invitation personally</h2>
 
-                                    <p>If you complete <a href="<%= @invite_url %>">the enclosed invitation</a>, we will pay you <b><%= @amount %></b> directly within the next two weeks for your work maintaining <b><%= @project %></b>:</p>
+                                    <p>If you complete <a href="<%= invitation_url(token: @invite_token) %>">the enclosed invitation</a>, we will pay you <b><%= @amount %></b> directly within the next two weeks for your work maintaining <b><%= @project %></b>:</p>
 
-                                    <p class="mb"><a href="<%= @invite_url %>" class="button">Respond to the invite</a></p>
+                                    <p class="mb"><a href="<%= invitation_url(token: @invite_token) %>" class="button">Respond to the invite</a></p>
                                     
                                     <h2  class="green">Accepting as part of a community</h2>
                                     <p>If you or your community already accept financial support for <%= @project %>, add this information to your <code>funding.yml</code> file in your repository, and we’ll direct this and future contributions there. For more information on formats, see <a href="<%= 'https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/displaying-a-sponsor-button-in-your-repository' %>">GitHub’s documentation</a> — your repository does not have to be on GitHub.</p>
@@ -82,8 +82,8 @@
                             <tr>
                                 <td>
                                     <h2  class="orange">Declining this invitation (and future participation)</h2>
-                                    <p>This invitation will remain open until <b><%= @decline_deadline %></b>. If you wish to decline this invitation, and future invitations, please indicate so using <a href="<%= @invite_url %>">the invitation itself</a>:</p>
-                                    <p class="mb"><a href="<%= @invite_url %>" class="button button--red">Respond to the invite</a></p>
+                                    <p>This invitation will remain open until <b><%= @decline_deadline %></b>. If you wish to decline this invitation, and future invitations, please indicate so using <a href="<%= invitation_url(token: @invite_token) %>">the invitation itself</a>:</p>
+                                    <p class="mb"><a href="<%= invitation_url(token: @invite_token) %>" class="button button--red">Respond to the invite</a></p>
 
                                     <p>If you decline this invitation, we will not contact you again concerning <b><%= @project %></b>.</p>
 

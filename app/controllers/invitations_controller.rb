@@ -7,6 +7,7 @@ class InvitationsController < ApplicationController
       redirect_to invitation_path(token: @invitation.token) and return
     end
     @invitation = Invitation.find_by_token(params[:token])
+    raise ActiveRecord::RecordNotFound unless @invitation
     @project_allocation = @invitation.project_allocation
     @project = @project_allocation.project
     raise ActiveRecord::RecordNotFound unless @invitation

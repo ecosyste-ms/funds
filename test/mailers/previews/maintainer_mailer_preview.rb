@@ -6,7 +6,7 @@ class MaintainerMailerPreview < ActionMailer::Preview
       "example-project",
       "Sentry",
       "$500.00",
-      "https://example.com/invite",
+      "123456",
       (Time.now + 14.days).strftime("%B %d, %Y")
     )
   end
