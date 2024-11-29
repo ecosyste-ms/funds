@@ -3,16 +3,22 @@
     <div class="col-lg-8 page-content">
       <h1 class="page-content__title display-2">Respond to a funding invitation</h1>
       <p class="lead"><strong><%= @project_allocation.funder_names %></strong> would like to donate <strong><%= number_to_currency @project_allocation.amount_cents / 100.0 %></strong> to <strong><%= @invitation.project_allocation.project %></strong></p>
+      
       <% if Rails.env.development? && params[:expired] || Rails.env.production? && @invitation.expired? %>
+
         <div class="alert alert-info" role="alert">
           <p class="mb-0"><%= bootstrap_icon 'exclamation-triangle-fill', width: 18, height: 18, class: "flex-shrink-0 me-2" %> This invitation has expired</p>
         </div>
+
       <% else %>
+      
         <h2>Accept the invitation personally</h2>
-        <p>If you accept this funding invitation, we will pay you <strong>£<%= @project_allocation.amount_cents / 100.0 %></strong> directly within the next two weeks for your work maintaining <strong><%= @invitation.project_allocation.project %></strong></p> 
+      
+        <p>If you accept this funding invitation, we will pay you <strong><%= number_to_currency @project_allocation.amount_cents / 100.0 %></strong> directly within the next two weeks for your work maintaining <strong><%= @invitation.project_allocation.project %></strong></p> 
+      
         <% if @invitation.accepted? %>
           <div class="alert alert-success" role="alert">
-            <p class="mb-0"><%= bootstrap_icon 'check-circle-fill', width: 18, height: 18, class: "flex-shrink-0 me-2" %> This invitation has already been accepted</p>
+            <p class="mb-0"><%= bootstrap_icon 'check-circle-fill', width: 18, height: 18, class: "flex-shrink-0 me-2" %> This invitation has been accepted. We will pay you shortly after <strong><%= @invitation.decline_deadline.strftime("%B %d, %Y") %></strong></p>
           </div>
         <% end %>
           
