@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_11_28_150023) do
+ActiveRecord::Schema[8.0].define(version: 2024_11_29_172651) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -60,6 +60,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_11_28_150023) do
     t.integer "transactions_count", default: 0
     t.float "balance", default: 0.0
     t.boolean "featured", default: false
+    t.string "topic_logo_url"
   end
 
   create_table "invitations", force: :cascade do |t|

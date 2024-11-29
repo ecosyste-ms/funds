@@ -50,6 +50,7 @@ class Fund < ApplicationRecord
       fund.description = topic['short_description']
       fund.wikipedia_url = topic['wikipedia_url']
       fund.github_url = topic['github_url']
+      fund.topic_logo_url = topic['logo_url']
       fund.save!
     end
   end
@@ -69,6 +70,7 @@ class Fund < ApplicationRecord
     fund.description = topic['short_description']
     fund.wikipedia_url = topic['wikipedia_url']
     fund.github_url = topic['github_url']
+    fund.topic_logo_url = topic['logo_url']
 
     fund.save!
     return fund
@@ -88,7 +90,9 @@ class Fund < ApplicationRecord
   end
 
   def logo_url
-    if github_owner_url.present?
+    if topic_logo_url.present?
+      topic_logo_url
+    elsif github_owner_url.present?
       github_owner_url + '.png'
     else
       "https://explore-feed.github.com/topics/#{slug}/#{slug}.png"
