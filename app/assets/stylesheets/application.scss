@@ -328,6 +328,10 @@ body {
   @include font-size(0.778rem);
 }
 
+.table a {
+  @include spesh-link();
+}
+
 /*  Header */
 .header {
   padding: 2em 0;
