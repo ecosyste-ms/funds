@@ -534,10 +534,15 @@ body {
   }
 }
 
+.fund-header__cta {
+  @include media-breakpoint-up(xl) {
+    text-align: right;
+  }
+}
+
 .btn-fund-header-cta {
   @include media-breakpoint-up(xl) {
-    position: absolute;
-    right: 0;
+    position: relative;
     top: 1rem;
   }
 }
