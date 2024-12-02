@@ -107,6 +107,10 @@ $btn-color: $color-white;
   background-color: $color-purple-light;
 }
 
+[data-bs-toggle="tooltip"] {
+  cursor: pointer;
+}
+
 .btn-primary {
   background: linear-gradient(180deg, $color-purple 0%, $color-purple-dark 100%);
   color: $color-white;
@@ -495,9 +499,12 @@ body {
   margin-right: 1.3334rem;
 }
 
-.stat-card-title,
-.stat-card-text {
+.stat-card-title {
   display: block;
+}
+
+.stat-card-text {
+  display: inline-block
 }
 
 .stat-card-title {
