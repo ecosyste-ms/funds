@@ -175,5 +175,15 @@
       <p>Coming soon...</p>
     <% end %>
     </div>
+    <p class="text-end mt-3">
+      <small class='text-muted'>
+      Projects considered for this fund
+      <% if @fund.registry_name %>
+        are the most critical packages published to <strong><%= @fund.registry_name %></strong>.
+      <% else %>
+        have one of the following topics or keywords: <strong><%= @fund.all_keywords.join(', ') %></strong>.
+      <% end %>
+      </small>
+    </p>
   </div>
 </div>
