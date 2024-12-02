@@ -202,7 +202,7 @@ class Fund < ApplicationRecord
   def possible_projects
     if primary_topic.present?
       # TODO include aliases
-      Project.keyword(all_keywords)
+      Project.keyword(all_keywords).exclude_keywords(excluded_topics)
     elsif registry_name.present?
       Project.registry_name(registry_name)
     end

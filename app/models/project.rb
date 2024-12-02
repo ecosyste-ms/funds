@@ -13,6 +13,8 @@ class Project < ApplicationRecord
   scope :language, ->(language) { where("(repository ->> 'language') = ?", language) }
   scope :owner, ->(owner) { where("(repository ->> 'owner') = ?", owner) }
   scope :keyword, ->(keywords) { where("keywords && ARRAY[?]::varchar[]", keywords) }
+  scope :exclude_keywords, ->(keywords) { where("NOT (keywords && ARRAY[?]::varchar[])", keywords) }
+
   scope :with_readme, -> { where.not(readme: nil) }
   scope :with_repository, -> { where.not(repository: {}) }
   scope :with_commits, -> { where.not(commits: nil) }
