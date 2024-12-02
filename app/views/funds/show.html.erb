@@ -87,33 +87,41 @@
         <div class="col-md-7 col-xl-12">
           <h3 class="fw-normal fs-6">Distribution Details</h3>
           <div class="fund-stat-bar fund-stat-bar--allocation-stat-bar mb-4 mb-md-5">
-            <div class="stat-card mb-2">
-              <div class="stat-card-body">
-                <span class="stat-card-title"><%= @allocation.github_sponsored_projects_count %></span>
-                <span class="stat-card-text extra-small">GitHub Sponsors</span>
+            <% if @allocation.github_sponsored_projects_count > 0 %>
+              <div class="stat-card mb-2">
+                <div class="stat-card-body">
+                  <span class="stat-card-title"><%= @allocation.github_sponsored_projects_count %></span>
+                  <span class="stat-card-text extra-small">GitHub Sponsors</span>
+                </div>
               </div>
-            </div>
+            <% end %>
 
-            <div class="stat-card mb-2">
-              <div class="stat-card-body">
-                <span class="stat-card-title"><%= @allocation.open_collective_projects_count %></span>
-                <span class="stat-card-text extra-small">Open Collective</span>
+            <% if @allocation.open_collective_projects_count > 0 %>
+              <div class="stat-card mb-2">
+                <div class="stat-card-body">
+                  <span class="stat-card-title"><%= @allocation.open_collective_projects_count %></span>
+                  <span class="stat-card-text extra-small">Open Collective</span>
+                </div>
               </div>
-            </div>
+            <% end %>
           
-            <div class="stat-card mb-2">
-              <div class="stat-card-body">
-                <span class="stat-card-title"><%= @allocation.other_projects_count %></span>
-                <span class="stat-card-text extra-small">Other sources <a href="#"><%= bootstrap_icon 'info-circle', width: 14, height: 14 %></a></span>
+            <% if @allocation.other_projects_count > 0 %>
+              <div class="stat-card mb-2">
+                <div class="stat-card-body">
+                  <span class="stat-card-title"><%= @allocation.other_projects_count %></span>
+                  <span class="stat-card-text extra-small">Other sources <a href="#"><%= bootstrap_icon 'info-circle', width: 14, height: 14 %></a></span>
+                </div>
               </div>
-            </div>
+            <% end %>
           
-            <div class="stat-card mb-2">
-              <div class="stat-card-body">
-                <span class="stat-card-title"><%= @allocation.invited_projects_count %></span>
-                <span class="stat-card-text extra-small">Projects invited <a href="#"><%= bootstrap_icon 'info-circle', width: 14, height: 14 %></a></span>
+            <% if @allocation.invited_projects_count > 0%>
+              <div class="stat-card mb-2">
+                <div class="stat-card-body">
+                  <span class="stat-card-title"><%= @allocation.invited_projects_count %></span>
+                  <span class="stat-card-text extra-small">Projects invited <a href="#"><%= bootstrap_icon 'info-circle', width: 14, height: 14 %></a></span>
+                </div>
               </div>
-            </div>
+            <% end %>
           </div> 
         </div> 
       </div> 
