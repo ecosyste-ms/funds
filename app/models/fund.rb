@@ -463,6 +463,8 @@ class Fund < ApplicationRecord
           transaction_expense_type: node['expense'] ? node['expense']['type'] : nil,
           currency: node['amount']['currency'],
           account: node['type'] == 'DEBIT' ? node['toAccount']['slug'] : node['fromAccount']['slug'],
+          account_name: node['type'] == 'DEBIT' ? node['toAccount']['name'] : node['fromAccount']['name'],
+          account_image_url: node['type'] == 'DEBIT' ? node['toAccount']['imageUrl'] : node['fromAccount']['imageUrl'],
           order: node['order'],
           created_at: node['createdAt'],
           description: node['description']
@@ -530,9 +532,13 @@ class Fund < ApplicationRecord
             }
             toAccount {
               slug
+              name
+              imageUrl
             }
             fromAccount {
               slug
+              name
+              imageUrl
             }
           }
         }
