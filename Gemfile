@@ -33,6 +33,7 @@ gem 'dotenv'
 gem 'csv'
 gem 'after_commit_action'
 gem 'premailer-rails'
+gem 'faraday-multipart'
 
 group :development, :test do
   gem "debug", platforms: %i[ mri mingw x64_mingw ]
