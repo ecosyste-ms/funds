@@ -13,6 +13,10 @@ class Invitation < ApplicationRecord
     end
   end
 
+  def fund
+    project_allocation.fund
+  end
+
   def decline_deadline
     project_allocation.decline_deadline
   end
@@ -48,7 +52,8 @@ class Invitation < ApplicationRecord
       project_allocation.funder_names,
       "$#{project_allocation.amount_cents / 100.0}",
       token,
-      decline_deadline.strftime("%B %d, %Y")
+      decline_deadline.strftime("%B %d, %Y"),
+      fund
     ).deliver_now
   end
 

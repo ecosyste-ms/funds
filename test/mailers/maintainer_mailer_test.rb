@@ -9,6 +9,7 @@ class MaintainerMailerTest < ActionMailer::TestCase
     amount = "$500.00"
     invite_token = "123456"
     decline_deadline = (Time.now + 14.days).strftime("%B %d, %Y")
+    fund = create(:fund)
 
     # Send the email
     email = MaintainerMailer.invitation_email(
@@ -17,7 +18,8 @@ class MaintainerMailerTest < ActionMailer::TestCase
       funders,
       amount,
       invite_token,
-      decline_deadline
+      decline_deadline,
+      fund
     )
 
     # Assert email properties

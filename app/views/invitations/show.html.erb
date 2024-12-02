@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-lg-8 page-content">
       <h1 class="page-content__title display-2">Respond to a funding invitation</h1>
-      <p class="lead"><strong><%= @project_allocation.funder_names %></strong> would like to donate <strong><%= number_to_currency @project_allocation.amount_cents / 100.0 %></strong> to <strong><%= @invitation.project_allocation.project %></strong></p>
+      <p class="lead"><strong><%= @project_allocation.funder_names %></strong> would like to donate <strong><%= number_to_currency @project_allocation.amount_cents / 100.0 %></strong> to <strong><%= @invitation.project_allocation.project %></strong> as part of the <strong><%= link_to "#{@invitation.fund} Ecosystem Fund", fund_path(@invitation.fund) %></strong></p>
       
       <% if Rails.env.development? && params[:expired] || Rails.env.production? && @invitation.expired? %>
 

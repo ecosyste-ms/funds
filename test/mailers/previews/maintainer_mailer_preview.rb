@@ -7,7 +7,8 @@ class MaintainerMailerPreview < ActionMailer::Preview
       "Sentry",
       "$500.00",
       "123456",
-      (Time.now + 14.days).strftime("%B %d, %Y")
+      (Time.now + 14.days).strftime("%B %d, %Y"),
+      Fund.first
     )
   end
 end
