@@ -170,7 +170,7 @@ class Allocation < ApplicationRecord
   end
 
   def invited_projects_count
-    project_allocations.select{|pa| pa.funding_source.blank?}.length
+    project_allocations.includes(:funding_source).select{|pa| pa.funding_source.blank?}.length
   end
 
   def github_sponsors_csv_export
