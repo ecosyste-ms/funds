@@ -239,7 +239,8 @@ GEM
       actionmailer (>= 3)
       net-smtp
       premailer (~> 1.7, >= 1.7.9)
-    psych (5.2.0)
+    psych (5.2.1)
+      date
       stringio
     public_suffix (6.0.1)
     puma (6.5.0)
