@@ -28,6 +28,8 @@ class ProjectAllocation < ApplicationRecord
   end
 
   def payout_method_name
+    return "Funding Rejected" if funding_rejected?
+
     if is_osc_collective?
       "Open Source Collective: #{funding_source.name}"
     elsif is_non_osc_collective?
@@ -42,6 +44,8 @@ class ProjectAllocation < ApplicationRecord
   end
 
   def choose_payout_method
+    return if funding_rejected?
+
     if is_osc_collective?
       puts "  Sending to OSC collective: #{funding_source.name}"
       send_to_osc_collective(collective_slug, amount_cents)
@@ -362,7 +366,7 @@ class ProjectAllocation < ApplicationRecord
     # TODO accept all other open invitations for that project
   end
 
-  def invitation_rejected?
+  def funding_rejected?
     project.funding_rejected?
   end
 

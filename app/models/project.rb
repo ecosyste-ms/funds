@@ -29,6 +29,8 @@ class Project < ApplicationRecord
 
   scope :synced, -> { where.not(last_synced_at: nil) }
 
+  scope :not_rejected_funding, -> { where(funding_rejected: false) }
+
   def self.sync_least_recently_synced
     Project.where(last_synced_at: nil).or(Project.where("last_synced_at < ?", 1.day.ago)).order('last_synced_at asc nulls first').limit(100).each do |project|
       project.sync_async
