@@ -159,7 +159,9 @@
                 <div class="collapse" id="details-<%= i %>">
                   <div class="p-4 well">
                     <p><%= bootstrap_icon 'git', width: 18, height: 18 %> <span class="visually-hidden">Repository:</span> <%= link_to project_allocation.project.url, project_allocation.project.url, target: :_blank %></p>
-                    <% if project_allocation.funding_source && project_allocation.funding_source.approved? %>
+                    <% if project_allocation.funding_rejected? %>
+                      <p><%= bootstrap_icon 'piggy-bank-fill', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> Funding Rejected</p>
+                    <% elsif project_allocation.funding_source && project_allocation.funding_source.approved? %>
                       <p><%= bootstrap_icon 'piggy-bank-fill', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> <%= link_to project_allocation.funding_source.url, project_allocation.funding_source.url, target: :_blank %></p>
                     <% else %>
                       <% if project_allocation.invitation.present? %>
