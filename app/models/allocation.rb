@@ -189,4 +189,10 @@ class Allocation < ApplicationRecord
   def decline_deadline
     created_at + 14.days
   end
+  
+  def send_invitations
+    project_allocations.select{|pa| pa.funding_source.blank?}.each do |pa|
+      pa.send_invitation
+    end
+  end
 end

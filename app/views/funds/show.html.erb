@@ -137,7 +137,7 @@
             <% next if project_allocation.project.nil? %>
 
             <!-- Main Row -->
-            <tr class="clickable-row" data-bs-toggle="collapse" data-bs-target="#details-<%= i %>" role="button" aria-controls="#details-<%= i %>">
+            <tr class="clickable-row <%= 'row-rejected' if project_allocation.invitation_rejected? %>" data-bs-toggle="collapse" data-bs-target="#details-<%= i %>" role="button" aria-controls="#details-<%= i %>">
               <td><%= i + 1 %></td>
               <td><%= link_to project_allocation.project, project_allocation.project.url, target: :_blank %></td>
               <td><%= number_to_currency project_allocation.amount_cents / 100.0 %></td>
@@ -162,7 +162,17 @@
                     <% if project_allocation.funding_source && project_allocation.funding_source.approved? %>
                       <p><%= bootstrap_icon 'piggy-bank-fill', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> <%= link_to project_allocation.funding_source.url, project_allocation.funding_source.url, target: :_blank %></p>
                     <% else %>
-                      <p><%= bootstrap_icon 'piggy-bank-fill', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> Contacting Maintainer</p>
+                      <% if project_allocation.invitation.present? %>
+                        <% if project_allocation.invitation_rejected? %>
+                          <p><%= bootstrap_icon 'piggy-bank-fill', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> Invitation Rejected on <%= project_allocation.invitation.rejected_at.strftime('%B %d, %Y') %></p>
+                        <% elsif project_allocation.invitation_accepted? %>
+                          <p><%= bootstrap_icon 'piggy-bank-fill', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> Invitation Accepted on <%= project_allocation.invitation.accepted_at.strftime('%B %d, %Y') %></p>
+                        <% else %>
+                          <p><%= bootstrap_icon 'piggy-bank-fill', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> Invitation Pending</p>
+                        <% end %>
+                      <% else %>
+                        <p><%= bootstrap_icon 'piggy-bank-fill', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> Contacting Maintainer</p>
+                      <% end %>
                     <% end %>  
                   </div>
                 </div>

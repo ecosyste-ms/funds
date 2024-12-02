@@ -344,15 +344,29 @@ class ProjectAllocation < ApplicationRecord
   end
 
   def send_invitation
-    # create invitation record
-    # send email
+    return if funding_source.present?
+    return if invitation.present?
+    
+    invitation = Invitation.create!(project_allocation: self, email: project.contact_email)
+    
+    invitation.send_email
   end
 
   def reject_funding!
-    project.update!(funding_rejected: true)
+    project.update!(funding_rejected: true) 
+    # TODO reject all other open invitations for that project
   end
 
   def accept_funding!
     project.update!(funding_rejected: false)
+    # TODO accept all other open invitations for that project
+  end
+
+  def invitation_rejected?
+    project.funding_rejected?
+  end
+
+  def invitation_accepted?
+    invitation.present? && invitation.accepted_at.present?
   end
 end
