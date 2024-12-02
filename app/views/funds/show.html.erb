@@ -8,8 +8,17 @@
         </div>
       <% end %>
       <div class="<% if @fund.logo_url.present? %>col-md-11<% end %>">
-        <h1 class="display-1 extra-bold"><%= @fund.name %></h1>
-        <p><%= @fund.description %></p>
+        <div class="row">
+          <div class="col-xl-8">
+            <h1 class="display-1 extra-bold"><%= @fund.name %></h1>
+            <p><%= @fund.description %></p>
+          </div>
+          <div class="col-xl-4 fund-header__cta">
+            <% if @fund.open_collective_project_url.present? %>
+              <%= link_to "Fund the #{@fund.name} Ecosystem on Open Source Collective", @fund.open_collective_project_url, class: 'btn btn-light btn-fund-header-cta rounded-pill mb-3' %>
+            <% end %>
+          </div>
+        </div>
         <div class="fund-header-stats">
           <div class="fund-stat-bar mb-2 mb-md-3">
             <div class="stat-card mb-2">
@@ -34,9 +43,7 @@
             </div>
           </div> 
         </div>
-        <% if @fund.open_collective_project_url.present? %>
-          <%= link_to "Fund the #{@fund.name} Ecosystem on Open Source Collective", @fund.open_collective_project_url, class: 'btn btn-success btn-fund-header-cta rounded-pill mb-3' %>
-        <% end %>
+        
       </div>
     </div>
   </div>
@@ -151,9 +158,9 @@
                 <div class="p-4 well">
                   <p><%= bootstrap_icon 'github', width: 18, height: 18 %> <span class="visually-hidden">Repository:</span> <%= link_to project_allocation.project.url, project_allocation.project.url, target: :_blank %></p>
                   <% if project_allocation.funding_source && project_allocation.funding_source.approved? %>
-                    <p><%= bootstrap_icon 'wallet', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> <%= link_to project_allocation.funding_source.url, project_allocation.funding_source.url, target: :_blank %></p>
+                    <p><%= bootstrap_icon 'piggy-bank-fill', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> <%= link_to project_allocation.funding_source.url, project_allocation.funding_source.url, target: :_blank %></p>
                   <% else %>
-                    <p><%= bootstrap_icon 'wallet', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> Contacting Maintainer</p>
+                    <p><%= bootstrap_icon 'piggy-bank-fill', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> Contacting Maintainer</p>
                   <% end %>  
                 </div>
               </div>

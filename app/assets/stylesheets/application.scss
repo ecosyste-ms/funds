@@ -328,6 +328,10 @@ body {
   @include font-size(0.778rem);
 }
 
+.table a {
+  @include spesh-link();
+}
+
 /*  Header */
 .header {
   padding: 2em 0;
@@ -530,10 +534,15 @@ body {
   }
 }
 
+.fund-header__cta {
+  @include media-breakpoint-up(xl) {
+    text-align: right;
+  }
+}
+
 .btn-fund-header-cta {
   @include media-breakpoint-up(xl) {
-    position: absolute;
-    right: 0;
+    position: relative;
     top: 1rem;
   }
 }
@@ -594,4 +603,73 @@ a {
   background: linear-gradient(0deg, $color-purple-dark 50%, $color-purple 100%);
 
   color: $color-white;
+}
+
+
+/* Error pages */
+.error-bg {
+  margin-bottom: -4em;
+}
+
+.error {
+  padding: 4rem 0;
+}
+
+.error--has-background {
+  padding-top: 480px;
+  background-size: 440px;
+  background-position: center top;
+  background-repeat: no-repeat;
+  min-height: 440px;
+  @include media-breakpoint-up(lg) {
+    background-size: 660px;
+    min-height: 700px;
+    position: relative;
+    background-position: left top;
+  }
+}
+
+.error--404 {
+  background-image: asset-url('error-missing.png');
+}
+
+.error--409,
+.error--422,
+.error--429,
+.error--500 {
+  background-image: asset-url('error-breaking.png');
+}
+
+.error--400,
+.error--401,
+.error--403, 
+.error--503 {
+  background-image: asset-url('error-broken.png');
+}
+
+.error--has-background .error__content {
+  @include media-breakpoint-up(lg) {
+    position: absolute;
+    right: 90px;
+    top: 180px;
+  }
+}
+
+.error__content {
+  text-align: center;
+}
+
+.error__code {
+  font-size: clamp(16px, 20vw, 256px);
+  font-weight: 800;
+  box-shadow: inset 0 -0.1em 0 $color-green;
+  line-height: 1;
+  display: inline-block;
+  margin-bottom: 1.5rem;
+}
+
+.error__description {
+  max-width: 30em;
+  margin-left: auto;
+  margin-right: auto;
 }
