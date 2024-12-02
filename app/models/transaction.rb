@@ -9,6 +9,10 @@ class Transaction < ApplicationRecord
   scope :host_fees, -> { where(transaction_kind: ['PAYMENT_PROCESSOR_FEE', 'PAYMENT_PROCESSOR_COVER', 'HOST_FEE'])}
   scope :not_host_fees, -> { where.not(transaction_kind: ['PAYMENT_PROCESSOR_FEE', 'PAYMENT_PROCESSOR_COVER', 'HOST_FEE'])}  
 
+  scope :created_after, ->(date) { where('transactions.created_at > ?', date) }
+  scope :created_before, ->(date) { where('transactions.created_at < ?', date) }
+  scope :between, ->(start_date, end_date) { where('transactions.created_at > ?', start_date).where('transactions.created_at < ?', end_date) }
+
   def html_url
     return unless order.present?
 

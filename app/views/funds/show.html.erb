@@ -128,6 +128,18 @@
     </div>
 
     <div class="col-xl-9">
+      <% @fund.funders.each do |account| %>
+        <div class="fund-funder">
+          <div class="fund-funder__avatar">
+            <%= link_to image_tag(account[:image_url], class: 'img-fluid rounded-circle'), "https://staging.opencollective.com/#{account[:slug]}", target: :_blank %>
+          </div>
+          <div class="fund-funder__details">
+            <h6 class="fw-normal"><%= link_to account[:name], "https://staging.opencollective.com/#{account[:slug]}", target: :_blank %></h6>
+            <p class="small"><%= number_to_currency account[:amount] %></p>
+          </div>
+        </div>
+      <% end %>
+
       <table class="table">
         <thead>
           <tr>

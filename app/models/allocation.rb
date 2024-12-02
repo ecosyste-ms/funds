@@ -182,8 +182,30 @@ class Allocation < ApplicationRecord
     end
   end
 
+  def transaction_start_date
+    created_at - 1.month
+  end
+
+  def transaction_end_date
+    created_at
+  end
+
   def funder_names
-    'Sentry' # TODO this should be based on transactions to the fund in the period of the allocation
+    all_names = fund.transactions.donations.between(transaction_start_date, transaction_end_date).distinct.pluck(:account_name)
+    return 'Funders' if all_names.empty?
+    if all_names.length == 1
+      all_names.first
+    elsif all_names.length < 6
+      all_names[0..-2].join(', ') + ' and ' + all_names.last
+    else
+      all_names[0..4].join(', ') + ' and ' + (all_names.length - 5).to_s + ' more'
+    end
+  end
+
+  def funders
+    fund.transactions.donations.between(transaction_start_date, transaction_end_date).map{|t| {name: t.account_name, slug: t.account, image_url: t.account_image_url, amount: t.amount}}
+      .group_by { |t| t[:slug] }
+      .map { |slug, txns| { slug: slug, name: txns.first[:name], image_url: txns.first[:image_url], amount: txns.sum { |t| t[:amount] } } }
   end
 
   def decline_deadline
