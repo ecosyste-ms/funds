@@ -358,12 +358,20 @@ class ProjectAllocation < ApplicationRecord
 
   def reject_funding!
     project.update!(funding_rejected: true) 
-    # TODO reject all other open invitations for that project
+    # reject all other invitations for the same project
+    project.project_allocations.each do |pa|
+      next unless pa.invitation.present?
+      pa.invitation.update!(rejected_at: Time.now)
+    end
   end
 
   def accept_funding!
     project.update!(funding_rejected: false)
-    # TODO accept all other open invitations for that project
+    # accept all other invitations for the same project
+    project.project_allocations.each do |pa|
+      next unless pa.invitation.present?
+      pa.invitation.update!(accepted_at: Time.now)
+    end
   end
 
   def funding_rejected?
