@@ -135,7 +135,7 @@ class Allocation < ApplicationRecord
   end
 
   def funders_count
-    1 # TODO
+    funders.length
   end
 
   def find_possible_projects
