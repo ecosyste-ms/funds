@@ -95,7 +95,7 @@ Transaction.create({
   transaction_kind: 'CONTRIBUTION',
   amount: 16800,
   currency: 'USD',
-  uuid: '1',
+  uuid: SecureRandom.uuid,
   order: {
     legacyId: '1'
   },
@@ -110,7 +110,7 @@ Transaction.create({
   transaction_kind: 'CONTRIBUTION',
   amount: 10000,
   currency: 'USD',
-  uuid: '2',
+  uuid: SecureRandom.uuid,
   order: {
     legacyId: '2'
   },
@@ -125,7 +125,7 @@ Transaction.create({
   transaction_kind: 'CONTRIBUTION',
   amount: 10000,
   currency: 'USD',
-  uuid: '2',
+  uuid: SecureRandom.uuid,
   order: {
     legacyId: '2'
   },
@@ -140,7 +140,7 @@ Transaction.create({
   transaction_kind: 'CONTRIBUTION',
   amount: 10000,
   currency: 'USD',
-  uuid: '3',
+  uuid: SecureRandom.uuid,
   order: {
     legacyId: '3'
   },
