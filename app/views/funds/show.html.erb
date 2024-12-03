@@ -1,4 +1,12 @@
 <% @meta_title = @fund.name %>
+
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function () {
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+});
+</script>
+
 <div class="fund-header purple-section mb-5 pt-4 pb-4">
   <div class="container">
     <div class="row">
@@ -109,7 +117,7 @@
               <div class="stat-card mb-2">
                 <div class="stat-card-body">
                   <span class="stat-card-title"><%= @allocation.other_projects_count %></span>
-                  <span class="stat-card-text extra-small">Other sources <a href="#"><%= bootstrap_icon 'info-circle', width: 14, height: 14 %></a></span>
+                  <span class="stat-card-text extra-small" data-bs-toggle="tooltip" data-bs-title="ecosyste.ms supports most funding platforms like Patreon, Kofi, and GoFundMe.">Other sources <a href="#"><%= bootstrap_icon 'info-circle', width: 14, height: 14 %></a></span>
                 </div>
               </div>
             <% end %>
@@ -118,7 +126,7 @@
               <div class="stat-card mb-2">
                 <div class="stat-card-body">
                   <span class="stat-card-title"><%= @allocation.invited_projects_count %></span>
-                  <span class="stat-card-text extra-small">Projects invited <a href="#"><%= bootstrap_icon 'info-circle', width: 14, height: 14 %></a></span>
+                  <span class="stat-card-text extra-small" data-bs-toggle="tooltip" data-bs-title="ecosyste.ms has contacted maintainers to direct this contribution to their preferred platform or payment method.">Projects invited <a href="#"><%= bootstrap_icon 'info-circle', width: 14, height: 14 %></a></span>
                 </div>
               </div>
             <% end %>
@@ -128,18 +136,23 @@
     </div>
 
     <div class="col-xl-9">
+      <h2>Funded by</h2>
+      <div class="row mt-4 mb-5">
       <% @fund.funders.each do |account| %>
-        <div class="fund-funder">
-          <div class="fund-funder__avatar">
-            <%= link_to image_tag(account[:image_url], class: 'img-fluid rounded-circle'), "https://staging.opencollective.com/#{account[:slug]}", target: :_blank %>
-          </div>
-          <div class="fund-funder__details">
-            <h6 class="fw-normal"><%= link_to account[:name], "https://staging.opencollective.com/#{account[:slug]}", target: :_blank %></h6>
-            <p class="small"><%= number_to_currency account[:amount] %></p>
+        <div class="col">
+          <div class="fund-funder card text-center">
+            <div class="fund-funder__avatar card-img-top">
+              <%= link_to image_tag(account[:image_url], class: 'img-fluid rounded-circle'), "https://staging.opencollective.com/#{account[:slug]}", target: :_blank %>
+            </div>
+            <div class="fund-funder__details card-body">
+              <h3 class="fund-funder__name card-title"><%= link_to account[:name], "https://staging.opencollective.com/#{account[:slug]}" %></h3>
+              <p class="small card-text"><%= number_to_currency account[:amount] %></p>
+            </div>
           </div>
         </div>
       <% end %>
-
+      </div>
+      <h2>Funding allocation</h2>
       <table class="table">
         <thead>
           <tr>
