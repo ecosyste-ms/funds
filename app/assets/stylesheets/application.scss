@@ -542,19 +542,6 @@ body {
   }
 }
 
-.fund-header__cta {
-  @include media-breakpoint-up(xl) {
-    text-align: right;
-  }
-}
-
-.btn-fund-header-cta {
-  @include media-breakpoint-up(xl) {
-    position: relative;
-    top: 1rem;
-  }
-}
-
 .fund-logo {
   max-width: 100px;
   border-radius: 8px;
@@ -713,4 +700,8 @@ a {
     margin-left: var(--bs-card-spacer-x);
     margin-right: var(--bs-card-spacer-x);
   }
+}
+
+.dark-shadow {
+  box-shadow: 0px 7px 24px rgba(56, 56, 192, 0.6);
 }

@@ -9,17 +9,13 @@
         </div>
       <% end %>
       <div class="<% if @fund.logo_url.present? %>col-md-11<% end %>">
-        <div class="row">
-          <div class="col-xl-8">
+   
             <h1 class="display-1 extra-bold"><%= @fund.name %></h1>
             <p><%= @fund.description %></p>
-          </div>
-          <div class="col-xl-4 fund-header__cta">
             <% if @fund.open_collective_project_url.present? %>
-              <%= link_to "Fund the #{@fund.name} Ecosystem on Open Source Collective", @fund.open_collective_project_url, class: 'btn btn-light btn-fund-header-cta rounded-pill mb-3' %>
+              <%= link_to "Fund the #{@fund.name} Ecosystem on Open Collective", @fund.open_collective_project_url, class: 'btn btn-light btn-fund-header-cta dark-shadow rounded-pill mb-3' %>
             <% end %>
-          </div>
-        </div>
+
         <div class="fund-header-stats">
           <div class="fund-stat-bar mb-2 mb-md-3">
             <div class="stat-card mb-2">
