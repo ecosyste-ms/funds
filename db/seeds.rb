@@ -86,3 +86,65 @@ funds.each do |fund|
   f.save
 
 end
+
+f = Fund.find_by(slug: 'django')
+
+Transaction.create({
+  fund: f,
+  transaction_type: 'CREDIT',
+  transaction_kind: 'CONTRIBUTION',
+  amount: 16800,
+  currency: 'USD',
+  uuid: '1',
+  order: {
+    legacyId: '1'
+  },
+  account_name: 'Sentry',
+  account_image_url: 'https://opencollective.com/sentry/logo.png',
+  account: 'sentry',
+})
+
+Transaction.create({
+  fund: f,
+  transaction_type: 'CREDIT',
+  transaction_kind: 'CONTRIBUTION',
+  amount: 10000,
+  currency: 'USD',
+  uuid: '2',
+  order: {
+    legacyId: '2'
+  },
+  account_name: 'Google',
+  account_image_url: 'https://opencollective.com/google/logo.png',
+  account: 'google',
+})
+
+Transaction.create({
+  fund: f,
+  transaction_type: 'CREDIT',
+  transaction_kind: 'CONTRIBUTION',
+  amount: 10000,
+  currency: 'USD',
+  uuid: '2',
+  order: {
+    legacyId: '2'
+  },
+  account_name: 'Google',
+  account_image_url: 'https://opencollective.com/google/logo.png',
+  account: 'google',
+})
+
+Transaction.create({
+  fund: f,
+  transaction_type: 'CREDIT',
+  transaction_kind: 'CONTRIBUTION',
+  amount: 10000,
+  currency: 'USD',
+  uuid: '3',
+  order: {
+    legacyId: '3'
+  },
+  account_name: 'Svelte',
+  account_image_url: 'https://opencollective.com/svelte/logo.png',
+  account: 'svelte',
+})
