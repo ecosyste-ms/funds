@@ -386,7 +386,7 @@ body {
   line-height: 1em;
   height: 7.5rem;
   padding: 0.25em 1.5em 0;
- 
+  background-color: $color-grey-light;
   display: flex;
   align-items: center; 
   justify-content: center; 
@@ -404,6 +404,7 @@ body {
 
 .fund-card {
   border: 0;
+  border-radius: 1.5rem;
   img {
     border-radius: 0;
   }
@@ -419,6 +420,7 @@ body {
 
 .fund-card--small {
   padding-bottom: 1.5rem;
+  border-radius: var(--bs-border-radius);
   .card-body {
     padding-left: 0.25rem;
     padding-right: 0.25rem;
@@ -686,4 +688,27 @@ a {
   color: #6c757d; 
   opacity: 0.6; 
   text-decoration: line-through;
+}
+
+.fund-funder {
+  max-width: 15rem;
+  border: 0;
+  background-color: $color-grey-light;
+  border-radius: 1.5rem;
+  padding-top: var(--bs-card-spacer-y);
+  padding-bottom: var(--bs-card-spacer-y);
+  margin-bottom: var(--bs-card-spacer-y);
+  box-shadow: 0px 7px 24px rgba(187, 187, 255, 1);
+}
+
+.fund-funder__name {
+  @include font-size(1rem);
+}
+
+.fund-funder__avatar {
+  img {
+    max-width: 150px;
+    margin-left: var(--bs-card-spacer-x);
+    margin-right: var(--bs-card-spacer-x);
+  }
 }

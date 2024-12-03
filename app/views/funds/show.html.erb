@@ -136,18 +136,23 @@ document.addEventListener('DOMContentLoaded', function () {
     </div>
 
     <div class="col-xl-9">
+      <h2>Funded by</h2>
+      <div class="row mt-4 mb-5">
       <% @fund.funders.each do |account| %>
-        <div class="fund-funder">
-          <div class="fund-funder__avatar">
-            <%= link_to image_tag(account[:image_url], class: 'img-fluid rounded-circle'), "https://staging.opencollective.com/#{account[:slug]}", target: :_blank %>
-          </div>
-          <div class="fund-funder__details">
-            <h6 class="fw-normal"><%= link_to account[:name], "https://staging.opencollective.com/#{account[:slug]}", target: :_blank %></h6>
-            <p class="small"><%= number_to_currency account[:amount] %></p>
+        <div class="col">
+          <div class="fund-funder card text-center">
+            <div class="fund-funder__avatar card-img-top">
+              <%= link_to image_tag(account[:image_url], class: 'img-fluid rounded-circle'), "https://staging.opencollective.com/#{account[:slug]}", target: :_blank %>
+            </div>
+            <div class="fund-funder__details card-body">
+              <h3 class="fund-funder__name card-title"><%= link_to account[:name], "https://staging.opencollective.com/#{account[:slug]}" %></h3>
+              <p class="small card-text"><%= number_to_currency account[:amount] %></p>
+            </div>
           </div>
         </div>
       <% end %>
-
+      </div>
+      <h2>Funding allocation</h2>
       <table class="table">
         <thead>
           <tr>
