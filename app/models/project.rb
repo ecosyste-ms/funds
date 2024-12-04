@@ -582,7 +582,7 @@ class Project < ApplicationRecord
       return unless response.success?
       json = JSON.parse(response.body)
 
-      self.readme = json['contents']
+      self.readme = json['contents'].encode('UTF-8', invalid: :replace, undef: :replace, replace: '').gsub("\u0000", '')
       self.save
     end
   rescue
@@ -599,7 +599,7 @@ class Project < ApplicationRecord
 
     response = conn.get
     return unless response.success?
-    self.readme = response.body
+    self.readme = response.body.encode('UTF-8', invalid: :replace, undef: :replace, replace: '').gsub("\u0000", '')
     self.save
   rescue
     puts "Error fetching readme for #{repository_url}"
