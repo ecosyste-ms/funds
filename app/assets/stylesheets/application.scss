@@ -439,7 +439,7 @@ body {
   }
 }
 
-.purple-bg-grad {
+.grey-grad-bg  {
   background: linear-gradient(180deg, #FFFFFF 0%, #F5F5FF 100%);
 }
 
@@ -595,7 +595,6 @@ a {
 .purple-section {
   background-color: $color-purple-dark;
   background: linear-gradient(0deg, $color-purple-dark 50%, $color-purple 100%);
-
   color: $color-white;
 }
 
