@@ -526,7 +526,7 @@ body {
 }
 
 .fund-section-header {
-  border-bottom: 1px solid $color-grey;
+  border-bottom: 3px solid $color-purple-light;
   .badge {
     @include font-size(0.875rem);
     margin-left: 1rem;
@@ -536,7 +536,6 @@ body {
 }
 
 .fund-header {
-  border-bottom: 1px solid $color-grey;
   .container {
     position: relative;
   }
