@@ -199,6 +199,9 @@ $btn-color: $color-white;
 .btn-light,
 .btn-dark {
   border: 0;
+  &:focus {
+    outline: 3px solid $color-orange;
+  }
 }
 
 .alert {
