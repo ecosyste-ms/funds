@@ -151,7 +151,6 @@
             <th>Downloads</th>
             <th>Dependent Repos</th>
             <th>Dependent Packages</th>
-            <th>Language</th>
           </tr>
         </thead>
         <tbody>
@@ -172,7 +171,6 @@
               <td>
                 <%= number_to_human(project_allocation.project&.dependent_packages_count, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %>
               </td>
-              <td><%= project_allocation.project.language %></td>
             </tr>
 
             <!-- Expandable Row -->
