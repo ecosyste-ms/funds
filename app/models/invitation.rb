@@ -57,8 +57,16 @@ class Invitation < ApplicationRecord
     ).deliver_now
   end
 
+  def draft_key
+    data['draftKey']
+  end
+
   def html_url
     "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{ENV['OPENCOLLECTIVE_PARENT_SLUG']}/projects/#{project_allocation.fund.oc_project_slug}/expenses/#{member_invitation_id}"
+  end
+
+  def invite_url
+    "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{ENV['OPENCOLLECTIVE_PARENT_SLUG']}/expenses/#{member_invitation_id}?key=#{draft_key}"
   end
 
   def sync_async
