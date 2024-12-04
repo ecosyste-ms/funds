@@ -90,7 +90,7 @@ class ProxyCollective < ApplicationRecord
     # Send the createProject mutation
     payload = { query: create_project_mutation, variables: variables }.to_json
     response = Faraday.post(
-      "https://staging.opencollective.com/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
       payload,
       { 'Content-Type' => 'application/json' }
     )
@@ -109,7 +109,7 @@ class ProxyCollective < ApplicationRecord
         # If the slug is taken, attempt to load the existing project by slug
         load_payload = { query: load_project_query, variables: { slug: project_slug } }.to_json
         load_response = Faraday.post(
-          "https://staging.opencollective.com/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+          "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
           load_payload,
           { 'Content-Type' => 'application/json' }
         )

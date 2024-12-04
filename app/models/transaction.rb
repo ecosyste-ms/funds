@@ -17,11 +17,11 @@ class Transaction < ApplicationRecord
     return unless order.present?
 
     if transaction_kind == 'CONTRIBUTION'
-      "https://staging.opencollective.com/#{fund.oc_project_slug}/contributions/#{order['legacyId']}"  
+      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{fund.oc_project_slug}/contributions/#{order['legacyId']}"  
     elsif transaction_kind == 'BALANCE_TRANSFER'
-      "https://staging.opencollective.com/#{account}/contributions/#{order['legacyId']}"  
+      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{account}/contributions/#{order['legacyId']}"  
     elsif transaction_kind == 'EXPENSE' 
-      "https://staging.opencollective.com/#{account}/expenses/#{order['legacyId']}"  
+      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{account}/expenses/#{order['legacyId']}"  
     else
       nil
     end

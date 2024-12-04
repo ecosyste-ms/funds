@@ -124,7 +124,7 @@ class ProjectAllocation < ApplicationRecord
     payload = { query: query, variables: variables }.to_json
 
     response = Faraday.post(
-      "https://staging.opencollective.com/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
       payload,
       { 'Content-Type' => 'application/json' }
     )
@@ -181,7 +181,7 @@ class ProjectAllocation < ApplicationRecord
     payload = { query: query, variables: variables }.to_json
 
     response = Faraday.post(
-      "https://staging.opencollective.com/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
       payload,
       { 'Content-Type' => 'application/json' }
     )
@@ -241,7 +241,7 @@ class ProjectAllocation < ApplicationRecord
     payload = { query: query, variables: variables }.to_json
   
     response = Faraday.post(
-      "https://staging.opencollective.com/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
       payload,
       { 'Content-Type' => 'application/json' }
     )
@@ -271,7 +271,7 @@ class ProjectAllocation < ApplicationRecord
     payload = { query: query, variables: variables }.to_json
   
     response = Faraday.post(
-      "https://staging.opencollective.com/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
       payload,
       { 'Content-Type' => 'application/json' }
     )
@@ -323,7 +323,7 @@ class ProjectAllocation < ApplicationRecord
     payload = { query: query, variables: variables }.to_json
 
     response = Faraday.post(
-      "https://staging.opencollective.com/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
       payload,
       { 'Content-Type' => 'application/json' }
     )

@@ -210,7 +210,7 @@ class Fund < ApplicationRecord
 
   def open_collective_project_url
     return nil if opencollective_project_id.blank?
-    "https://staging.opencollective.com/#{ENV['OPENCOLLECTIVE_PARENT_SLUG']}/projects/#{oc_project_slug}"
+    "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{ENV['OPENCOLLECTIVE_PARENT_SLUG']}/projects/#{oc_project_slug}"
   end
 
   def oc_project_slug
@@ -253,7 +253,7 @@ class Fund < ApplicationRecord
     payload = { query: query, variables: variables }.to_json
 
     response = Faraday.post(
-      "https://staging.opencollective.com/api/graphql/v2?personalToken=#{ENV['OPEN_COLLECTIVE_API_KEY']}",
+      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPEN_COLLECTIVE_API_KEY']}",
       payload,
       { 'Content-Type' => 'application/json' }
     )
@@ -319,7 +319,7 @@ class Fund < ApplicationRecord
       "1" => Faraday::Multipart::FilePart.new(file.path, 'image/png', 'logo.png')
     }
   
-    connection = Faraday.new(url: "https://staging.opencollective.com") do |faraday|
+    connection = Faraday.new(url: "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}") do |faraday|
       faraday.request :multipart
       faraday.adapter Faraday.default_adapter
     end
@@ -397,7 +397,7 @@ class Fund < ApplicationRecord
     payload = { query: query, variables: variables }.to_json
 
     response = Faraday.post(
-      "https://staging.opencollective.com/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
       payload,
       { 'Content-Type' => 'application/json' }
     )
@@ -477,7 +477,7 @@ class Fund < ApplicationRecord
   end
 
   def fetch_transactions_from_graphql(offset: 0)
-    graphql_url = "https://staging.opencollective.com/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}"
+    graphql_url = "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}"
 
     query = <<~GRAPHQL
       query Transactions(
@@ -576,7 +576,7 @@ class Fund < ApplicationRecord
     payload = { query: query, variables: variables }.to_json
 
     response = Faraday.post(
-      "https://staging.opencollective.com/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
       payload,
       { 'Content-Type' => 'application/json' }
     )
