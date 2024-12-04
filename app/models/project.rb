@@ -758,7 +758,11 @@ class Project < ApplicationRecord
       if FundingSource.has_open_collective_alternative?(name)
         oc_name = FundingSource.open_collective_github_sponsors_mapping[name]
         return "https://opencollective.com/#{oc_name}"
+      else
+        link
       end
+    else
+      link
     end
   end
 
