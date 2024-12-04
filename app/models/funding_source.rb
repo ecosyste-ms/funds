@@ -36,7 +36,7 @@ class FundingSource < ApplicationRecord
   end
 
   def clean_url
-    url.strip.chomp.gsub(/\[|\]/, '') # remove square brackets for vllm project with invalid funding.yml
+    url.strip.chomp.gsub(/\[\"([^\"]+)\"\]/, '\1') # remove square brackets for vllm project with invalid funding.yml
   end
 
   def name
