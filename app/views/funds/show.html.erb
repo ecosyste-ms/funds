@@ -129,8 +129,7 @@
       <div class="row mt-4 mb-5">
       <% @fund.funders.each do |account| %>
         <div class="col">
-          <% href = "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{account[:slug]}" %>
-          <a href="<%= href %>" class="block-link block-link--spesh">
+          <a href="<%= "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{account[:slug]}" %>" class="block-link block-link--spesh">
             <div class="fund-funder card text-center">
               <div class="fund-funder__avatar card-img-top">
                 <%= image_tag(account[:image_url], class: 'img-fluid rounded-circle') %>

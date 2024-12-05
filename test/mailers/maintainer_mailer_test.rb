@@ -28,7 +28,7 @@ class MaintainerMailerTest < ActionMailer::TestCase
     end
 
     assert_equal ["maintainer@example.com"], email.to
-    assert_equal ["from@example.com"], email.from # Update if you customized the sender
+    assert_equal ["hello@oscollective.org"], email.from
     assert_equal "Thank you for your work maintaining #{package}", email.subject
 
     # Assert email body contains expected content
