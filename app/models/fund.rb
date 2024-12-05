@@ -222,6 +222,7 @@ class Fund < ApplicationRecord
   end
 
   def sync_opencollective_project
+    return unless featured?
     if opencollective_project_id.present?
       fetch_opencollective_project
     else
