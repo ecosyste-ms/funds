@@ -1,7 +1,5 @@
 class ProxyCollective < ApplicationRecord
 
-  PROXY_PARENT_COLLECTIVE_SLUG = ENV['PROXY_PARENT_COLLECTIVE_SLUG'] || 'ecosystem-funds-accounts'
-
   def self.find_or_create_by_website(url)
     find_by_website(url) || create_by_website(url)
   end
@@ -77,7 +75,7 @@ class ProxyCollective < ApplicationRecord
     # Set up variables for project creation
     project_slug = slug_from_url(url)
     variables = {
-      parent: { slug: PROXY_PARENT_COLLECTIVE_SLUG },
+      parent: { slug: ENV['PROXY_PARENT_COLLECTIVE_SLUG'] },
       project: {
         name: name_from_url(url),
         slug: project_slug,
