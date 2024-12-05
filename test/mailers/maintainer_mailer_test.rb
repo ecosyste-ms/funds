@@ -35,6 +35,7 @@ class MaintainerMailerTest < ActionMailer::TestCase
     assert_includes email.html_part.body.to_s, "Sentry"
     assert_includes email.html_part.body.to_s, invite_token
     assert_includes email.html_part.body.to_s, decline_deadline
+    assert_includes email.html_part.body.to_s, 'src="https://funds.ecosyste.ms'
 
     assert_includes email.text_part.body.to_s, "Sentry"
     assert_includes email.text_part.body.to_s, invite_token
