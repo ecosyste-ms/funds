@@ -329,6 +329,7 @@ class Fund < ApplicationRecord
     response = connection.post do |req|
       req.url "/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}"
       req.headers['Authorization'] = "Bearer #{ENV['OPENCOLLECTIVE_TOKEN']}" # Authorization header
+      req.headers['Personal-Token'] = ENV['OPENCOLLECTIVE_TOKEN'] # Personal-Token header
       req.body = payload
     end
   
