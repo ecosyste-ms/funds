@@ -129,15 +129,18 @@
       <div class="row mt-4 mb-5">
       <% @fund.funders.each do |account| %>
         <div class="col">
-          <div class="fund-funder card text-center">
-            <div class="fund-funder__avatar card-img-top">
-              <%= link_to image_tag(account[:image_url], class: 'img-fluid rounded-circle'), "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{account[:slug]}", target: :_blank %>
+          <% href = "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{account[:slug]}" %>
+          <a href="<%= href %>" class="block-link block-link--spesh">
+            <div class="fund-funder card text-center">
+              <div class="fund-funder__avatar card-img-top">
+                <%= image_tag(account[:image_url], class: 'img-fluid rounded-circle') %>
+              </div>
+              <div class="fund-funder__details card-body">
+                <h3 class="fund-funder__name card-title spesh-link"><%= account[:name] %></h3>
+                <p class="small card-text"><%= number_to_currency account[:amount] %></p>
+              </div>
             </div>
-            <div class="fund-funder__details card-body">
-              <h3 class="fund-funder__name card-title"><%= link_to account[:name], "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{account[:slug]}" %></h3>
-              <p class="small card-text"><%= number_to_currency account[:amount] %></p>
-            </div>
-          </div>
+          </a>
         </div>
       <% end %>
       </div>
