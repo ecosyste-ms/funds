@@ -275,6 +275,7 @@ class Fund < ApplicationRecord
   end
 
   def setup_opencollective_project
+    return unless featured?
     return if opencollective_project_id.present?
   
     file = download_image(logo_url)

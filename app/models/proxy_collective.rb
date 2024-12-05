@@ -1,6 +1,6 @@
 class ProxyCollective < ApplicationRecord
 
-  PROXY_PARENT_COLLECTIVE_SLUG = ENV['PROXY_PARENT_COLLECTIVE_SLUG'] || 'ecosystem-funds'
+  PROXY_PARENT_COLLECTIVE_SLUG = ENV['PROXY_PARENT_COLLECTIVE_SLUG'] || 'ecosystem-funds-accounts'
 
   def self.find_or_create_by_website(url)
     find_by_website(url) || create_by_website(url)
