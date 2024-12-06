@@ -32,6 +32,10 @@ h2 {
   text-align: center;
 }
 
+.tagline {
+  font-size: 14px;
+}
+
 .bullet-image {
   margin-top: 14px;
 }
@@ -42,7 +46,7 @@ h2 {
 }
 
 .orange {
-  color: #FF807D;
+  color: #DE5858;
 }
 
 .green {
@@ -63,7 +67,7 @@ h2 {
 }
 
 .button--red {
-  background-color: #FF807D;
+  background-color: #DE5858;
 }
 
 .footer {
