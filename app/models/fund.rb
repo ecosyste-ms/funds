@@ -331,7 +331,6 @@ class Fund < ApplicationRecord
           slug
           tags
           imageUrl
-          socialLinks { website }
           createdAt
           updatedAt
         }
