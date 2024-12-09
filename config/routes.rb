@@ -9,7 +9,11 @@ end if Rails.env.production?
 Rails.application.routes.draw do
   mount Sidekiq::Web => "/sidekiq"
   mount PgHero::Engine, at: "pghero"
-  
+
+  namespace :admin do
+    resources :invitations, only: [:index]
+  end
+
   resources :funds, only: [:index, :show] do
     member do
       get :transactions

@@ -1,0 +1,43 @@
+<div class="container">
+  <div class="row">
+
+    <h2>Invitations Admin</h2>
+
+    <table class='table'>
+      <thead>
+        <tr>
+          <th>Fund</th>
+          <th>Project</th>
+          <th>Email</th>
+          <th>Invited</th>
+          <th>State</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @invitations.each do |invitation| %>
+          <tr>
+            <td>
+              <%= invitation.project_allocation.fund %>
+            </td>
+            <td>
+              <%= invitation.project_allocation.project %>
+            </td>
+            <td><%= invitation.email %></td>
+            <td><%= invitation.created_at.strftime('%Y-%m-%d %H:%M:%S') %></td>
+            <td>
+              
+              <% if invitation.accepted_at.present? %>
+                <span class='invitation-status label-accepted'>Accepted</span>
+              <% elsif invitation.rejected_at.present? %>
+                <span class='invitation-status label-rejected'>Rejected</span>
+              <% else %>
+                <span class='invitation-status label-pending'>Pending</span>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+  </div>
+</div>  

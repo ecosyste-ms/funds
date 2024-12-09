@@ -723,3 +723,21 @@ a {
     --bs-table-bg: transparent;
   }
 }
+
+.invitation-status{
+  border-radius: 5px;
+  color: $color-white;
+  padding: 0.25rem 0.5rem;
+}
+
+.label-rejected{
+  background-color: $color-orange-dark; 
+}
+
+.label-accepted{
+  background-color: $color-green-dark; 
+}
+
+.label-pending{
+  background-color: $color-grey-dark
+}
