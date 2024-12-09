@@ -17,15 +17,14 @@
         <% @invitations.each do |invitation| %>
           <tr>
             <td>
-              <%= invitation.project_allocation.fund %>
+              <%= link_to invitation.project_allocation.fund, fund_path(invitation.project_allocation.fund) %>
             </td>
             <td>
-              <%= invitation.project_allocation.project %>
+              <%= link_to invitation.project_allocation.project, invitation.project_allocation.project.url, target: :_blank %>
             </td>
             <td><%= invitation.email %></td>
             <td><%= invitation.created_at.strftime('%Y-%m-%d %H:%M:%S') %></td>
             <td>
-              
               <% if invitation.accepted_at.present? %>
                 <span class='invitation-status label-accepted'>Accepted</span>
               <% elsif invitation.rejected_at.present? %>
