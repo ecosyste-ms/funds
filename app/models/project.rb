@@ -834,14 +834,14 @@ class Project < ApplicationRecord
   def committers_without_bots
     return [] unless commits.present?
     return [] unless commits['committers'].present?
-    commits['committers'].reject{|c| c['name'].downcase.include?('bot') }
+    commits['committers'].reject{|c| c['name'].downcase.include?('bot') || c['name'] == "github-actions" }
   end
 
   def top_committers
     return [] unless commits.present?
     c = committers_without_bots.sort_by{|c| c['count'] }.reverse
     # reject invalid emails or github no-reply emails or email with no @
-    c = c.reject{|c| c['email'].blank? || c['email'].include?('noreply') || !c['email'].include?('@') }
+    c = c.reject{|c| c['email'].blank? || c['email'].include?('noreply') || !c['email'].include?('@') || c['email'].include?('@localhost') }
     c.first(3)
   end
 
