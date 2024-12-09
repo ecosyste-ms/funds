@@ -10,7 +10,7 @@ class FundsController < ApplicationController
 
     @allocation = @fund.allocations.order('created_at DESC').first
     if @allocation
-      @project_allocations = @allocation.project_allocations.includes({project: :funding_source}, :funding_source, :invitation).order('amount_cents desc').where('amount_cents >= 1')
+      @project_allocations = @allocation.project_allocations.includes(:project, :funding_source, :invitation).order('amount_cents desc').where('amount_cents >= 1')
     end
   end
 
