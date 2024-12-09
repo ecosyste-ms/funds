@@ -227,6 +227,7 @@ class Fund < ApplicationRecord
       fetch_opencollective_project
     else
       setup_opencollective_project
+      update_social_links
     end
     setup_webhook
     sync_transactions
@@ -274,6 +275,45 @@ class Fund < ApplicationRecord
 
   end
 
+  def update_social_links
+    query = <<~GRAPHQL
+      mutation UpdateSocialLinks($account: AccountReferenceInput!, $socialLinks: [SocialLinkInput!]!) {
+        updateSocialLinks(account: $account, socialLinks: $socialLinks) {
+          type
+          url
+          createdAt
+          updatedAt
+        }
+      }
+    GRAPHQL
+
+    variables = {
+      account: { slug: oc_project_slug },
+      socialLinks: [
+        { type: "WEBSITE", url: "https://funds.ecosyste.ms/funds/#{slug}" }
+      ]
+    }
+
+    payload = { query: query, variables: variables }.to_json
+
+    response = Faraday.post(
+      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+      payload,
+      { 'Content-Type' => 'application/json' }
+    )
+
+    puts "Response status: #{response.status}"
+    puts "Response body: #{response.body}"
+
+    response_data = JSON.parse(response.body)
+
+    if response_data['errors']
+      puts "GraphQL Errors: #{response_data['errors']}"
+    else
+      return response_data['data']['updateSocialLinks']
+    end
+  end
+
   def setup_opencollective_project
     return unless featured?
     return if opencollective_project_id.present?
@@ -291,6 +331,7 @@ class Fund < ApplicationRecord
           slug
           tags
           imageUrl
+          socialLinks { website }
           createdAt
           updatedAt
         }
@@ -304,8 +345,9 @@ class Fund < ApplicationRecord
         project: {
           name: "#{name} Fund",
           slug: oc_project_slug,
-          description: "This is the Open Source Collective for the #{name} Fund. We support open-source projects in the #{name} ecosystem.",
+          description: "Supporting maintainers and communities in the #{name} ecosystem.",
           tags: ["open-source", "community", "fund", slug],
+          socialLinks: { website: "https://funds.ecosyste.ms/funds/#{slug}" },
           image: nil # Placeholder for the file reference
         }
       }
