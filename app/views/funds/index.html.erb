@@ -50,7 +50,7 @@
     <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-5">
       <% @funds.each do |fund| %>
         <div class="col-lg">
-          <a href="<%= fund_path(fund) %>" class="fund-card fund-card--small card text-center block-link">
+          <a href="#<%#= fund_path(fund) %>" class="fund-card fund-card--small card text-center block-link">
             <img src="<%= fund.logo_url %>" class="card-img-top" onerror="this.style.display='none'">
             <div class="card-body">
               <h3 class="card-title block-link__title">
