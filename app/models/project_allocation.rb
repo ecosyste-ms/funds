@@ -347,13 +347,20 @@ class ProjectAllocation < ApplicationRecord
     created_at + 14.days
   end
 
+  def create_invite
+    return if funding_source.present?
+    return if invitation.present?
+      
+    Invitation.create!(project_allocation: self, email: project.contact_email)  
+  end
+
   def send_invitation
     return if funding_source.present?
     return if invitation.present?
     
-    invitation = Invitation.create!(project_allocation: self, email: project.contact_email)
+    invitation = create_invite
     
-    invitation.send_email
+    invitation.try(:send_email)
   end
 
   def reject_funding!
