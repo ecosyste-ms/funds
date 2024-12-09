@@ -116,7 +116,7 @@ class ProxyCollective < ApplicationRecord
         if load_response_data['data'] && load_response_data['data']['account']
           project = load_response_data['data']['account']
           puts "Project with slug already exists. Loaded project ID: #{project['id']}"
-          ProxyCollective.create(
+          pc = ProxyCollective.create(
             uuid: project['id'],
             legacy_id: project['legacyId'],
             slug: project['slug'],
@@ -126,6 +126,7 @@ class ProxyCollective < ApplicationRecord
             website: project['website'] || url,
             image_url: project['imageUrl']
           )
+          pc.update_social_links
         else
           puts "Error: Project exists but could not be loaded."
         end
@@ -138,7 +139,7 @@ class ProxyCollective < ApplicationRecord
       # Project created successfully
       project = response_data['data']['createProject']
       puts "Project created: #{project['name']} (#{project['slug']})"
-      ProxyCollective.create(
+      pc = ProxyCollective.create(
         uuid: project['id'],
         legacy_id: project['legacyId'],
         slug: project['slug'],
@@ -148,6 +149,46 @@ class ProxyCollective < ApplicationRecord
         website: project['website'] || url,
         image_url: project['imageUrl']
       )
+      pc.update_social_links
+    end
+  end
+
+  def update_social_links
+    query = <<~GRAPHQL
+      mutation UpdateSocialLinks($account: AccountReferenceInput!, $socialLinks: [SocialLinkInput!]!) {
+        updateSocialLinks(account: $account, socialLinks: $socialLinks) {
+          type
+          url
+          createdAt
+          updatedAt
+        }
+      }
+    GRAPHQL
+
+    variables = {
+      account: { slug: slug },
+      socialLinks: [
+        { type: "WEBSITE", url: website }
+      ]
+    }
+
+    payload = { query: query, variables: variables }.to_json
+
+    response = Faraday.post(
+      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+      payload,
+      { 'Content-Type' => 'application/json' }
+    )
+
+    puts "Response status: #{response.status}"
+    puts "Response body: #{response.body}"
+
+    response_data = JSON.parse(response.body)
+
+    if response_data['errors']
+      puts "GraphQL Errors: #{response_data['errors']}"
+    else
+      return response_data['data']['updateSocialLinks']
     end
   end
 end
