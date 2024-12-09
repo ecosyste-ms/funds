@@ -27,7 +27,7 @@
 
             <div class="stat-card mb-2">
               <div class="stat-card-body">
-                <span class="stat-card-title"><%= @fund.try(:total_donors) || 0 %></span>
+                <span class="stat-card-title"><%= @allocation.try(:funders_count) || 0 %></span>
                 <span class="stat-card-text small">Funders</span>
               </div>
             </div>
@@ -67,7 +67,7 @@
 
             <div class="stat-card mb-2">
               <div class="stat-card-body">
-                <span class="stat-card-title"><%= @fund.total_donors %></span>
+                <span class="stat-card-title"><%= @allocation.funders_count %></span>
                 <span class="stat-card-text extra-small">Funders</span>
               </div>
             </div>
