@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_02_162858) do
+ActiveRecord::Schema[8.0].define(version: 2024_12_09_154903) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -114,6 +114,9 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_02_162858) do
     t.integer "funding_source_id"
     t.string "licenses", default: [], array: true
     t.boolean "funding_rejected", default: false
+    t.integer "total_downloads", default: 0
+    t.integer "total_dependent_repos", default: 0
+    t.integer "total_dependent_packages", default: 0
     t.index ["funding_source_id"], name: "index_projects_on_funding_source_id"
     t.index ["url"], name: "index_projects_on_url", unique: true
   end

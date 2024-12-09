@@ -95,8 +95,16 @@ class Project < ApplicationRecord
     find_or_create_funding_source
     search_for_collective
     set_licenses
+    set_totals
     update(last_synced_at: Time.now)
     ping
+  end
+
+  def set_totals
+    self.total_downloads = downloads
+    self.total_dependent_repos = dependent_repos_count
+    self.total_dependent_packages = dependent_packages_count
+    self.save
   end
 
   def sync_async
