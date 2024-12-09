@@ -212,7 +212,16 @@
         </div>
       </figure>
     <% else%>
-      <p>Coming soon...</p>
+      <div class="row align-items-center">
+        <div class="col-lg-6">
+          <%= image_tag("coming-soon.svg", alt: "", class: "img-fluid", size: "500x460") %>
+        </div>
+        <div class="col-lg-6">
+          <h2>Coming soon</h2>
+          <p>Contact us about support for <%= @fund.name %></p>
+          <p><a href="mailto:hello@oscollective.org " class="btn btn-primary">Contact us</a></p>
+        </div>
+      </div>
     <% end %>
     </div>
     <p class="text-end mt-3">
