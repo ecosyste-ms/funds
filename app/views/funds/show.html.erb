@@ -161,21 +161,21 @@
             </thead>
             <tbody>
               <% @project_allocations.each_with_index do |project_allocation, i| %>
-                <% next if project_allocation.project.nil? %>
+                <% next if project_allocation.project_url.nil? %>
 
                 <!-- Main Row -->
-                <tr class="clickable-row <%= 'row-rejected' if project_allocation.funding_rejected? %>" data-bs-toggle="collapse" data-bs-target="#details-<%= i %>" role="button" aria-controls="#details-<%= i %>">
+                <tr class="clickable-row <%= 'row-rejected' if project_allocation.project_funding_rejected %>" data-bs-toggle="collapse" data-bs-target="#details-<%= i %>" role="button" aria-controls="#details-<%= i %>">
                   <td><%= i + 1 %></td>
-                  <td><%= link_to project_allocation.project, project_allocation.project.url, target: :_blank %></td>
+                  <td><%= link_to project_allocation.project_name, project_allocation.project_url, target: :_blank %></td>
                   <td><%= number_to_currency project_allocation.amount_cents / 100.0 %></td>
                   <td>
-                    <%= number_to_human(project_allocation.project&.downloads, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %>
+                    <%= number_to_human(project_allocation.project_downloads, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %>
                   </td>
                   <td>
-                    <%= number_to_human(project_allocation.project&.dependent_repos_count, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %>
+                    <%= number_to_human(project_allocation.project_dependent_repos, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %>
                   </td>
                   <td>
-                    <%= number_to_human(project_allocation.project&.dependent_packages_count, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %>
+                    <%= number_to_human(project_allocation.project_dependent_packages, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %>
                   </td>
                 </tr>
 
@@ -184,14 +184,14 @@
                   <td colspan="6">
                     <div class="collapse" id="details-<%= i %>">
                       <div class="p-4 well">
-                        <p><%= bootstrap_icon 'git', width: 18, height: 18 %> <span class="visually-hidden">Repository:</span> <%= link_to project_allocation.project.url, project_allocation.project.url, target: :_blank %></p>
-                        <% if project_allocation.funding_rejected? %>
+                        <p><%= bootstrap_icon 'git', width: 18, height: 18 %> <span class="visually-hidden">Repository:</span> <%= link_to project_allocation.project_url, project_allocation.project_url, target: :_blank %></p>
+                        <% if project_allocation.project_funding_rejected %>
                           <p><%= bootstrap_icon 'piggy-bank-fill', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> Funding Rejected</p>
                         <% elsif project_allocation.funding_source && project_allocation.funding_source.approved? %>
                           <p><%= bootstrap_icon 'piggy-bank-fill', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> <%= link_to project_allocation.funding_source.url, project_allocation.funding_source.url, target: :_blank %></p>
                         <% else %>
                           <% if project_allocation.invitation.present? %>
-                            <% if project_allocation.funding_rejected? %>
+                            <% if project_allocation.project_funding_rejected %>
                               <p><%= bootstrap_icon 'piggy-bank-fill', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> Invitation Rejected on <%= project_allocation.invitation.rejected_at.strftime('%B %d, %Y') %></p>
                             <% elsif project_allocation.invitation_accepted? %>
                               <p><%= bootstrap_icon 'piggy-bank-fill', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> Invitation Accepted on <%= project_allocation.invitation.accepted_at.strftime('%B %d, %Y') %></p>
