@@ -17,10 +17,10 @@
         <% @invitations.each do |invitation| %>
           <tr>
             <td>
-              <%= link_to invitation.project_allocation.fund, fund_path(invitation.project_allocation.fund) %>
+              <%= link_to invitation.fund_name, fund_path(invitation.fund_slug) %>
             </td>
             <td>
-              <%= link_to invitation.project_allocation.project, invitation.project_allocation.project.url, target: :_blank %>
+              <%= link_to invitation.project_name, invitation.url, target: :_blank %>
             </td>
             <td><%= invitation.email %></td>
             <td><%= invitation.created_at.strftime('%Y-%m-%d %H:%M:%S') %></td>
