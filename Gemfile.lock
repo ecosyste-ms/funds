@@ -126,7 +126,7 @@ GEM
       railties (>= 5.0.0)
     faker (3.5.1)
       i18n (>= 1.8.11, < 2)
-    faraday (2.12.1)
+    faraday (2.12.2)
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
@@ -194,7 +194,7 @@ GEM
     marcel (1.0.4)
     mini_mime (1.1.5)
     minitest (5.25.4)
-    mocha (2.7.0)
+    mocha (2.7.1)
       ruby2_keywords (>= 0.0.5)
     msgpack (1.7.5)
     multipart-post (2.4.1)
