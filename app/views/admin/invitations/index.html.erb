@@ -3,6 +3,13 @@
 
     <h2>Invitations Admin</h2>
 
+    <ul class='list-unstyled'>
+      <li>Total: <%= @invitations.length %></li>
+      <li>Pending: <%= @invitations.select { |i| i.accepted_at.blank? && i.rejected_at.blank? }.count %></li>
+      <li>Accepted: <%= @invitations.select { |i| i.accepted_at.present? }.count %></li>
+      <li>Rejected: <%= @invitations.select { |i| i.rejected_at.present? }.count %></li>
+    </ul>
+
     <table class='table'>
       <thead>
         <tr>
