@@ -213,6 +213,11 @@ class Fund < ApplicationRecord
     "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{ENV['OPENCOLLECTIVE_PARENT_SLUG']}/projects/#{oc_project_slug}"
   end
 
+  def open_collective_project_embed_url
+    return nil if opencollective_project_id.blank?
+    "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/embed/#{ENV['OPENCOLLECTIVE_PARENT_SLUG']}/projects/#{oc_project_slug}/donate?hideSteps=false&hideFAQ=true&hideHeader=false"
+  end
+
   def oc_project_slug
     "oc-#{slug}-fund"
   end
