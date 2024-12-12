@@ -14,19 +14,7 @@
         <h1 class="display-1 extra-bold"><%= @fund.name %></h1>
         <p><%= @fund.description %></p>
         <% if @fund.open_collective_project_url.present? %>
-          <!-- Button trigger modal -->
-          <button type="button" class="btn btn-success btn-fund-header-cta dark-shadow rounded-pill mb-3" data-bs-toggle="modal" data-bs-target="#exampleModal">
-            Fund the <%= @fund.name %> Ecosystem on Open Collective
-          </button>
-
-          <!-- Modal -->
-          <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-              <div class="modal-content p-3">
-                <iframe src="<%= @fund.open_collective_project_embed_url %>" style="width: 100%; min-height: 92vh; "></iframe>
-              </div>
-            </div>
-          </div>
+          <%= link_to "Fund the #{@fund.name} Ecosystem on Open Collective", @fund.open_collective_project_donate_url, class: 'btn btn-success btn-fund-header-cta dark-shadow rounded-pill mb-3' %>
         <% end %>
 
         <div class="fund-header-stats">
