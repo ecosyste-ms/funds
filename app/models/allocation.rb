@@ -154,7 +154,23 @@ class Allocation < ApplicationRecord
   end
 
   def payout
-    project_allocations.find_each(&:choose_payout_method)
+    project_allocations.each(&:payout)
+  end
+
+  def payout_open_source_collectives
+    project_allocations.select(&:is_osc_collective?).each(&:payout)
+  end
+
+  def payout_open_collectives
+    project_allocations.select(&:is_non_osc_collective?).each(&:payout)
+  end
+
+  def payout_proxy_collectives
+    project_allocations.select(&:is_proxy_collective?).each(&:payout)
+  end
+
+  def payout_invited
+    project_allocations.select(&:is_invited?).each(&:payout)
   end
 
   def github_sponsored_projects_count
@@ -217,4 +233,6 @@ class Allocation < ApplicationRecord
       pa.send_invitation
     end
   end
+
+  
 end

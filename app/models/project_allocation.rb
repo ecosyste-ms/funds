@@ -23,6 +23,14 @@ class ProjectAllocation < ApplicationRecord
     funding_source && funding_source.platform == 'opencollective.com' && funding_source.host != 'opensource'
   end
 
+  def is_proxy_collective?
+    funding_source && funding_source.approved? && funding_source.platform != 'opencollective.com'
+  end
+
+  def is_invited?
+    invite.present?
+  end
+
   def collective_slug
     funding_source.platform == 'opencollective.com' ? funding_source.name : nil
   end
@@ -43,7 +51,7 @@ class ProjectAllocation < ApplicationRecord
     end
   end
 
-  def choose_payout_method
+  def payout
     return if funding_rejected?
 
     if is_osc_collective?
@@ -69,6 +77,7 @@ class ProjectAllocation < ApplicationRecord
   end
 
   def send_expense_invite
+    return if funding_rejected?
     return if approved_funding_source?
     return unless project.contact_email.present?
     return if invitation.present?
@@ -141,6 +150,7 @@ class ProjectAllocation < ApplicationRecord
   end
 
   def send_to_osc_collective(collective_slug, amount_cents)
+    return if funding_rejected?
     query = <<-GQL
       mutation(
         $fromAccount: AccountReferenceInput!,
@@ -198,6 +208,7 @@ class ProjectAllocation < ApplicationRecord
   end
 
   def send_draft_expense_invitation(collective_slug, amount_cents, description)
+    return if funding_rejected?
     query = <<-GQL
       mutation(
         $account: AccountReferenceInput!,
@@ -295,6 +306,7 @@ class ProjectAllocation < ApplicationRecord
   end
 
   def add_funds_to_proxy_collective(proxy_collective_slug, amount_cents, description)
+    return if funding_rejected?
     query = <<-GQL
       mutation AddFunds($fromAccount: AccountReferenceInput!, $account: AccountReferenceInput!, $amount: AmountInput!, $description: String!) {
         addFunds(
