@@ -15,6 +15,7 @@
         <tr>
           <th>Fund</th>
           <th>Project</th>
+          <th>Amount</th>
           <th>Email</th>
           <th>Invited</th>
           <th>State</th>
@@ -29,6 +30,7 @@
             <td>
               <%= link_to invitation.project_name, invitation.url, target: :_blank %>
             </td>
+            <td><%= number_to_currency(invitation.project_allocation.amount_cents / 100.0) %></td>
             <td><%= invitation.email %></td>
             <td><%= invitation.created_at.strftime('%Y-%m-%d %H:%M:%S') %></td>
             <td>
