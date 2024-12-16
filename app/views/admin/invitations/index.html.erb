@@ -1,14 +1,20 @@
 <div class="container">
   <div class="row">
-
     <h2>Invitations Admin</h2>
 
-    <ul class='list-unstyled'>
-      <li>Total: <%= @invitations.length %></li>
-      <li>Pending: <%= @invitations.select { |i| i.accepted_at.blank? && i.rejected_at.blank? }.count %></li>
-      <li>Accepted: <%= @invitations.select { |i| i.accepted_at.present? }.count %></li>
-      <li>Rejected: <%= @invitations.select { |i| i.rejected_at.present? }.count %></li>
+    <ul class='list-inline'>
+      <li class="list-inline-item">Total: <%= @invitations.length %></li>
+      <li class="list-inline-item">
+        Pending: <%= @invitations.select { |i| i.accepted_at.blank? && i.rejected_at.blank? }.count %> (<%= (@invitations.select { |i| i.accepted_at.blank? && i.rejected_at.blank? }.count.to_f / @invitations.length * 100).round(2) %>%)
+      </li>
+      <li class="list-inline-item">
+        Accepted: <%= @invitations.select { |i| i.accepted_at.present? }.count %> (<%= (@invitations.select { |i| i.accepted_at.present? }.count.to_f / @invitations.length * 100).round(2) %>%)
+      </li>
+      <li class="list-inline-item">
+        Rejected: <%= @invitations.select { |i| i.rejected_at.present? }.count %> (<%= (@invitations.select { |i| i.rejected_at.present? }.count.to_f / @invitations.length * 100).round(2) %>%)
+      </li>
     </ul>
+  </div>
 
     <table class='table'>
       <thead>
