@@ -6,6 +6,10 @@ class Invitation < ApplicationRecord
 
   before_validation :generate_token, on: :create
 
+  def project
+    project_allocation.project
+  end
+
   def generate_token
     loop do
       self.token = SecureRandom.hex(16)

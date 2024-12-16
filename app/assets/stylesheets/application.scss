@@ -741,3 +741,13 @@ a {
 .label-pending{
   background-color: $color-grey-dark
 }
+
+.tooltip {
+  max-width: 400px !important;
+  white-space: normal; 
+}
+
+.tooltip-inner {
+  max-width: 400px !important; 
+  text-align: left; 
+}

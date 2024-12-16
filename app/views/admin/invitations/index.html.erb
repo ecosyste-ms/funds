@@ -55,6 +55,15 @@
             </td>
             <td>
               <%= link_to invitation.project_name, invitation.url, target: :_blank %>
+              <% if invitation.project.funding_links.any? %>
+<span 
+  title="<%= invitation.project.funding_links.join(', ') %>" 
+  data-bs-toggle="tooltip" 
+  data-bs-placement="top" 
+  style="max-width: 600px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+  <%= bootstrap_icon 'piggy-bank-fill', width: 18, height: 18 %>
+</span>
+              <% end %>
             </td>
             <td><%= number_to_currency(invitation.project_allocation.amount_cents / 100.0) %></td>
             <td><%= invitation.email %></td>
