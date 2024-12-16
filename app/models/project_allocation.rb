@@ -28,7 +28,7 @@ class ProjectAllocation < ApplicationRecord
   end
 
   def is_invited?
-    invite.present?
+    invitation.present?
   end
 
   def collective_slug
