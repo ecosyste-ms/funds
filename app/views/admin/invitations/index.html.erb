@@ -19,12 +19,32 @@
     <table class='table'>
       <thead>
         <tr>
-          <th>Fund</th>
+          <th>
+            <%= link_to admin_invitations_path(sort: "fund", order: params[:order] == "asc" ? "desc" : "asc") do %>
+              Fund
+              <% if params[:sort] == "fund" %>
+                <%= bootstrap_icon params[:order] == 'asc' ? 'caret-up-fill' : 'caret-down-fill', width: 18, height: 18 %>
+              <% end %>
+            <% end %>
+          </th>
           <th>Project</th>
-          <th>Amount</th>
+          <th>
+            <%= link_to admin_invitations_path(sort: "amount", order: params[:order] == "asc" ? "desc" : "asc") do %>
+              Amount
+              <% if params[:sort] == "amount" %>
+                <%= bootstrap_icon params[:order] == 'asc' ? 'caret-up-fill' : 'caret-down-fill', width: 18, height: 18 %>
+              <% end %>
+            <% end %>
+          </th>
           <th>Email</th>
           <th>Invited</th>
-          <th>State</th>
+          <th>
+            <%= link_to admin_invitations_path(sort: "status", order: params[:order] == "asc" ? "desc" : "asc") do %>
+              Status
+              <% if params[:sort] == "status" %>
+                <%= bootstrap_icon params[:order] == 'asc' ? 'caret-up-fill' : 'caret-down-fill', width: 18, height: 18 %>
+              <% end %>
+            <% end %>
         </tr>
       </thead>
       <tbody>
