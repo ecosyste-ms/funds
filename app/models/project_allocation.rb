@@ -11,6 +11,12 @@ class ProjectAllocation < ApplicationRecord
 
   scope :platform, ->(platform) { joins(:funding_source).where(funding_sources: { platform: platform }) }
 
+  def update_funding_source
+    return if funding_source_id.present?
+    self.funding_source_id = project.funding_source_id
+    save
+  end
+
   def approved_funding_source?
     funding_source && funding_source.approved?
   end
