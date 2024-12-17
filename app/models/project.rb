@@ -198,7 +198,11 @@ class Project < ApplicationRecord
   end
 
   def repos_api_url
-    "https://repos.ecosyste.ms/api/v1/repositories/lookup?url=#{repository_url}"
+    if repository.present?
+      "https://repos.ecosyste.ms/api/v1/hosts/#{repository['host']['name']}/repositories/#{repository['full_name']}"  
+    else
+      "https://repos.ecosyste.ms/api/v1/repositories/lookup?url=#{repository_url}"
+    end
   end
 
   def repos_url
