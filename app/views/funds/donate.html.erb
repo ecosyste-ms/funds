@@ -1,0 +1,53 @@
+<div class="fund-header purple-grad-bg  mb-5 pt-4 pb-4">
+  <div class="container">
+    <div class="row">
+      <% if @fund.logo_url.present? %>
+        <div class="col-md-1 mb-3 pt-3">
+          <img src="<%= @fund.logo_url %>" alt="" class="img-fluid fund-logo" onerror="this.style.display='none'">
+        </div>
+      <% end %>
+      <div class="<% if @fund.logo_url.present? %>col-md-11<% end %>">
+   
+        <h1 class="display-1 extra-bold"><%= @fund.name %></h1>
+
+        <div class="fund-header-stats">
+          <div class="fund-stat-bar mb-2 mb-md-3">
+            <div class="stat-card mb-2">
+              <div class="stat-card-body">
+                <span class="stat-card-title"><%= number_to_currency (@allocation.try(:total_cents) || 0)/100.0 %></span>
+                <span class="stat-card-text small">Total funded</span>
+              </div>
+            </div>
+
+            <div class="stat-card mb-2">
+              <div class="stat-card-body">
+                <span class="stat-card-title"><%= @allocation.try(:funders_count) || 0 %></span>
+                <span class="stat-card-text small">Funders</span>
+              </div>
+            </div>
+
+            <div class="stat-card mb-2">
+              <div class="stat-card-body">
+                <span class="stat-card-title"><%= @allocation.try(:funded_projects_count) || 0 %></span>
+                <span class="stat-card-text small">Projects</span>
+              </div>
+            </div>
+          </div> 
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="fund-section-header mb-3 mb-md-5">
+      <h2 class="h1 extra-bold">
+        Donate to the <%= @fund.name %> ecosystem
+      </h2>
+    </div>
+
+    <iframe src="<%= @fund.open_collective_project_embed_url %>" style="width: 100%; min-height: 100vh;"></iframe>
+  </div>
+</div>

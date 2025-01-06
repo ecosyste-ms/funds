@@ -14,7 +14,6 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_09_160203) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
-  enable_extension "pg_stat_statements"
 
   create_table "allocations", force: :cascade do |t|
     t.integer "fund_id"
