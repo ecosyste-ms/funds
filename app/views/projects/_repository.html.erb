@@ -8,9 +8,11 @@
     </p>
 
     <ul>
+      <% if @project.repository['host'] %>
       <li>
         Host: <%= @project.repository['host']['name'] %>
       </li>
+      <% end %>
       <li>
         URL: <%= link_to @project['url'], @project['url'] %>
       </li>
