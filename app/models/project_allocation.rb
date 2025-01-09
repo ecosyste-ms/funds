@@ -11,7 +11,12 @@ class ProjectAllocation < ApplicationRecord
 
   scope :platform, ->(platform) { joins(:funding_source).where(funding_sources: { platform: platform }) }
 
+  def self.update_funding_sources
+    ProjectAllocation.without_funding_source.find_each(&:update_funding_source)
+  end
+
   def update_funding_source
+    return if Time.now > allocation_payout_date
     return if funding_source_id.present?
     return if project.funding_rejected?
     return unless project.funding_source && project.funding_source.approved?
@@ -365,6 +370,10 @@ class ProjectAllocation < ApplicationRecord
 
   def decline_deadline
     created_at + 14.days
+  end
+
+  def allocation_payout_date
+    created_at + 28.days
   end
 
   def create_invite
