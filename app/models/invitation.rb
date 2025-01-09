@@ -6,6 +6,12 @@ class Invitation < ApplicationRecord
 
   before_validation :generate_token, on: :create
 
+  def self.delete_expired
+    Invitation.all.find_each do |invitation|
+      invitation.delete_expense if invitation.expired?
+    end
+  end
+
   def project
     project_allocation.project
   end
@@ -122,13 +128,43 @@ class Invitation < ApplicationRecord
 
     response_body = JSON.parse(response.body)
 
-    # Check for errors or print the result
     if response_body['errors']
       puts "Error: #{response_body['errors']}"
     else
       puts "Expense details:"
       puts JSON.pretty_generate(response_body['data']['expense'])
       update!(data: response_body['data']['expense'])
+    end
+  end
+
+  def delete_expense
+    query = <<~GRAPHQL
+      mutation($id: String!) {
+        deleteExpense(id: $id) {
+          id
+        }
+      }
+    GRAPHQL
+
+    variables = {
+      id: member_invitation_id
+    }
+
+    payload = { query: query, variables: variables }.to_json
+
+    response = Faraday.post(
+      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+      payload,
+      { 'Content-Type' => 'application/json' }
+    )
+
+    response_body = JSON.parse(response.body)
+
+    if response_body['errors']
+      puts "Error: #{response_body['errors']}"
+    else
+      puts "Deleted expense:"
+      puts JSON.pretty_generate(response_body['data']['deleteExpense'])
     end
   end
 end
