@@ -13,7 +13,7 @@
       "schedule": "*/30 * * * *"
     },
     {
-      "command": "bundle exec rake funding_sources:update_project_allocation_funding_sources",,
+      "command": "bundle exec rake funding_sources:update_project_allocation_funding_sources",
       "schedule": "0 0 * * *"
     }
   ]
