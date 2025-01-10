@@ -37,7 +37,7 @@ class ProxyCollective < ApplicationRecord
     end
   end
 
-  self.image_url_from_url(url)
+  def self.image_url_from_url(url)
     case platform_from_url(url)
     when 'github-sponsors'
       "https://github.com/#{username_from_url(url, 'github-sponsors')}.png"
