@@ -668,7 +668,7 @@ class Project < ApplicationRecord
   end
 
   def funding_links
-    @funding_links ||= clean_funding_links(package_funding_links + repo_funding_links + owner_funding_links + repo_owner_funding_links + readme_funding_links).uniq
+    @funding_links ||= clean_funding_links(repo_funding_links + package_funding_links + owner_funding_links + repo_owner_funding_links + readme_funding_links).uniq
   end
 
   def clean_funding_links(links)
