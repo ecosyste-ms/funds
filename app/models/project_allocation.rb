@@ -89,6 +89,16 @@ class ProjectAllocation < ApplicationRecord
     end
   end
 
+  def expense_invite_description
+    if invitation.present? && invitation.accepted?
+      "You are receiving this message because you confirmed you are happy to accept a donation for your work within the #{fund.name} open source ecosystem."
+    else
+      "You are receiving this message because we have not received a response regarding a donation for your work within the #{fund.name} open source ecosystem.
+
+If you wish to accept this donation please follow the instructions in this message."
+    end
+  end
+
   def send_expense_invite
     return if funding_rejected?
     return if approved_funding_source?
@@ -128,11 +138,11 @@ class ProjectAllocation < ApplicationRecord
         type: "INVOICE",
         payee: {
           name: "#{project.to_s} maintainer", # TODO try to get the maintainer name
-          email: "#{project.contact_email.gsub('@', '+test')}@test.com" # Use a test email for now
+          email: project.contact_email
         },
         items: [
           {
-            description: "Allocation for #{project.to_s}",
+            description: expense_invite_description,
             amount: amount_cents,
             currency: "USD"
           }
