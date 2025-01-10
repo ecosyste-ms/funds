@@ -37,12 +37,24 @@ class ProxyCollective < ApplicationRecord
     end
   end
 
+  self.image_url_from_url(url)
+    case platform_from_url(url)
+    when 'github-sponsors'
+      "https://github.com/#{username_from_url(url, 'github-sponsors')}.png"
+    else
+      "https://github.com/ecosyste-ms.png"
+    end
+  end
+
   def self.platform_from_url(url)
     host = URI.parse(url).host
     host.include?('github') ? 'github-sponsors' : host.split('.').first
   end
 
   def self.create_by_website(url)
+    file = download_image(image_url_from_url(url))
+    return unless file
+  
     create_project_mutation = <<~GRAPHQL
       mutation CreateProject($parent: AccountReferenceInput!, $project: ProjectCreateInput!) {
         createProject(parent: $parent, project: $project, disableContributions: true) {
@@ -71,22 +83,41 @@ class ProxyCollective < ApplicationRecord
     GRAPHQL
   
     project_slug = slug_from_url(url)
-    variables = {
-      parent: { slug: ENV['PROXY_PARENT_COLLECTIVE_SLUG'] },
-      project: {
-        name: name_from_url(url),
-        slug: project_slug,
-        description: description_from_url(url),
-        tags: tags_from_url(url)
+    operations = {
+      query: create_project_mutation,
+      variables: {
+        parent: { slug: ENV['PROXY_PARENT_COLLECTIVE_SLUG'] },
+        project: {
+          name: name_from_url(url),
+          slug: project_slug,
+          description: description_from_url(url),
+          tags: tags_from_url(url),
+          image: nil # Placeholder for the file reference
+        }
       }
+    }.to_json
+  
+    map = {
+      "1" => ["variables.project.image"]
+    }.to_json
+  
+    payload = {
+      operations: Faraday::Multipart::ParamPart.new(operations, 'application/json'),
+      map: Faraday::Multipart::ParamPart.new(map, 'application/json'),
+      "1" => Faraday::Multipart::FilePart.new(file.path, 'image/png', 'logo.png')
     }
   
-    payload = { query: create_project_mutation, variables: variables }.to_json
-    response = Faraday.post(
-      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
-      payload,
-      { 'Content-Type' => 'application/json' }
-    )
+    connection = Faraday.new(url: "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}") do |faraday|
+      faraday.request :multipart
+      faraday.adapter Faraday.default_adapter
+    end
+  
+    response = connection.post do |req|
+      req.url "/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}"
+      req.headers['Authorization'] = "Bearer #{ENV['OPENCOLLECTIVE_TOKEN']}" # Authorization header
+      req.headers['Personal-Token'] = ENV['OPENCOLLECTIVE_TOKEN'] # Personal-Token header
+      req.body = payload
+    end
   
     puts "Response status: #{response.status}"
     puts "Response body: #{response.body}"
@@ -142,6 +173,26 @@ class ProxyCollective < ApplicationRecord
         image_url: project['imageUrl']
       )
       pc.update_social_links
+    end
+  ensure
+    file.close if file
+    file.unlink if file
+  end
+  
+  def self.download_image(url)
+    return nil if url.blank?
+  
+    begin
+      tempfile = Tempfile.new(['logo', '.png'])
+      URI.open(url) do |image|
+        tempfile.binmode
+        tempfile.write(image.read)
+      end
+      tempfile.rewind
+      tempfile
+    rescue => e
+      puts "Failed to download image: #{e.message}"
+      nil
     end
   end
 
