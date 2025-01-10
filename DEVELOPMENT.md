@@ -66,4 +66,4 @@ Required environment variables:
 - `OPENCOLLECTIVE_DOMAIN` - staging.opencollective.com or opencollective.com
 - `OPENCOLLECTIVE_TOKEN` - A token for the Open Source Collective API
 - `OPENCOLLECTIVE_PARENT_SLUG` - The parent collective id for the Open Source Collective API (e.g. `ecosystem-funds`)
-- `PROXY_PARENT_COLLECTIVE_SLUG` - The parent collective slug for the proxy collectives (e.g. `ecosystem-funds-accounts`)
+- `PROXY_PARENT_COLLECTIVE_SLUG` - The parent collective slug for the proxy collectives (e.g. `ecosystems-funds-accounts`)
