@@ -8,6 +8,9 @@ class ProjectAllocation < ApplicationRecord
   scope :with_funding_source, -> { where.not(funding_source_id: nil) }
   scope :with_approved_funding_source, -> { joins(:funding_source).where(funding_sources: { platform: FundingSource::APPROVED_PLATFORMS }) }
   scope :without_funding_source, -> { where(funding_source_id: nil) }
+  
+  scope :paid, -> { where.not(paid_at: nil) }
+  scope :unpaid, -> { where(paid_at: nil) }
 
   scope :platform, ->(platform) { joins(:funding_source).where(funding_sources: { platform: platform }) }
 
