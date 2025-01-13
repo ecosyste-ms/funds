@@ -10,11 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_09_160203) do
+ActiveRecord::Schema[8.0].define(version: 2025_01_13_150416) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
-  enable_extension "pg_stat_statements"
 
   create_table "allocations", force: :cascade do |t|
     t.integer "fund_id"
@@ -88,6 +87,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_09_160203) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "funding_source_id"
+    t.datetime "paid_at"
     t.index ["allocation_id"], name: "index_project_allocations_on_allocation_id"
     t.index ["fund_id"], name: "index_project_allocations_on_fund_id"
     t.index ["funding_source_id"], name: "index_project_allocations_on_funding_source_id"

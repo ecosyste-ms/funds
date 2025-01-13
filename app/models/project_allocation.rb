@@ -64,15 +64,21 @@ class ProjectAllocation < ApplicationRecord
     end
   end
 
+  def paid?
+    paid_at.present?
+  end
+
   def payout
     return if funding_rejected?
+    return if paid?
 
     if is_osc_collective?
       puts "  Sending to OSC collective: #{funding_source.name}"
       send_to_osc_collective(collective_slug, amount_cents)
     elsif is_non_osc_collective?
       puts "  Sending to non-OSC collective: #{funding_source.name}"
-      send_draft_expense_invitation(collective_slug, amount_cents, expense_invite_description) # TODO record this an an invitation as well
+      description = "#{fund.name} Ecosystem allocation for #{project.to_s}"
+      send_draft_expense_invitation(collective_slug, amount_cents, description) # TODO record this an an invitation as well
     elsif approved_funding_source?
       puts "  Sending to approved funding source: #{funding_source.url}"
       proxy_collective = find_or_create_proxy_collective(funding_source.url)
@@ -281,7 +287,7 @@ If you wish to accept this donation please follow the instructions in this messa
     )
   
     response_body = JSON.parse(response.body)
-  
+    expense_invite_description
     if response_body['errors']
       puts "Error: #{response_body['errors']}"
     else
