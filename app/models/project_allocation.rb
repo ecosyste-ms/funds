@@ -72,7 +72,7 @@ class ProjectAllocation < ApplicationRecord
       send_to_osc_collective(collective_slug, amount_cents)
     elsif is_non_osc_collective?
       puts "  Sending to non-OSC collective: #{funding_source.name}"
-      send_draft_expense_invitation(collective_slug, amount_cents, description) # TODO record this an an invitation as well
+      send_draft_expense_invitation(collective_slug, amount_cents, expense_invite_description) # TODO record this an an invitation as well
     elsif approved_funding_source?
       puts "  Sending to approved funding source: #{funding_source.url}"
       proxy_collective = find_or_create_proxy_collective(funding_source.url)
