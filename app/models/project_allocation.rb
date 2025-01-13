@@ -75,20 +75,24 @@ class ProjectAllocation < ApplicationRecord
     if is_osc_collective?
       puts "  Sending to OSC collective: #{funding_source.name}"
       send_to_osc_collective(collective_slug, amount_cents)
+      update!(paid_at: Time.now)
     elsif is_non_osc_collective?
       puts "  Sending to non-OSC collective: #{funding_source.name}"
       description = "#{fund.name} Ecosystem allocation for #{project.to_s}"
       send_draft_expense_invitation(collective_slug, amount_cents, description) # TODO record this an an invitation as well
+      update!(paid_at: Time.now)
     elsif approved_funding_source?
       puts "  Sending to approved funding source: #{funding_source.url}"
       proxy_collective = find_or_create_proxy_collective(funding_source.url)
       if proxy_collective
         puts "  Adding funds to proxy collective: #{proxy_collective.slug}" 
         send_to_osc_collective(proxy_collective.slug, amount_cents)
+        update!(paid_at: Time.now)
       end
     elsif project && project.contact_email.present?
       puts "  Sending expense invite: #{project.contact_email}"
       send_expense_invite
+      update!(paid_at: Time.now)
     else
       puts "  No valid payout method found for #{project.to_s}"
        # can't pay
