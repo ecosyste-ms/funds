@@ -75,37 +75,31 @@ class ProjectAllocation < ApplicationRecord
     return if funding_rejected?
     return if paid?
 
-    if is_osc_collective?
-      puts "  Sending to OSC collective: #{funding_source.name}"
-      send_to_osc_collective(collective_slug, amount_cents)
-      update!(paid_at: Time.now)
-    elsif is_non_osc_collective?
-      puts "  Sending to non-OSC collective: #{funding_source.name}"
-      send_draft_expense_invitation_to_collective(collective_slug, amount_cents, non_osc_collective_expense_invite_description) # TODO record this an an invitation as well
-      update!(paid_at: Time.now)
-    elsif approved_funding_source?
-      puts "  Sending to approved funding source: #{funding_source.url}"
-      proxy_collective = find_or_create_proxy_collective(funding_source.url)
-      if proxy_collective
-        puts "  Adding funds to proxy collective: #{proxy_collective.slug}" 
-        send_to_osc_collective(proxy_collective.slug, amount_cents)
-        update!(paid_at: Time.now)
-      end
-    elsif project && project.contact_email.present?
-      puts "  Sending expense invite: #{project.contact_email}"
-      send_expense_invite
-      update!(paid_at: Time.now)
-    else
-      puts "  No valid payout method found for #{project.to_s}"
+    if is_osc_collective? puts "  Sending to OSC collective: #
+    {funding_source.name}" send_to_osc_collective
+    (collective_slug, amount_cents) update!(paid_at: Time.now) elsif
+    is_non_osc_collective? puts "  Sending to non-OSC collective: #
+    {funding_source.name}" send_draft_expense_invitation_to_collective
+    (collective_slug, amount_cents,
+    non_osc_collective_expense_invite_description) # TODO record this an an
+    invitation as well update!(paid_at: Time.now) elsif
+    approved_funding_source? puts "  Sending to approved funding source: #
+    {funding_source.url}" proxy_collective = find_or_create_proxy_collective
+    (funding_source.url) if proxy_collective puts "  Adding funds to proxy
+    collective: #{proxy_collective.slug}" send_to_osc_collective
+    (proxy_collective.slug, amount_cents) update!(paid_at: Time.now) end elsif
+    project && project.contact_email.present? puts "  Sending expense invite: #
+    {project.contact_email}" send_expense_invite update!(paid_at: Time.now)
+    else puts "  No valid payout method found for #{project.to_s}"
        # can't pay
     end
   end
 
   def non_osc_collective_expense_invite_description
     <<~DESCRIPTION
-      You are receiving this message because we are offering a donation for your work within the #{fund.name} open source ecosystem, and your collective is currently hosted by a different fiscal host than OSC.
+      You are receiving this message because we are offering a donation for your work within the #{fund.name} open source ecosystem. A technical limitation with the Open Collective platform requires that we make donations like this (i.e. between legal entities) using the expense workflow.
   
-      Please provide an invoice that includes your payment details to complete the process. Our team will review and process your payment promptly.
+      To complete the donation we need some further information from you. Please complete the linked form in order for our team to process your payment promptly.
   
       For more information, please visit our FAQ at https://funds.ecosyste.ms/faq.
 
@@ -120,7 +114,7 @@ class ProjectAllocation < ApplicationRecord
       <<~DESCRIPTION
         You are receiving this message because you confirmed you are happy to accept a donation for your work within the #{fund.name} open source ecosystem.
   
-        To complete the process, please provide an invoice that includes your payment details. Our team will review and process your payment promptly.
+        To complete the donation we need some further information from you. Please complete the linked form in order for our team to process your payment promptly.
   
         For more information, please visit our FAQ at https://funds.ecosyste.ms/faq.
 
@@ -132,7 +126,7 @@ class ProjectAllocation < ApplicationRecord
       <<~DESCRIPTION
         You are receiving this message because we have not yet received a response regarding a donation for your work within the #{fund.name} open source ecosystem.
   
-        If you wish to accept this donation, please provide an invoice that includes your payment details. Our team will review and process your payment promptly.
+        If you wish to accept this donation, please complete the linked form in order for our team to process your payment promptly.
   
         For more information, please visit our FAQ at https://funds.ecosyste.ms/faq.
 
