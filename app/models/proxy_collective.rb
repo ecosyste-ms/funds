@@ -234,4 +234,12 @@ class ProxyCollective < ApplicationRecord
       return response_data['data']['updateSocialLinks']
     end
   end
+
+  def enable_contributions
+    # TODO once we have the ability to enable contributions on opencollective
+  end
+
+  def disable_contributions
+    # TODO once we have the ability to disable contributions on opencollective
+  end
 end
