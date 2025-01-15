@@ -81,8 +81,7 @@ class ProjectAllocation < ApplicationRecord
       update!(paid_at: Time.now)
     elsif is_non_osc_collective?
       puts "  Sending to non-OSC collective: #{funding_source.name}"
-      description = "#{fund.name} Ecosystem allocation for #{project.to_s}"
-      send_draft_expense_invitation(collective_slug, amount_cents, description) # TODO record this an an invitation as well
+      send_draft_expense_invitation(collective_slug, amount_cents, non_osc_collective_expense_invite_description) # TODO record this an an invitation as well
       update!(paid_at: Time.now)
     elsif approved_funding_source?
       puts "  Sending to approved funding source: #{funding_source.url}"
@@ -102,13 +101,39 @@ class ProjectAllocation < ApplicationRecord
     end
   end
 
+  def non_osc_collective_expense_invite_description
+    <<~DESCRIPTION
+      You are receiving this message because we are offering a donation for your work within the #{fund.name} open source ecosystem, and your collective is currently hosted by a different fiscal host than OSC.
+  
+      Please provide an invoice that includes your payment details to complete the process. Our team will review and process your payment promptly.
+  
+      If you have any questions or need assistance, please contact us at hello@oscollective.org.
+  
+      Thank you for your continued contributions to the #{fund.name} open source community!
+    DESCRIPTION
+  end
+
   def expense_invite_description
     if invitation.present? && invitation.accepted?
-      "You are receiving this message because you confirmed you are happy to accept a donation for your work within the #{fund.name} open source ecosystem."
+      <<~DESCRIPTION
+        You are receiving this message because you confirmed you are happy to accept a donation for your work within the #{fund.name} open source ecosystem.
+  
+        To complete the process, please provide an invoice that includes your payment details. Our team will review and process your payment promptly.
+  
+        If you have any questions or need assistance, please contact us at hello@oscollective.org.
+  
+        Thank you for your incredible contributions to the #{fund.name} open source community!
+      DESCRIPTION
     else
-      "You are receiving this message because we have not received a response regarding a donation for your work within the #{fund.name} open source ecosystem.
-
-If you wish to accept this donation please follow the instructions in this message."
+      <<~DESCRIPTION
+        You are receiving this message because we have not yet received a response regarding a donation for your work within the #{fund.name} open source ecosystem.
+  
+        If you wish to accept this donation, please provide an invoice that includes your payment details. Our team will review and process your payment promptly.
+  
+        If you have any questions or need assistance, please contact us at hello@oscollective.org.
+  
+        Thank you for your contributions to the #{fund.name} open source community!
+      DESCRIPTION
     end
   end
 
@@ -155,7 +180,8 @@ If you wish to accept this donation please follow the instructions in this messa
         },
         items: [
           {
-            description: expense_invite_description,
+            description: expense_invite_title,
+            longDescription: expense_invite_description,
             amount: amount_cents,
             currency: "USD"
           }
@@ -243,6 +269,10 @@ If you wish to accept this donation please follow the instructions in this messa
     end
   end
 
+  def expense_invite_title
+    "#{fund.name} Ecosystem Funds Sponsorship Invitation for #{project.name}"
+  end
+
   def send_draft_expense_invitation(collective_slug, amount_cents, description)
     return if funding_rejected?
     query = <<-GQL
@@ -273,7 +303,7 @@ If you wish to accept this donation please follow the instructions in this messa
     variables = {
       account: { slug: fund.oc_project_slug },          # Collective initiating the expense draft
       expense: {
-        description: description,
+        description: expense_invite_title,
         longDescription: description,
         currency: "USD",
         type: "INVOICE",
@@ -294,7 +324,7 @@ If you wish to accept this donation please follow the instructions in this messa
     )
   
     response_body = JSON.parse(response.body)
-    expense_invite_description
+
     if response_body['errors']
       puts "Error: #{response_body['errors']}"
     else
