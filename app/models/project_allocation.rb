@@ -107,6 +107,8 @@ class ProjectAllocation < ApplicationRecord
   
       Please provide an invoice that includes your payment details to complete the process. Our team will review and process your payment promptly.
   
+      For more information, please visit our FAQ at https://funds.ecosyste.ms/faq.
+
       If you have any questions or need assistance, please contact us at hello@oscollective.org.
   
       Thank you for your continued contributions to the #{fund.name} open source community!
@@ -120,6 +122,8 @@ class ProjectAllocation < ApplicationRecord
   
         To complete the process, please provide an invoice that includes your payment details. Our team will review and process your payment promptly.
   
+        For more information, please visit our FAQ at https://funds.ecosyste.ms/faq.
+
         If you have any questions or need assistance, please contact us at hello@oscollective.org.
   
         Thank you for your incredible contributions to the #{fund.name} open source community!
@@ -130,6 +134,8 @@ class ProjectAllocation < ApplicationRecord
   
         If you wish to accept this donation, please provide an invoice that includes your payment details. Our team will review and process your payment promptly.
   
+        For more information, please visit our FAQ at https://funds.ecosyste.ms/faq.
+
         If you have any questions or need assistance, please contact us at hello@oscollective.org.
   
         Thank you for your contributions to the #{fund.name} open source community!
