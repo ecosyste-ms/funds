@@ -15,6 +15,7 @@ RUN apk add --update \
     tzdata \
     curl-dev \
     libc6-compat \
+    libyaml-dev \
     bash \
  && rm -rf /var/cache/apk/* 
 
