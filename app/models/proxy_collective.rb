@@ -57,7 +57,7 @@ class ProxyCollective < ApplicationRecord
   
     create_project_mutation = <<~GRAPHQL
       mutation CreateProject($parent: AccountReferenceInput!, $project: ProjectCreateInput!) {
-        createProject(parent: $parent, project: $project, disableContributions: true) {
+        createProject(parent: $parent, project: $project) {
           id
           legacyId
           name
