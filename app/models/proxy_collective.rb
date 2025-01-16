@@ -242,4 +242,37 @@ class ProxyCollective < ApplicationRecord
   def disable_contributions
     # TODO once we have the ability to disable contributions on opencollective
   end
+
+  def destroy_project
+    query = <<~GRAPHQL
+      mutation DeleteAccount($account: AccountReferenceInput!) {
+        deleteAccount(account: $account) {
+          id
+          slug
+        }
+      }
+    GRAPHQL
+  
+    variables = {
+      account: { id: uuid }
+    }
+  
+    payload = { query: query, variables: variables }.to_json
+  
+    response = Faraday.post(
+      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+      payload,
+      { 'Content-Type' => 'application/json' }
+    )
+  
+    response_body = JSON.parse(response.body)
+  
+    if response_body['errors']
+      puts "Error deleting project: #{response_body['errors']}"
+      return nil
+    else
+      puts "Project deleted successfully: #{response_body['data']['deleteAccount']}"
+      destroy # Delete the local record from the database
+    end
+  end
 end
