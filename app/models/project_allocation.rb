@@ -13,6 +13,13 @@ class ProjectAllocation < ApplicationRecord
   scope :unpaid, -> { where(paid_at: nil) }
 
   scope :platform, ->(platform) { joins(:funding_source).where(funding_sources: { platform: platform }) }
+  scope :not_platform, ->(platform) { joins(:funding_source).where.not(funding_sources: { platform: platform }) }
+
+  scope :funding_not_rejected, -> { joins(:project).where(projects: { funding_rejected: false }) }
+  scope :with_contact_email, -> { joins(:project).where.not(projects: { contact_email: nil }) }
+
+  scope :expense_invites, -> { without_funding_source.funding_not_rejected }
+  scope :proxy_collectives, -> { with_approved_funding_source.funding_not_rejected.not_platform('opencollective.com') }
 
   def self.update_funding_sources
     ProjectAllocation.without_funding_source.find_each(&:update_funding_source)
