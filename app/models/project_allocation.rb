@@ -154,7 +154,7 @@ class ProjectAllocation < ApplicationRecord
     return if funding_rejected?
     return if approved_funding_source?
     return unless project.contact_email.present?
-    return if invitation.present?
+    return if invitation.present? && invitation.member_invitation_id.present?
     return if paid?
     
     query = <<~GRAPHQL
