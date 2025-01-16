@@ -16,7 +16,6 @@ class ProjectAllocation < ApplicationRecord
   scope :not_platform, ->(platform) { joins(:funding_source).where.not(funding_sources: { platform: platform }) }
 
   scope :funding_not_rejected, -> { joins(:project).where(projects: { funding_rejected: false }) }
-  scope :with_contact_email, -> { joins(:project).where.not(projects: { contact_email: nil }) }
 
   scope :expense_invites, -> { without_funding_source.funding_not_rejected }
   scope :proxy_collectives, -> { with_approved_funding_source.funding_not_rejected.not_platform('opencollective.com') }
