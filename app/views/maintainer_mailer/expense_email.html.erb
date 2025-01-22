@@ -20,12 +20,33 @@
                             <tr>
                                 <td>
                                     <p>Dear Maintainer,</p>
-                                    <p><%= @funders %> would like to donate <b><%= @amount %></b> to <b><%= @project %></b> as part of the <b><%= link_to "#{@fund} Ecosystem Fund", fund_url(@fund) %></b>. If you’d like to accept this invitation, read on…</p>
+                                    <p><%= @funders %> would like to donate <b><%= @amount %></b> to <b><%= @project %></b> as part of the <b><%= link_to "#{@fund} Ecosystem Fund", fund_url(@fund) %></b>.</p>
                                 </td>
                             </tr>
                         </table>
                     </td>
                 </tr>
+                <% if @invitation.accepted? %>
+
+                  <tr>
+                    <td>
+                        <table cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td width="40" style="vertical-align:top;">
+                                    <%= image_tag("stone-1.png", alt: " ", class: "bullet-image", size: "24x24") %>
+                                </td>
+                                <td class="explanation">
+                                  <h2 class="green">Accepting this invitation personally</h2>
+                                  <p>It's time to submit an expense for this donation. Please follow the link below to submit your expense:</p>
+
+                                  <p class="mb"><a href="<%= @invitation.invite_url %>" class="button">Submit an expense</a></p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <% else %>
                 <tr>
                     <td>
                         <table cellpadding="0" cellspacing="0" border="0">
@@ -50,9 +71,9 @@
                                 <td>
                                     <h2 class="green">Accepting this invitation personally</h2>
 
-                                    <p>If you complete <a href="<%= invitation_url(token: @invite_token) %>">the enclosed invitation</a>, we will pay you <b><%= @amount %></b> directly within the next two weeks for your work maintaining <b><%= @project %></b>:</p>
+                                    <p>We're still waiting for you to accept the invitation. Please follow the link below to accept the invitation and submit your expense:</p>
 
-                                    <p class="mb"><a href="<%= invitation_url(token: @invite_token) %>" class="button">Respond to the invite</a></p>
+                                    <p class="mb"><a href="<%= @invitation.invite_url %>" class="button">Submit an expense</a></p>
                                     
                                     <h2  class="green">Accepting as part of a community</h2>
                                     <p>If you or your community already accept financial support for <%= @project %>, add this information to your <code>funding.yml</code> file in your repository, and we’ll direct this and future contributions there. For more information on formats, see <a href="<%= 'https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/displaying-a-sponsor-button-in-your-repository' %>">GitHub’s documentation</a> — your repository does not have to be on GitHub.</p>
@@ -83,7 +104,7 @@
                                 <td>
                                     <h2  class="orange">Declining this invitation (and future participation)</h2>
                                     <p>This invitation will remain open until <b><%= @decline_deadline %></b>. If you wish to decline this invitation, and future invitations, please indicate so using <a href="<%= invitation_url(token: @invite_token) %>">the invitation itself</a>:</p>
-                                    <p class="mb"><a href="<%= invitation_url(token: @invite_token) %>" class="button button--red">Respond to the invite</a></p>
+                                    <p class="mb"><a href="<%= invitation_url(token: @invite_token) %>" class="button button--red">Reject to the invite</a></p>
 
                                     <p>If you decline this invitation, we will not contact you again concerning <b><%= @project %></b>.</p>
 
@@ -108,6 +129,7 @@
                         </table>
                     </td>
                 </tr>
+                <% end %>
             </table>
         </td>
     </tr>
