@@ -67,6 +67,20 @@ class Invitation < ApplicationRecord
     ).deliver_now
   end
 
+  def send_expense_invite_email
+    return if draft_key.blank?
+    MaintainerMailer.expense_email(
+      self,
+      email,
+      project_allocation.project.to_s,
+      project_allocation.funder_names,
+      "$#{project_allocation.amount_cents / 100.0}",
+      token,
+      decline_deadline.strftime("%B %d, %Y"),
+      fund
+    ).deliver_now
+  end
+
   def draft_key
     data['draftKey']
   end

@@ -1,0 +1,121 @@
+<table class="ecosystems-mail-wrapper" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+        <td>
+            <table class="ecosystems-mail-body" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td>
+                        <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                            <tr>
+                                <td class="header">
+                                    <%= image_tag("ecosystems-funds-logo-purplebg-png@2x.png", alt: "ecosyste.ms", size: "282x68") %>
+                                    <p class="tagline">Collaboratively funding the software we all depend upon</p>
+                                </td>
+                            </tr>
+                        </table>   
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td>
+                                    <p>Dear Maintainer,</p>
+                                    <p><%= @funders %> would like to donate <b><%= @amount %></b> to <b><%= @project %></b> as part of the <b><%= link_to "#{@fund} Ecosystem Fund", fund_url(@fund) %></b>. If you’d like to accept this invitation, read on…</p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td width="40" style="vertical-align:top;">
+                                    <%= image_tag("stone-1.png", alt: " ", class: "bullet-image", size: "24x24") %>
+                                </td>
+                                <td class="explanation">
+                                    <h3>What’s this all about?</h3>
+                                    <p>Open Source Collective is a non-profit organisation committed to supporting those who create and use open-source software. We’ve created a way to fund the most critical open source projects within their respective ecosystems. <a href="<%= overview_url %>">Read more here</a>.</p>
+
+                                    <p class="mb">You’re receiving this message because this email address is publicly linked to <%= @project %>.</p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td>
+                                    <h2 class="green">Accepting this invitation personally</h2>
+
+                                    <p>If you complete <a href="<%= invitation_url(token: @invite_token) %>">the enclosed invitation</a>, we will pay you <b><%= @amount %></b> directly within the next two weeks for your work maintaining <b><%= @project %></b>:</p>
+
+                                    <p class="mb"><a href="<%= invitation_url(token: @invite_token) %>" class="button">Respond to the invite</a></p>
+                                    
+                                    <h2  class="green">Accepting as part of a community</h2>
+                                    <p>If you or your community already accept financial support for <%= @project %>, add this information to your <code>funding.yml</code> file in your repository, and we’ll direct this and future contributions there. For more information on formats, see <a href="<%= 'https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/displaying-a-sponsor-button-in-your-repository' %>">GitHub’s documentation</a> — your repository does not have to be on GitHub.</p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td width="40" style="vertical-align:top;">
+                                    <%= image_tag("stone-2.png", alt: " ", class: "bullet-image", size: "24x24") %>
+                                </td>
+                                <td class="explanation">
+                                    <h3>Not thought about funding yet?</h3>
+                                    <p class="mb">Many open-source communities accept donations and sponsorships to support their work. Whether it’s paying for hosting, tools, hardware, travel, or paying contributors for their time, money is an essential resource for modern open-source projects. <a href="<%= faq_url %>">Read more about funding platforms here</a>.</p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td>
+                                    <h2  class="orange">Declining this invitation (and future participation)</h2>
+                                    <p>This invitation will remain open until <b><%= @decline_deadline %></b>. If you wish to decline this invitation, and future invitations, please indicate so using <a href="<%= invitation_url(token: @invite_token) %>">the invitation itself</a>:</p>
+                                    <p class="mb"><a href="<%= invitation_url(token: @invite_token) %>" class="button button--red">Respond to the invite</a></p>
+
+                                    <p>If you decline this invitation, we will not contact you again concerning <b><%= @project %></b>.</p>
+
+                                    <p class="mb">Thanks,</p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td width="40" style="vertical-align:top;">
+                                    <%= image_tag("stone-3.png", alt: " ", class: "bullet-image", size: "24x24") %>
+                                </td>
+                                <td class="explanation">
+                                    <h3>Find out more</h3>
+                                    <p class="mb">If you’d like to know more about Open Source Collective, ecosyste.ms, and this project check out <a href="<%= about_url %>"><%= about_url %></a></p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+<table class="footer" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+        <td>
+            <%= image_tag("stones.png", alt: " ", class: "bullet-image", size: "344x173") %>
+        </td>
+    </tr>
+</table>
