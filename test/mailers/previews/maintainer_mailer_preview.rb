@@ -14,7 +14,7 @@ class MaintainerMailerPreview < ActionMailer::Preview
 
   def expense_email
     data = {"draftKey" => "123"}
-    invitation = Invitation.create!(email: "maintainer@example.com", project_allocation: ProjectAllocation.first, data: data, member_invitation_id: 123)
+    invitation = Invitation.create!(email: "maintainer@example.com", project_allocation: ProjectAllocation.first, data: data, member_invitation_id: 123, accepted_at: Time.now)
     MaintainerMailer.expense_email(
       invitation,
       "maintainer@example.com",
