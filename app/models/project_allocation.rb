@@ -305,6 +305,7 @@ class ProjectAllocation < ApplicationRecord
           amount
           currency
           description
+          legacyId
           payee {
             ... on Collective {
               slug
