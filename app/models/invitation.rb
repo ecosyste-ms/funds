@@ -6,6 +6,10 @@ class Invitation < ApplicationRecord
 
   before_validation :generate_token, on: :create
 
+  scope :accepted, -> { where.not(accepted_at: nil) }
+  scope :rejected, -> { where.not(rejected_at: nil) }
+  scope :pending, -> { where(accepted_at: nil, rejected_at: nil) }
+
   def self.delete_expired
     Invitation.all.find_each do |invitation|
       invitation.delete_expense if invitation.expired?
