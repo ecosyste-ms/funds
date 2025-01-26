@@ -464,6 +464,11 @@ class ProjectAllocation < ApplicationRecord
     invitation.try(:send_email)
   end
 
+  def send_expense_invite_email
+    return unless invitation.present?
+    invitation.send_expense_invite_email
+  end
+
   def reject_funding!
     project.update!(funding_rejected: true) 
     # reject all other invitations for the same project
