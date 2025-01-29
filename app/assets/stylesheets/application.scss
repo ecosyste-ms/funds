@@ -751,3 +751,30 @@ a {
   max-width: 400px !important; 
   text-align: left; 
 }
+
+.logo-grid {
+	img {
+		max-height: 60px; 
+  		width: auto;
+  		object-fit: contain;
+	}
+}
+
+.logo-grid {
+  display: flex;
+	justify-content: space-around;
+	align-items: center; /* Align logos vertically */
+	flex-wrap: wrap;
+  gap: 2rem 2rem;
+  @include media-breakpoint-up(xl) { 
+    flex-wrap: nowrap;
+    justify-content: space-between; 
+  }
+  a {
+    display: block;
+  }
+}
+
+.logo-grid__logo {
+  max-width: 150px;
+}
