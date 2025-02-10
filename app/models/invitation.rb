@@ -160,27 +160,27 @@ class Invitation < ApplicationRecord
 
   def delete_expense
     query = <<~GRAPHQL
-      mutation($id: String!) {
-        deleteExpense(id: $id) {
+      mutation($expense: ExpenseReferenceInput!) {
+        deleteExpense(expense: $expense) {
           id
         }
       }
     GRAPHQL
-
+  
     variables = {
-      id: member_invitation_id
+      expense: { id: member_invitation_id }
     }
-
+  
     payload = { query: query, variables: variables }.to_json
-
+  
     response = Faraday.post(
       "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
       payload,
       { 'Content-Type' => 'application/json' }
     )
-
+  
     response_body = JSON.parse(response.body)
-
+  
     if response_body['errors']
       puts "Error: #{response_body['errors']}"
     else
