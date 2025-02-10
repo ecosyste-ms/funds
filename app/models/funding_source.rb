@@ -111,4 +111,30 @@ class FundingSource < ApplicationRecord
     self.collective = JSON.parse(response.body)
     self.save
   end
+
+  def fetch_github_sponsors
+    return unless platform == 'github.com'
+
+    gh_url = "https://sponsors.ecosyste.ms/api/v1/accounts/#{name.downcase}"
+
+    conn = Faraday.new(url: gh_url) do |faraday|
+      faraday.response :follow_redirects
+      faraday.adapter Faraday.default_adapter
+    end
+
+    response = conn.get
+    return unless response.success?
+    self.github_sponsors = JSON.parse(response.body)
+    self.save
+  end
+
+  def minimum_donation_ammount_cents
+    return 100 unless platform == 'github.com'
+
+    if github_sponsors['minimum_sponsorship_amount'].present?
+      github_sponsors['minimum_sponsorship_amount'] * 100
+    else
+      100
+    end
+  end
 end
