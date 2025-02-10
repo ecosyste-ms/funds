@@ -56,6 +56,7 @@ class Allocation < ApplicationRecord
   
     scores.each do |score|
       allocation_amount = (score[:score] / total_score) * total_cents
+      allocation_amount = (allocation_amount / 100).floor * 100 # Round down to whole dollars
   
       if allocation_amount < minimum_allocation
         leftover_funds += allocation_amount
@@ -68,6 +69,7 @@ class Allocation < ApplicationRecord
     total_remaining_score = allocations.sum { |a| a[:score] }
     allocations.each do |allocation|
       additional_amount = (allocation[:score] / total_remaining_score) * leftover_funds
+      additional_amount = (additional_amount / 100).floor * 100 # Round down again
       allocation[:allocation] += additional_amount
     end
   
