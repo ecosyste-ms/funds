@@ -12,7 +12,7 @@ class WebhooksController < ApplicationController
         fund.sync_opencollective_project_async
       end
     when 'collective.expense.updated' # expense invite updated
-      invitation = Invitation.find_by(member_invitation_id: params[:expense][:id])
+      invitation = Invitation.find_by(member_invitation_id: params[:data][:expense][:id])
       if invitation.present?
         invitation.sync_async
       end
