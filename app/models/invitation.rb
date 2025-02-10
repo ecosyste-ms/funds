@@ -9,9 +9,12 @@ class Invitation < ApplicationRecord
   scope :accepted, -> { where.not(accepted_at: nil) }
   scope :rejected, -> { where.not(rejected_at: nil) }
   scope :pending, -> { where(accepted_at: nil, rejected_at: nil) }
+  scope :deleted, -> { where.not(deleted_at: nil) }
+  scope :not_deleted, -> { where(deleted_at: nil) }
+  scope :draft, -> { where(status: 'DRAFT') }
 
   def self.delete_expired
-    Invitation.all.find_each do |invitation|
+    Invitation.draft.not_deleted.find_each do |invitation|
       invitation.delete_expense if invitation.expired?
     end
   end
@@ -36,7 +39,7 @@ class Invitation < ApplicationRecord
   end
 
   def expired?
-    Time.zone.now > decline_deadline
+    status == 'DRAFT' && Time.zone.now > decline_deadline
   end
 
   def accept!
@@ -183,6 +186,7 @@ class Invitation < ApplicationRecord
     else
       puts "Deleted expense:"
       puts JSON.pretty_generate(response_body['data']['deleteExpense'])
+      update!(status: 'DELETED', deleted_at: Time.zone.now)
     end
   end
 end
