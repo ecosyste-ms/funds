@@ -17,18 +17,23 @@ class Allocation < ApplicationRecord
   def calculate_funded_projects
     # TODO: Only calculate if the fund has over a certain amount of money
   
+    projects = find_possible_projects
+    return false if projects.empty?
+  
     weights = (read_attribute(:weights) || default_weights).symbolize_keys
     minimum_allocation = read_attribute(:minimum_allocation) || default_minimum_allocation
-
-    # Get a list of all possible projects for this fund
-    projects = find_possible_projects
   
-    if projects.empty?
-      puts "No projects found for fund #{fund.id}"
-      return false
-    end
-
-    # Fetch all metrics for all projects
+    normalized_metrics, maxs = fetch_project_metrics(projects)
+    scores, total_score = calculate_scores(normalized_metrics, weights)
+  
+    allocations = total_score.zero? ? allocate_funds_evenly(scores) : allocate_funds_by_score(scores, total_score)
+  
+    distribute_leftover_funds(allocations) unless total_score.zero?
+  
+    save_project_allocations(allocations, minimum_allocation, maxs, weights)
+  end
+  
+  def fetch_project_metrics(projects)
     metrics = projects.map do |project|
       {
         project_id: project.id,
@@ -39,41 +44,60 @@ class Allocation < ApplicationRecord
       }
     end
   
-    # Normalize metrics and explicitly return max values
-    normalized_metrics, maxs = normalize_metrics_with_max_storage(metrics)
+    normalize_metrics_with_max_storage(metrics)
+  end
   
-    # Calculate weighted scores for each project
+  def calculate_scores(normalized_metrics, weights)
     total_score = 0
+  
     scores = normalized_metrics.map do |metric|
       score = weights.sum { |metric_name, weight| metric[metric_name] * weight }
       total_score += score
       { project_id: metric[:project_id], score: score, funding_source_id: metric[:funding_source_id] }
     end
   
-    # Initial allocation calculation
+    # Sort to ensure deterministic allocation
+    scores.sort_by! { |s| s[:project_id] }
+  
+    [scores, total_score]
+  end
+  
+  def allocate_funds_evenly(scores)
+    allocation_amount = total_cents / scores.size
+  
+    scores.map do |score|
+      { project_id: score[:project_id], allocation: allocation_amount, score: score[:score], funding_source_id: score[:funding_source_id] }
+    end
+  end
+  
+  def allocate_funds_by_score(scores, total_score)
     allocations = []
+    total_allocated = 0
     leftover_funds = 0
   
     scores.each do |score|
-      allocation_amount = (score[:score] / total_score) * total_cents
-      allocation_amount = (allocation_amount / 100).floor * 100 # Round down to whole dollars
+      allocation_amount = (score[:score] * total_cents) / total_score
+      allocation_amount = (allocation_amount / 100) * 100 # Round to whole dollars
+      total_allocated += allocation_amount
   
-      if allocation_amount < minimum_allocation
+      if allocation_amount < default_minimum_allocation
         leftover_funds += allocation_amount
       else
         allocations << { project_id: score[:project_id], allocation: allocation_amount, score: score[:score], funding_source_id: score[:funding_source_id] }
       end
     end
   
-    # Redistribute leftover funds
-    total_remaining_score = allocations.sum { |a| a[:score] }
-    allocations.each do |allocation|
-      additional_amount = (allocation[:score] / total_remaining_score) * leftover_funds
-      additional_amount = (additional_amount / 100).floor * 100 # Round down again
-      allocation[:allocation] += additional_amount
-    end
+    [allocations, total_allocated, leftover_funds]
+  end
   
-    # Save allocations meeting the minimum allocation
+  def distribute_leftover_funds(allocations)
+    total_allocated = allocations.sum { |a| a[:allocation] }
+    leftover = total_cents - total_allocated
+  
+    allocations.first[:allocation] += leftover if leftover.positive?
+  end
+  
+  def save_project_allocations(allocations, minimum_allocation, maxs, weights)
     allocations.each do |allocation|
       next if allocation[:allocation] < minimum_allocation
   
@@ -87,10 +111,14 @@ class Allocation < ApplicationRecord
       )
     end
   
-    # Store the maxs and weights used for this allocation
-    update!(max_values: maxs, weights: weights, minimum_allocation_cents: minimum_allocation, funded_projects_count: project_allocations.count)
+    update!(
+      max_values: maxs,
+      weights: weights,
+      minimum_allocation_cents: minimum_allocation,
+      funded_projects_count: project_allocations.count
+    )
   end
-  
+
   def normalize_metrics_with_max_storage(metrics)
     maxs = {}
 
