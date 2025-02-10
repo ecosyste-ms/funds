@@ -75,6 +75,7 @@
             <td><%= invitation.email %></td>
             <td><%= invitation.created_at.strftime('%Y-%m-%d %H:%M:%S') %></td>
             <td>
+              
               <% if invitation.accepted_at.present? %>
                 <span class='invitation-status label-accepted'>Accepted</span>
               <% elsif invitation.rejected_at.present? %>
@@ -83,7 +84,7 @@
                 <span class='invitation-status label-deleted'>Deleted</span>
               <% elsif invitation.status != 'DRAFT' %>
                 <span class='invitation-status label-info'>
-                  <%= invitation.status %>
+                  <%= link_to invitation.status, invitation.html_url %>
                 </span>
               <% else %>
                 <span class='invitation-status label-pending'>Pending</span>
