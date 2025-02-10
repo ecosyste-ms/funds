@@ -168,7 +168,7 @@ class Invitation < ApplicationRecord
     GRAPHQL
   
     variables = {
-      expense: { id: member_invitation_id }
+      expense: { id: data['id'] }
     }
   
     payload = { query: query, variables: variables }.to_json
