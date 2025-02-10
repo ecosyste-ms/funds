@@ -235,14 +235,6 @@ class ProxyCollective < ApplicationRecord
     end
   end
 
-  def enable_contributions
-    # TODO once we have the ability to enable contributions on opencollective
-  end
-
-  def disable_contributions
-    # TODO once we have the ability to disable contributions on opencollective
-  end
-
   def destroy_project
     query = <<~GRAPHQL
       mutation DeleteAccount($account: AccountReferenceInput!) {
