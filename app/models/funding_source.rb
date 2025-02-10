@@ -50,6 +50,8 @@ class FundingSource < ApplicationRecord
     else
       URI.parse(clean_url).path.sub(/\A\//, '')
     end
+  rescue
+    nil
   end
 
   def platform_name
@@ -126,6 +128,8 @@ class FundingSource < ApplicationRecord
     return unless response.success?
     self.github_sponsors = JSON.parse(response.body)
     self.save
+  rescue
+    nil
   end
 
   def minimum_donation_ammount_cents
