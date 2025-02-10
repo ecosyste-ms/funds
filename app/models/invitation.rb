@@ -151,7 +151,7 @@ class Invitation < ApplicationRecord
     else
       puts "Expense details:"
       puts JSON.pretty_generate(response_body['data']['expense'])
-      update!(data: response_body['data']['expense'])
+      update!(data: response_body['data']['expense'], status: response_body['data']['expense']['status'])
     end
   end
 
