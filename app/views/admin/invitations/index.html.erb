@@ -14,6 +14,9 @@
         Rejected: <%= @invitations.select { |i| i.rejected_at.present? }.count %> (<%= (@invitations.select { |i| i.rejected_at.present? }.count.to_f / @invitations.length * 100).round(2) %>%)
       </li>
       <li class="list-inline-item">
+        Rejected: <%= @invitations.select { |i| i.deleted_at.present? }.count %> (<%= (@invitations.select { |i| i.deleted_at.present? }.count.to_f / @invitations.length * 100).round(2) %>%)
+      </li>
+      <li class="list-inline-item">
         Added funding.yml: <%= @invitations.select { |i| i.project.funding_links.any? }.count %> (<%= (@invitations.select { |i| i.project.funding_links.any? }.count.to_f / @invitations.length * 100).round(2) %>%)
       </li>
     </ul>
@@ -76,6 +79,8 @@
                 <span class='invitation-status label-accepted'>Accepted</span>
               <% elsif invitation.rejected_at.present? %>
                 <span class='invitation-status label-rejected'>Rejected</span>
+              <% elsif invitation.deleted_at.present? %>
+                <span class='invitation-status label-deleted'>Deleted</span>
               <% else %>
                 <span class='invitation-status label-pending'>Pending</span>
               <% end %>
