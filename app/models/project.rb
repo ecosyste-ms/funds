@@ -120,11 +120,9 @@ class Project < ApplicationRecord
     response = conn.get
     return unless response.success?
     update!(url: response.env.url.to_s) 
-    # TODO avoid duplicates
   rescue ActiveRecord::RecordInvalid => e
     puts "Duplicate url #{url}"
     puts e.class
-    # destroy
     return nil
   rescue
     puts "Error checking url for #{url}"
@@ -363,22 +361,6 @@ class Project < ApplicationRecord
     self.save
   rescue
     puts "Error fetching dependencies for #{repository_url}"
-  end
-
-  def fetch_dependent_repos
-    return unless packages.present?
-    dependent_repos = []
-    packages.each do |package|
-      # TODO paginate
-      # TODO group dependencies by repo
-      dependent_repos_url = "https://repos.ecosyste.ms/api/v1/usage/#{package["ecosystem"]}/#{package["name"]}/dependencies"
-      conn = Faraday.new(url: dependent_repos_url)
-      response = conn.get
-      return unless response.success?
-      dependent_repos += JSON.parse(response.body)
-    end
-    self.dependent_repos = dependent_repos.uniq
-    self.save
   end
 
   def issues_api_url

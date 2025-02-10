@@ -87,7 +87,7 @@ class ProjectAllocation < ApplicationRecord
       update!(paid_at: Time.now)
     elsif is_non_osc_collective?
       puts "  Sending to non-OSC collective: #{funding_source.name}"
-      send_draft_expense_invitation_to_collective(collective_slug, amount_cents, non_osc_collective_expense_invite_description) # TODO record this an an invitation as well
+      send_draft_expense_invitation_to_collective(collective_slug, amount_cents, non_osc_collective_expense_invite_description)
       update!(paid_at: Time.now)
     elsif approved_funding_source?
       puts "  Sending to approved funding source: #{funding_source.url}"
