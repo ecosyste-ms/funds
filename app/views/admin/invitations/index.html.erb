@@ -81,6 +81,10 @@
                 <span class='invitation-status label-rejected'>Rejected</span>
               <% elsif invitation.deleted_at.present? %>
                 <span class='invitation-status label-deleted'>Deleted</span>
+              <% elsif invitation.status != 'DRAFT' %>
+                <span class='invitation-status label-info'>
+                  <%= invitation.status %>
+                </span>
               <% else %>
                 <span class='invitation-status label-pending'>Pending</span>
               <% end %>

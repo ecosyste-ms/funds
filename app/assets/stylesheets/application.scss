@@ -739,11 +739,15 @@ a {
 }
 
 .label-pending{
-  background-color: $color-grey
+  background-color: $color-grey;
 }
 
 .label-deleted{
   background-color: $color-grey-dark;
+}
+
+.label-info{
+  background-color: $color-purple-light;
 }
 
 .tooltip {
