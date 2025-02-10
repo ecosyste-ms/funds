@@ -348,7 +348,8 @@ class ProjectAllocation < ApplicationRecord
       puts JSON.pretty_generate(response_body['data']['draftExpenseAndInviteUser'])
       response_body['data']['draftExpenseAndInviteUser']
       pp response_body
-      Invitation.create!(project_allocation: self, email: project.contact_email, status: 'DRAFT', member_invitation_id: response_body['data']['draftExpenseAndInviteUser']['legacyId'], data: response_body['data']['draftExpenseAndInviteUser'])
+      # TODO this doesn't record the invitation id
+      Invitation.create!(project_allocation: self, email: project.contact_email, status: 'DRAFT', member_invitation_id: response_body['data']['draftExpenseAndInviteUser']['legacyId'], data: response_body['data']['draftExpenseAndInviteUser']) 
     end
   end
 
