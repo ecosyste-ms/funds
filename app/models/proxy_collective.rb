@@ -52,60 +52,30 @@ class ProxyCollective < ApplicationRecord
   end
 
   def self.create_by_website(url)
-    file = download_image(image_url_from_url(url))
-    return unless file
+    vendor_slug = slug_from_url(url)
+    vendor_name = name_from_url(url)
   
-    create_project_mutation = <<~GRAPHQL
-      mutation CreateProject($parent: AccountReferenceInput!, $project: ProjectCreateInput!) {
-        createProject(parent: $parent, project: $project) {
+    query = <<-GQL
+      mutation($vendor: VendorCreateInput!, $host: AccountReferenceInput!) {
+        createVendor(
+          vendor: $vendor,
+          host: $host
+        ) {
           id
           legacyId
-          name
-          description
           slug
-          tags
-          website
-          imageUrl
-          createdAt
-          updatedAt
-        }
-      }
-    GRAPHQL
-  
-    load_project_query = <<~GRAPHQL
-      query LoadProjectBySlug($slug: String!) {
-        account(slug: $slug) {
-          id
-          legacyId
+          type
           name
         }
       }
-    GRAPHQL
+    GQL
   
-    project_slug = slug_from_url(url)
-    operations = {
-      query: create_project_mutation,
-      variables: {
-        parent: { slug: ENV['PROXY_PARENT_COLLECTIVE_SLUG'] },
-        project: {
-          name: name_from_url(url),
-          slug: project_slug,
-          description: description_from_url(url),
-          tags: tags_from_url(url),
-          image: nil # Placeholder for the file reference
-        }
-      }
-    }.to_json
-  
-    map = {
-      "1" => ["variables.project.image"]
-    }.to_json
-  
-    payload = {
-      operations: Faraday::Multipart::ParamPart.new(operations, 'application/json'),
-      map: Faraday::Multipart::ParamPart.new(map, 'application/json'),
-      "1" => Faraday::Multipart::FilePart.new(file.path, 'image/png', 'logo.png')
+    variables = {
+      vendor: { name: vendor_name },
+      host: { slug: 'opensource' }
     }
+  
+    payload = { query: query, variables: variables }.to_json
   
     connection = Faraday.new(url: "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}") do |faraday|
       faraday.request :multipart
@@ -114,128 +84,54 @@ class ProxyCollective < ApplicationRecord
   
     response = connection.post do |req|
       req.url "/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}"
-      req.headers['Authorization'] = "Bearer #{ENV['OPENCOLLECTIVE_TOKEN']}" # Authorization header
-      req.headers['Personal-Token'] = ENV['OPENCOLLECTIVE_TOKEN'] # Personal-Token header
+      req.headers['Authorization'] = "Bearer #{ENV['OPENCOLLECTIVE_TOKEN']}"
       req.body = payload
     end
-  
-    puts "Response status: #{response.status}"
-    puts "Response body: #{response.body}"
   
     response_data = JSON.parse(response.body)
   
     if response_data['errors']
       puts "GraphQL Errors: #{response_data['errors']}"
-      
-      # Check if the error is specifically about the slug being taken
-      if response_data['errors'].any? { |error| error['message'].include?("slug '#{project_slug}' is already taken") }
-        # If the slug is taken, attempt to load the existing project by slug
-        load_payload = { query: load_project_query, variables: { slug: project_slug } }.to_json
+  
+      if response_data['errors'].any? { |error| error['message'].include?("slug '#{vendor_slug}' is already taken") }
+        load_payload = { query: load_vendor_query, variables: { slug: vendor_slug } }.to_json
         load_response = Faraday.post(
           "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
           load_payload,
           { 'Content-Type' => 'application/json' }
         )
-        
+  
         load_response_data = JSON.parse(load_response.body)
-        if load_response_data['data'] && load_response_data['data']['account']
-          project = load_response_data['data']['account']
-          puts "Project with slug already exists. Loaded project ID: #{project['id']}"
-          pc = ProxyCollective.create(
-            uuid: project['id'],
-            legacy_id: project['legacyId'],
-            slug: project['slug'],
-            name: project['name'],
-            description: project['description'],
-            tags: project['tags'],
-            website: project['website'] || url,
-            image_url: project['imageUrl']
+        if load_response_data.dig('data', 'account')
+          vendor = load_response_data['data']['account']
+          puts "Vendor with slug already exists. Loaded vendor ID: #{vendor['id']}"
+          return ProxyCollective.create(
+            uuid: vendor['id'],
+            legacy_id: vendor['legacyId'],
+            slug: vendor['slug'],
+            name: vendor['name'],
           )
-          pc.update_social_links
         else
-          puts "Error: Project exists but could not be loaded."
+          puts "Error: Vendor exists but could not be loaded."
+          return nil
         end
       else
-        error_messages = response_data['errors'].map { |error| error['message'] }.join(', ')
-        puts "Error creating project: #{error_messages}"
+        puts "Error creating vendor: #{response_data['errors'].map { |e| e['message'] }.join(', ')}"
+        return nil
       end
     else
-      project = response_data['data']['createProject']
-      puts "Project created: #{project['name']} (#{project['slug']})"
-      pc = ProxyCollective.create(
-        uuid: project['id'],
-        legacy_id: project['legacyId'],
-        slug: project['slug'],
-        name: project['name'],
-        description: project['description'],
-        tags: project['tags'],
-        website: project['website'] || url,
-        image_url: project['imageUrl']
+      vendor = response_data['data']['createVendor']
+      puts "Vendor created: #{vendor['name']} (#{vendor['slug']})"
+      return ProxyCollective.create(
+        uuid: vendor['id'],
+        legacy_id: vendor['legacyId'],
+        slug: vendor['slug'],
+        name: vendor['name']
       )
-      pc.update_social_links
-    end
-  ensure
-    file.close if file
-    file.unlink if file
-  end
-  
-  def self.download_image(url)
-    return nil if url.blank?
-  
-    begin
-      tempfile = Tempfile.new(['logo', '.png'])
-      URI.open(url) do |image|
-        tempfile.binmode
-        tempfile.write(image.read)
-      end
-      tempfile.rewind
-      tempfile
-    rescue => e
-      puts "Failed to download image: #{e.message}"
-      nil
     end
   end
 
-  def update_social_links
-    query = <<~GRAPHQL
-      mutation UpdateSocialLinks($account: AccountReferenceInput!, $socialLinks: [SocialLinkInput!]!) {
-        updateSocialLinks(account: $account, socialLinks: $socialLinks) {
-          type
-          url
-          createdAt
-          updatedAt
-        }
-      }
-    GRAPHQL
-
-    variables = {
-      account: { slug: slug },
-      socialLinks: [
-        { type: "WEBSITE", url: website }
-      ]
-    }
-
-    payload = { query: query, variables: variables }.to_json
-
-    response = Faraday.post(
-      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
-      payload,
-      { 'Content-Type' => 'application/json' }
-    )
-
-    puts "Response status: #{response.status}"
-    puts "Response body: #{response.body}"
-
-    response_data = JSON.parse(response.body)
-
-    if response_data['errors']
-      puts "GraphQL Errors: #{response_data['errors']}"
-    else
-      return response_data['data']['updateSocialLinks']
-    end
-  end
-
-  def destroy_project
+  def destroy_vendor
     query = <<~GRAPHQL
       mutation DeleteAccount($account: AccountReferenceInput!) {
         deleteAccount(account: $account) {
@@ -260,10 +156,10 @@ class ProxyCollective < ApplicationRecord
     response_body = JSON.parse(response.body)
   
     if response_body['errors']
-      puts "Error deleting project: #{response_body['errors']}"
+      puts "Error deleting vendor: #{response_body['errors']}"
       return nil
     else
-      puts "Project deleted successfully: #{response_body['data']['deleteAccount']}"
+      puts "Vendor deleted successfully: #{response_body['data']['deleteAccount']}"
       destroy # Delete the local record from the database
     end
   end
