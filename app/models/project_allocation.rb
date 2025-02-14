@@ -94,7 +94,7 @@ class ProjectAllocation < ApplicationRecord
       proxy_collective = find_or_create_proxy_collective(funding_source.url)
       if proxy_collective
         puts "  Adding funds to proxy collective: #{proxy_collective.slug}" 
-        send_to_osc_collective(proxy_collective.slug, amount_cents)
+        send_draft_expense_invitation_to_collective(proxy_collective.slug, amount_cents, proxy_collective_expense_invite_description(proxy_collective))
         update!(paid_at: Time.now)
       end
     elsif project && project.contact_email.present?
@@ -105,6 +105,10 @@ class ProjectAllocation < ApplicationRecord
       puts "  No valid payout method found for #{project.to_s}"
        # can't pay
     end
+  end
+
+  def proxy_collective_expense_invite_description(proxy_collective)
+    "Ecosystem allocation for #{project.to_s} on #{proxy_collective.website} from #{fund.name}"
   end
 
   def non_osc_collective_expense_invite_description
