@@ -52,15 +52,11 @@ class ProxyCollective < ApplicationRecord
   end
 
   def self.create_by_website(url)
-    vendor_slug = slug_from_url(url)
     vendor_name = name_from_url(url)
   
-    query = <<-GQL
-      mutation($vendor: VendorCreateInput!, $host: AccountReferenceInput!) {
-        createVendor(
-          vendor: $vendor,
-          host: $host
-        ) {
+    query = <<-GQL.strip
+      mutation CreateVendor($vendor: VendorCreateInput!, $host: AccountReferenceInput!) {
+        createVendor(vendor: $vendor, host: $host) {
           id
           legacyId
           slug
@@ -77,6 +73,13 @@ class ProxyCollective < ApplicationRecord
   
     payload = { query: query, variables: variables }.to_json
   
+    puts "QUERY:"
+    puts query
+    puts
+    puts "VARIABLES:"
+    pp variables
+    puts
+
     connection = Faraday.new(url: "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}") do |faraday|
       faraday.request :multipart
       faraday.adapter Faraday.default_adapter
@@ -92,33 +95,8 @@ class ProxyCollective < ApplicationRecord
   
     if response_data['errors']
       puts "GraphQL Errors: #{response_data['errors']}"
-  
-      if response_data['errors'].any? { |error| error['message'].include?("slug '#{vendor_slug}' is already taken") }
-        load_payload = { query: load_vendor_query, variables: { slug: vendor_slug } }.to_json
-        load_response = Faraday.post(
-          "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
-          load_payload,
-          { 'Content-Type' => 'application/json' }
-        )
-  
-        load_response_data = JSON.parse(load_response.body)
-        if load_response_data.dig('data', 'account')
-          vendor = load_response_data['data']['account']
-          puts "Vendor with slug already exists. Loaded vendor ID: #{vendor['id']}"
-          return ProxyCollective.create(
-            uuid: vendor['id'],
-            legacy_id: vendor['legacyId'],
-            slug: vendor['slug'],
-            name: vendor['name'],
-          )
-        else
-          puts "Error: Vendor exists but could not be loaded."
-          return nil
-        end
-      else
-        puts "Error creating vendor: #{response_data['errors'].map { |e| e['message'] }.join(', ')}"
-        return nil
-      end
+      puts "Error creating vendor: #{response_data['errors'].map { |e| e['message'] }.join(', ')}"
+      return nil
     else
       vendor = response_data['data']['createVendor']
       puts "Vendor created: #{vendor['name']} (#{vendor['slug']})"
