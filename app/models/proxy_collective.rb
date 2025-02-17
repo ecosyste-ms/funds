@@ -73,13 +73,6 @@ class ProxyCollective < ApplicationRecord
   
     payload = { query: query, variables: variables }.to_json
   
-    puts "QUERY:"
-    puts query
-    puts
-    puts "VARIABLES:"
-    pp variables
-    puts
-
     connection = Faraday.new(url: "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}") do |faraday|
       faraday.request :multipart
       faraday.adapter Faraday.default_adapter
