@@ -18,6 +18,11 @@ class FundsController < ApplicationController
     end
   end
 
+  def donate
+    @fund = Fund.find_by(slug: params[:id])
+    raise ActiveRecord::RecordNotFound unless @fund
+  end
+
   def transactions
     @fund = Fund.find_by(slug: params[:id])
     @transactions = @fund.transactions

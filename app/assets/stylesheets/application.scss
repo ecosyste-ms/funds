@@ -252,6 +252,14 @@ hr {
   border-top: 3px solid $color-purple-light;
 }
 
+.no-border {
+	border: 0 !important;
+}
+
+.color-green-dark {
+	color: $color-green-dark;
+}
+
 .container {
   @include media-breakpoint-down(md) {
     padding-left: 1.5rem;

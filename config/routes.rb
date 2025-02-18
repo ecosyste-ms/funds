@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   resources :funds, only: [:index, :show] do
     member do
       get :transactions
+      get :donate
     end
     resources :allocations, only: [:show] do |allocations|
       member do
