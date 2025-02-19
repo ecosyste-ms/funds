@@ -1,6 +1,7 @@
 @import "bootstrap"; 
 @import "ecosystems"; 
 
+/* START Remove this when global header is merged */
 .navigation-bar {
   a {
     @include spesh-link();
@@ -35,6 +36,8 @@
 .site-logo--white {
   background-image: asset-url('eco-systems-funds-logo-white.svg');
 }
+/* END Remove this when global header is merged */
+
 /* Hero */
 .hero {
   .lead {
