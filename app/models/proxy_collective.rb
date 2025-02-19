@@ -51,9 +51,7 @@ class ProxyCollective < ApplicationRecord
     host.include?('github') ? 'github-sponsors' : host.split('.').first
   end
 
-  def self.create_by_website(url)
-    vendor_name = name_from_url(url)
-  
+  def self.create_by_website(url)  
     query = <<-GQL.strip
       mutation CreateVendor($vendor: VendorCreateInput!, $host: AccountReferenceInput!) {
         createVendor(vendor: $vendor, host: $host) {
@@ -67,7 +65,7 @@ class ProxyCollective < ApplicationRecord
     GQL
   
     variables = {
-      vendor: { name: vendor_name },
+      vendor: { name: url },
       host: { slug: 'opensource' }
     }
   
