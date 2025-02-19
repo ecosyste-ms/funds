@@ -101,6 +101,55 @@ class ProxyCollective < ApplicationRecord
     end
   end
 
+  def platform
+    self.class.platform_from_url(name)
+  end
+
+  def username
+    self.class.username_from_url(name, platform)
+  end
+
+  def set_payout_method
+    query = <<-GRAPHQL
+      mutation CreatePayoutMethod($payoutMethod: PayoutMethodInput!, $account: AccountReferenceInput!) {
+        createPayoutMethod(payoutMethod: $payoutMethod, account: $account) {
+          id
+          type
+          data
+        }
+      }
+    GRAPHQL
+
+    payout_method_data = {
+      type: "OTHER",
+      name: platform
+    }
+
+    variables = {
+      payoutMethod: payout_method_data,
+      account: { slug: slug }
+    }
+
+    payload = { query: query, variables: variables }.to_json
+
+    response = Faraday.post(
+      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+      payload,
+      { 'Content-Type' => 'application/json' }
+    )
+
+    response_body = JSON.parse(response.body)
+
+    if response_body['errors']
+      puts "Error creating payout method: #{response_body['errors']}"
+      nil
+    else
+      payout_method = response_body['data']
+      puts "Payout method created: #{payout_method}"
+      payout_method
+    end
+  end
+
   def destroy_vendor
     query = <<~GRAPHQL
       mutation DeleteAccount($account: AccountReferenceInput!) {
