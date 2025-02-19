@@ -10,7 +10,7 @@
     },
     {
       "command": "bundle exec rake funds:sync_least_recent",
-      "schedule": "*/30 * * * *"
+      "schedule": "0 * * * *"
     },
     {
       "command": "bundle exec rake funding_sources:update_project_allocation_funding_sources",
