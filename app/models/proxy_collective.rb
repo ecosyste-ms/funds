@@ -80,6 +80,7 @@ class ProxyCollective < ApplicationRecord
       req.url "/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}"
       req.headers['Authorization'] = "Bearer #{ENV['OPENCOLLECTIVE_TOKEN']}"
       req.body = payload
+      req.headers['Content-Type'] = 'application/json'
     end
   
     response_data = JSON.parse(response.body)
