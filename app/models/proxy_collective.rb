@@ -122,7 +122,10 @@ class ProxyCollective < ApplicationRecord
 
     payout_method_data = {
       type: "OTHER",
-      name: platform
+      data: {
+        content: name,
+        currency: "USD",
+      }
     }
 
     variables = {
