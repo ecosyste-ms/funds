@@ -96,7 +96,8 @@ class ProxyCollective < ApplicationRecord
         uuid: vendor['id'],
         legacy_id: vendor['legacyId'],
         slug: vendor['slug'],
-        name: vendor['name']
+        name: vendor['name'],
+        website: url
       )
     end
   end
