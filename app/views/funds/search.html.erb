@@ -1,0 +1,32 @@
+<div class="container-sm">
+  <h1>Funds Search: <%= params[:query] %> </h1>
+
+    <%= form_tag search_funds_path, method: :get, class: "mb-4" do %>
+    <div class="input-group">
+      <%= text_field_tag :query, params[:query], class: "form-control", placeholder: "Search funds..." %>
+      <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+  <% end %>
+
+  <div class="row mb-5">
+  <% @funds.each do |fund| %>
+    <div class="col-lg-6 col-xl-3">
+      <a href="<%= fund_path(fund) %>" class="card fund-card p-4 mb-3 mb-xl-0 block-link block-link--spesh">
+        <div class="row align-items-center align-items-stretch">
+          <div class="col-8">
+            <h3 class="mb-3 block-link__title spesh-link"><%= fund.name %></h3>
+            <p><span class="label">Distributed</span><strong class="value"><%= number_to_currency fund.total_distributed_cents/100 %></strong></p>
+            <p><span class="label">From</span><strong class="value"><%= pluralize fund.total_donors, 'Funder'%></strong></p>
+            <p><span class="label">To</span><strong class="value"><%= pluralize fund.total_funded_projects, 'Projects' %></strong></p>
+          </div>
+          <div class="col-4 text-end">
+            <img src="<%= fund.logo_url %>" alt="" class="card-img-top img-fluid" onerror="this.style.display='none'" style="max-width: 60px;">
+          </div>
+        </div>
+      </a>
+    </div>
+  <% end %>
+  </div>
+
+  <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>  
+</div>

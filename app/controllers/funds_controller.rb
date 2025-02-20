@@ -4,6 +4,11 @@ class FundsController < ApplicationController
     @funds = Fund.not_featured.short_names.order(Arel.sql('CASE WHEN projects_count > 0 THEN 0 ELSE 1 END, RANDOM()')).limit(12)
   end
 
+  def search
+    @funds = Fund.search(params[:query])
+    @pagy, @funds = pagy(@funds)
+  end
+
   def show
     @fund = Fund.find_by(slug: params[:id])
     raise ActiveRecord::RecordNotFound unless @fund
