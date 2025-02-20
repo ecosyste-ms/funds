@@ -110,12 +110,16 @@ class ProxyCollective < ApplicationRecord
   end
 
   def set_payout_method
+    return if payout_method.present?
+    
     query = <<-GRAPHQL
       mutation CreatePayoutMethod($payoutMethod: PayoutMethodInput!, $account: AccountReferenceInput!) {
         createPayoutMethod(payoutMethod: $payoutMethod, account: $account) {
           id
           type
           data
+          isSaved
+          name
         }
       }
     GRAPHQL
@@ -151,7 +155,7 @@ class ProxyCollective < ApplicationRecord
     else
       payout_method = response_body['data']
       puts "Payout method created: #{payout_method}"
-      payout_method
+      update!(payout_method: payout_method)
     end
   end
 
