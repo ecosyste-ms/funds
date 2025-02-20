@@ -164,7 +164,7 @@ class ProjectAllocation < ApplicationRecord
     
     query = <<~GRAPHQL
       mutation($expense: ExpenseInviteDraftInput!, $account: AccountReferenceInput!) {
-        draftExpenseAndInviteUser(expense: $expense, account: $account, skipInvite: true, lockedFields: [AMOUNT, DESCRIPTION, TYPE]) {
+        draftExpenseAndInviteUser(expense: $expense, account: $account, skipInvite: true, lockedFields: [AMOUNT, DESCRIPTION, TYPE, PAYEE]) {
           id
           legacyId
           draft
