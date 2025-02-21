@@ -8,25 +8,26 @@
     </div>
   <% end %>
 
-  <div class="row mb-5">
-  <% @funds.each do |fund| %>
-    <div class="col-lg-6 col-xl-3">
-      <a href="<%= fund_path(fund) %>" class="card fund-card p-4 mb-3 mb-xl-0 block-link block-link--spesh">
-        <div class="row align-items-center align-items-stretch">
-          <div class="col-8">
-            <h3 class="mb-3 block-link__title spesh-link"><%= fund.name %></h3>
-            <p><span class="label">Distributed</span><strong class="value"><%= number_to_currency fund.total_distributed_cents/100 %></strong></p>
-            <p><span class="label">From</span><strong class="value"><%= pluralize fund.total_donors, 'Funder'%></strong></p>
-            <p><span class="label">To</span><strong class="value"><%= pluralize fund.total_funded_projects, 'Projects' %></strong></p>
-          </div>
-          <div class="col-4 text-end">
-            <img src="<%= fund.logo_url %>" alt="" class="card-img-top img-fluid" onerror="this.style.display='none'" style="max-width: 60px;">
-          </div>
+<% @funds.each do |fund| %>
+	<div class="card mb-4 pb-4 listing d-flex flex-row align-items-center">
+    <img src="<%= fund.logo_url %>" alt="" class="card-img img-fluid" onerror="this.style.display='none'" style="max-width: 60px;">
+    <div class="card-body p-0 ms-3">
+      <h3 class="card-title listing__title mt-3">
+        <a href="<%= fund_path(fund) %>">
+          <%= fund.name %> <span class="listing__meta"><%= fund.description %></span>
+        </a>
+      </h3>
+      <div class="mt-3 listing__details">
+        <div class="d-flex align-items-top">
+          <%= bootstrap_icon 'box', width: 18, height: 18, class: 'flex-shrink-0 me-2' %>
+          <span class="me-3"><%= pluralize fund.total_funded_projects, 'Projects' %></span>
+          <%= bootstrap_icon 'wallet', width: 18, height: 18, class: 'flex-shrink-0 me-2' %>
+          <%= pluralize fund.total_donors, 'Funder'%>
         </div>
-      </a>
+      </div>
     </div>
-  <% end %>
-  </div>
+	</div>
+<% end %>
 
   <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>  
 </div>
