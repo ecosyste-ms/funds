@@ -18,7 +18,15 @@ module ApplicationHelper
   end
 
   def meta_description
-    @meta_description || 'An open source funding solution from ecosyste.ms & Open Source Collective.'
+    @meta_description || app_description
+  end
+
+  def app_name
+    "Funds"
+  end
+
+  def app_description
+    'An open source funding solution from ecosyste.ms & Open Source Collective.'
   end
 
   def obfuscate_email(email)
