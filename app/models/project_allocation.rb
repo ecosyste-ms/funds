@@ -92,9 +92,11 @@ class ProjectAllocation < ApplicationRecord
     elsif approved_funding_source?
       puts "  Sending to approved funding source: #{funding_source.url}"
       proxy_collective = find_or_create_proxy_collective(funding_source.url)
+      proxy_collective.set_payout_method
       if proxy_collective
         puts "  Adding funds to proxy collective: #{proxy_collective.slug}" 
-        send_draft_expense_invitation_to_collective(proxy_collective.slug, amount_cents, proxy_collective_expense_invite_description(proxy_collective))
+        expense = send_expense_to_vendor(proxy_collective, amount_cents)
+        expense.approve_expense
         update!(paid_at: Time.now)
       end
     elsif project && project.contact_email.present?
@@ -162,7 +164,7 @@ class ProjectAllocation < ApplicationRecord
     
     query = <<~GRAPHQL
       mutation($expense: ExpenseInviteDraftInput!, $account: AccountReferenceInput!) {
-        draftExpenseAndInviteUser(expense: $expense, account: $account, skipInvite: true, lockedFields: [AMOUNT, DESCRIPTION, TYPE]) {
+        draftExpenseAndInviteUser(expense: $expense, account: $account, skipInvite: true, lockedFields: [AMOUNT, DESCRIPTION, TYPE, PAYEE]) {
           id
           legacyId
           draft
@@ -354,6 +356,73 @@ class ProjectAllocation < ApplicationRecord
       pp response_body
       # TODO this doesn't record the invitation id
       Invitation.create!(project_allocation: self, email: project.contact_email, status: 'DRAFT', member_invitation_id: response_body['data']['draftExpenseAndInviteUser']['legacyId'], data: response_body['data']['draftExpenseAndInviteUser']) 
+    end
+  end
+
+  def send_expense_to_vendor(vendor, amount_cents)
+    return if funding_rejected?
+    return if paid?
+
+    description =  proxy_collective_expense_invite_description(vendor)
+
+    query = <<-GQL
+      mutation(
+        $account: AccountReferenceInput!,
+        $expense: ExpenseCreateInput!,
+      ) {
+        createExpense(
+          account: $account,
+          expense: $expense,
+        ) {
+          id
+          status
+          draftKey
+          amount
+          currency
+          description
+          legacyId
+          payee {
+            ... on Collective {
+              slug
+            }
+          }
+        }
+      }
+    GQL
+  
+    variables = {
+      account: { slug: fund.oc_project_slug },          # Collective initiating the expense draft
+      expense: {
+        description: expense_invite_title,
+        longDescription: description,
+        currency: "USD",
+        type: "INVOICE",
+        items: [{ amount: amount_cents, description: description }],
+        payee: {
+          slug: vendor.slug
+        },
+        payoutMethod: { type: "ACCOUNT_BALANCE" }       # Specify payout method, adjust if needed
+      }
+    }
+    payload = { query: query, variables: variables }.to_json
+  
+    response = Faraday.post(
+      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+      payload,
+      { 'Content-Type' => 'application/json' }
+    )
+  
+    response_body = JSON.parse(response.body)
+
+    if response_body['errors']
+      puts "Error: #{response_body['errors']}"
+    else
+      puts "Draft expense created successfully and invitation sent:"
+      puts JSON.pretty_generate(response_body['data']['createExpense'])
+      response_body['data']['createExpense']
+      pp response_body
+      # TODO this doesn't record the invitation id
+      Invitation.create!(project_allocation: self, email: project.contact_email, status: 'DRAFT', member_invitation_id: response_body['data']['createExpense']['legacyId'], data: response_body['data']['createExpense']) 
     end
   end
 

@@ -15,8 +15,12 @@ Rails.application.routes.draw do
   end
 
   resources :funds, only: [:index, :show] do
+    collection do
+      get :search
+    end
     member do
       get :transactions
+      get :donate
     end
     resources :allocations, only: [:show] do |allocations|
       member do

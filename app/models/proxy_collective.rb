@@ -51,9 +51,7 @@ class ProxyCollective < ApplicationRecord
     host.include?('github') ? 'github-sponsors' : host.split('.').first
   end
 
-  def self.create_by_website(url)
-    vendor_name = name_from_url(url)
-  
+  def self.create_by_website(url)  
     query = <<-GQL.strip
       mutation CreateVendor($vendor: VendorCreateInput!, $host: AccountReferenceInput!) {
         createVendor(vendor: $vendor, host: $host) {
@@ -67,7 +65,7 @@ class ProxyCollective < ApplicationRecord
     GQL
   
     variables = {
-      vendor: { name: vendor_name },
+      vendor: { name: url },
       host: { slug: 'opensource' }
     }
   
@@ -82,6 +80,7 @@ class ProxyCollective < ApplicationRecord
       req.url "/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}"
       req.headers['Authorization'] = "Bearer #{ENV['OPENCOLLECTIVE_TOKEN']}"
       req.body = payload
+      req.headers['Content-Type'] = 'application/json'
     end
   
     response_data = JSON.parse(response.body)
@@ -97,8 +96,67 @@ class ProxyCollective < ApplicationRecord
         uuid: vendor['id'],
         legacy_id: vendor['legacyId'],
         slug: vendor['slug'],
-        name: vendor['name']
+        name: vendor['name'],
+        website: url
       )
+    end
+  end
+
+  def platform
+    self.class.platform_from_url(name)
+  end
+
+  def username
+    self.class.username_from_url(name, platform)
+  end
+
+  def set_payout_method
+    return if payout_method.present?
+    
+    query = <<-GRAPHQL
+      mutation CreatePayoutMethod($payoutMethod: PayoutMethodInput!, $account: AccountReferenceInput!) {
+        createPayoutMethod(payoutMethod: $payoutMethod, account: $account) {
+          id
+          type
+          data
+          isSaved
+          name
+        }
+      }
+    GRAPHQL
+
+    payout_method_data = {
+      type: "OTHER",
+      isSaved: true,
+      name: platform,
+      data: {
+        content: name,
+        currency: "USD",
+      }
+    }
+
+    variables = {
+      payoutMethod: payout_method_data,
+      account: { slug: slug }
+    }
+
+    payload = { query: query, variables: variables }.to_json
+
+    response = Faraday.post(
+      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+      payload,
+      { 'Content-Type' => 'application/json' }
+    )
+
+    response_body = JSON.parse(response.body)
+
+    if response_body['errors']
+      puts "Error creating payout method: #{response_body['errors']}"
+      nil
+    else
+      payout_method = response_body['data']
+      puts "Payout method created: #{payout_method}"
+      update!(payout_method: payout_method)
     end
   end
 

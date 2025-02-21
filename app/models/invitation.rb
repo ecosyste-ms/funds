@@ -189,4 +189,40 @@ class Invitation < ApplicationRecord
       update!(status: 'DELETED', deleted_at: Time.zone.now)
     end
   end
+
+  def approve_expense
+    query = <<~GRAPHQL
+      mutation($expense: ExpenseReferenceInput!, $action: ExpenseProcessAction!) {
+        processExpense(expense: $expense, action: $action) {
+          id
+          status
+        }
+      }
+    GRAPHQL
+
+    variables = {
+      expense: {
+        id: data['id']
+      },
+      action: "APPROVE"
+    }
+  
+    payload = { query: query, variables: variables }.to_json
+  
+    response = Faraday.post(
+      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+      payload,
+      { 'Content-Type' => 'application/json' }
+    )
+  
+    response_body = JSON.parse(response.body)
+  
+    if response_body['errors']
+      puts "Error: #{response_body['errors']}"
+    else
+      puts "Approved expense:"
+      puts JSON.pretty_generate(response_body['data']['processExpense'])
+      update!(status: response_body['data']['processExpense']['status'])
+    end
+  end
 end
