@@ -30,10 +30,12 @@ class FundsController < ApplicationController
     @allocation = @fund.allocations.order('created_at DESC').first
 
     if params[:OrderId].present?
-      @transaction = Transaction.find_by_legacy_id(params[:OrderId])
+      id = params[:OrderId]
+
+      @transaction = Transaction.donations.where("transactions.order->>'legacyId' = ?", id.to_s)
       if @transaction.nil?
         @fund.sync_transactions
-        @transaction = Transaction.find_by_legacy_id(params[:OrderId])
+        @transaction = Transaction.donations.where("transactions.order->>'legacyId' = ?", id.to_s)
         raise ActiveRecord::RecordNotFound unless @transaction
       end
     end
