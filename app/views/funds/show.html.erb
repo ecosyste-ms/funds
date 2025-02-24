@@ -14,7 +14,6 @@
         <h1 class="display-1 extra-bold"><%= @fund.name %></h1>
         <p><%= @fund.description %></p>
         <% if @fund.open_collective_project_url.present? %>
-          <%#= link_to "Fund the #{@fund.name} Ecosystem on Open Collective", @fund.open_collective_project_donate_url, class: 'btn btn-success btn-fund-header-cta dark-shadow rounded-pill mb-3' %>
           <%= link_to "Fund the #{@fund.name} Ecosystem on Open Collective", donate_fund_path(@fund), class: 'btn btn-success btn-fund-header-cta dark-shadow rounded-pill mb-3' %>
         <% end %>
 

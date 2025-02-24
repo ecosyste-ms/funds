@@ -88,14 +88,14 @@
       </div>
       <div class="col-12 col-lg-4 page-content">
         <h3 class="mt-lg-0">How donating works</h3>
-        <p>Donations are allocated and distributed between the projects in this ecosystem monthly. The next allocation takes place on <strong>25 December 2024</strong>.
+        <p>Donations are allocated and distributed between the projects in this ecosystem monthly. The next allocation takes place on <strong>3 March 2025</strong>.
         </p>
         <p>Projects receive their share based on a combination of observed usage amongst 240m tracked repositories and downloads for 10.7m tracked packages.</p>
         <p><a href="<%= overview_path %>">Read more in our overview</a></p>
       </div>
     </div>
 
-  <% elsif params[:embed].present? %>
+  <% elsif params[:embed].present? && params[:OrderId].blank? %>
 
     <div class="row">
       <div class="col-12 col-lg-8">
@@ -108,7 +108,7 @@
             console.log(event); 
             if (event.data && event.data.event === 'success') {
               const url = new URL(window.location.href);
-              url.searchParams.set('OrderId', event.data.payload.order.id);
+              url.searchParams.set('OrderId', event.data.payload.order.legacyId);
               window.location.href = url.toString();
             }
           }
@@ -118,7 +118,7 @@
       </div>
       <div class="col-12 col-lg-4 page-content">
         <h3 class="mt-lg-0">How donating works</h3>
-        <p>Donations are allocated and distributed between the projects in this ecosystem monthly. The next allocation takes place on <strong>25 December 2024</strong>.
+        <p>Donations are allocated and distributed between the projects in this ecosystem monthly. The next allocation takes place on <strong>3 March 2025</strong>.
         </p>
         <p>Projects receive their share based on a combination of observed usage amongst 240m tracked repositories and downloads for 10.7m tracked packages.</p>
         <p><a href="<%= overview_path %>">Read more in our overview</a></p>
@@ -137,14 +137,18 @@
                 <h2 class="card-title">Thank you</h2>
                 <div class="stat-card mt-4">
                   <div class="stat-card-body">
-                    <span class="stat-card-title color-green-dark">$10,000.00</span>
+                    <span class="stat-card-title color-green-dark">
+                      <%= number_to_currency @transaction.amount %>
+                    </span>
                     <span class="stat-card-text small">Your donation</span>
                   </div>
                 </div>
                 <p class="card-text mt-4">Your generosity has raised the fund total amount and will be sent out to projects in the next allocation</p>
                 <div class="stat-card mt-4">
                   <div class="stat-card-body">
-                    <span class="stat-card-title color-green-dark">$10,000.00</span>
+                    <span class="stat-card-title color-green-dark">
+                      <%= number_to_currency @fund.current_balance %>
+                    </span>
                     <span class="stat-card-text small">New fund total</span>
                   </div>
                 </div>
@@ -159,9 +163,9 @@
       </div>
       <div class="col-12 col-lg-4 page-content">
         <h3 class="mt-lg-0">What happens next?</h3>
-        <p>Your donation will be sent out to <strong><%= @fund.name %> ecosystem projects</strong> in the next allocation, happening on <strong>25 December 2024</strong>.</p>
+        <p>Your donation will be sent out to <strong><%= @fund.name %> ecosystem projects</strong> in the next allocation, happening on <strong>3 March 2025</strong>.</p>
         <h3>Need to amend your donation?</h3>
-        <p><a href="<%= "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}" %>">Log in</a> to your Open Collective account to make changes until 25th December 2024.
+        <p><a href="<%= "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}" %>">Log in</a> to your Open Collective account to make changes until 3 March 2025.
         </p>
         <h3>Any problems at all</h3>
         <p><a href="mailto:hello@oscollective.org">Contact us</a></p>

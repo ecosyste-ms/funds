@@ -26,6 +26,17 @@ class FundsController < ApplicationController
   def donate
     @fund = Fund.find_by(slug: params[:id])
     raise ActiveRecord::RecordNotFound unless @fund
+
+    @allocation = @fund.allocations.order('created_at DESC').first
+
+    if params[:OrderId].present?
+      @transaction = Transaction.find_by_legacy_id(params[:OrderId])
+      if @transaction.nil?
+        @fund.sync_transactions
+        @transaction = Transaction.find_by_legacy_id(params[:OrderId])
+        raise ActiveRecord::RecordNotFound unless @transaction
+      end
+    end
   end
 
   def transactions
