@@ -1,43 +1,6 @@
 @import "bootstrap"; 
 @import "ecosystems"; 
 
-/* START Remove this when global header is merged */
-.navigation-bar {
-  a {
-    @include spesh-link();
-    padding: 0;
-  }
-  li {
-    padding: var(--bs-nav-link-padding-y) var(--bs-nav-link-padding-x);
-  }
-}
-
-.nav {
-  @include media-breakpoint-up(md) {
-    justify-content: end;
-  }
-}
-
-.site-logo {
-  font-size: 0;
-  line-height: 0;
-  color: transparent;
-
-  background-image: asset-url('eco-systems-funds-logo.svg');
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
-  display: inline-block;
-
-  width: 350px;
-  height: 50px; 
-}
-
-.site-logo--white {
-  background-image: asset-url('eco-systems-funds-logo-white.svg');
-}
-/* END Remove this when global header is merged */
-
 /* Hero */
 .hero {
   .lead {

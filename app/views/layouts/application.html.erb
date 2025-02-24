@@ -1,103 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
       <%= meta_title %>
     </title>
     <meta name="description" content="<%= meta_description %>">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
-
-    <%= yield :head %>
-
+    <%= stylesheet_link_tag "application", :media => "all" %>
+    <%= javascript_include_tag "application" %>
+    <link rel="stylesheet" href="//unpkg.com/@highlightjs/cdn-assets@11.5.1/styles/github.min.css">
+    <script defer src="//unpkg.com/@highlightjs/cdn-assets@11.5.1/highlight.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    <%= stylesheet_link_tag "application" %>
-    <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
-
-    <meta property="og:title" content="<%= meta_title %>" />
-    <meta property="og:description" content="<%= meta_description %>" />
-    <meta property="og:image" content="<%= asset_path('social-share.png') %>" />
-    <meta property="og:url" content="<%= request.original_url %>" />
-    <meta property="og:type" content="website" />
-
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="<%= meta_title %>" />
-    <meta name="twitter:description" content="<%= meta_description %>" />
-    <meta name="twitter:image" content="<%= asset_path('social-share.png') %>" />
   </head>
-
   <body>
+		<%= render 'shared/header' %>
+		
     <div class="main">
-      <div class="container">
-        <header class="header">
-        <div class="row align-items-center">
-          <div class="col-md-4"> 
-            <h1><a class="site-logo" href="/" >Ecosyste.ms: Funds</a></h1>
-          </div>
-          <div class="col-md-8">
-            <nav class="navigation-bar">
-              <ul class="nav">
-                <li class="nav-item">
-                  <%= link_to 'About', about_path, class:'nav-link' %>
-                </li>
-                <li class="nav-item">
-                  <%= link_to 'How it works', overview_path, class:'nav-link' %>
-                </li>
-                <li class="nav-item">
-                   <%= link_to 'FAQ', faq_path, class:'nav-link' %>
-                </li>
-              </ul>
-            </nav>
-          </div>
-        </div>
-         
-          
-        </header>
-      </div>
-
       <%= yield %>
     </div>
 
-    <footer class="footer dark-section">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-8">
-            <a class="site-logo site-logo--white" href="/">Ecosyste.ms: Funds</a>
-            <p class="small">An open source funding solution from <a href="/"><strong>ecosyste.ms</strong></a> &amp; <a href="https://oscollective.org"><strong>Open Source Collective</strong></a>.</p>
-            <p class="small">
-              Code: <%= link_to 'AGPL-3', 'https://github.com/ecosyste-ms/documentation/blob/main/LICENSE' %>  — 
-              Data: <%= link_to 'CC BY-SA 4.0', 'https://creativecommons.org/licenses/by-sa/4.0/', target: :_blank %>
-            </p>
-            <p class='footer-icons'>
-              <%= link_to "https://github.com/ecosyste-ms", target: :_blank do %>
-                <%= bootstrap_icon 'github', width: 20, height: 20 %>
-              <% end %>
-              <%= link_to "https://mastodon.social/@ecosystems", target: :_blank do %>
-                <%= bootstrap_icon 'mastodon', width: 20, height: 20 %>
-              <% end %>
-              <%= link_to "https://opencollective.com/ecosystems", target: :_blank do %>
-                <%= bootstrap_icon 'opencollective', width: 20, height: 20 %>
-              <% end %>
-              <%= link_to "mailto:funds@ecosyste.ms", target: :_blank do %>
-                <%= bootstrap_icon 'envelope', width: 20, height: 20 %>
-              <% end %>
-            </p>
-          </div>
-          <div class="col-md-4">
-            <ul class="list-unstyled footer-links small">
-              <li><strong><%= link_to 'About', about_path %></strong></li>
-              <li><strong><%= link_to 'Blog', 'https://blog.ecosyste.ms' %></strong></li>
-              <li><strong><%= link_to 'Privacy', privacy_path %></strong></li>
-              <li><strong><%= link_to 'Terms', terms_path %></strong></li>
-              <li><strong><%= link_to 'Status', 'https://ecosystems.appsignal-status.com/' %></strong></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </footer>
+    <%= render 'shared/footer' %>
   </body>
 </html>

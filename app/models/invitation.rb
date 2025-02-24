@@ -101,7 +101,7 @@ class Invitation < ApplicationRecord
   end
 
   def sync_async
-    SyncInvitationWorker.perform_async(id)
+    SyncInviteWorker.perform_async(id)
   end
 
   def sync
