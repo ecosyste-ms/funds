@@ -14,7 +14,7 @@ class Fund < ApplicationRecord
   scope :short_names, -> { where("LENGTH(name) < ?", 20) }
 
   def self.search(query)
-    where("name ILIKE ?", "%#{query}%")
+    where("name ILIKE :query OR description ILIKE :query", query: "%#{query}%")
   end
 
   def self.sync_least_recently_synced    
