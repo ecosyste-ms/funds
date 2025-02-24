@@ -14,7 +14,7 @@ class Transaction < ApplicationRecord
   scope :between, ->(start_date, end_date) { where('transactions.created_at > ?', start_date).where('transactions.created_at < ?', end_date) }
 
   def self.find_by_legacy_id(id)
-    Transaction.find_by(order: { 'legacyId' => id })
+    Transaction.where("transactions.order->>'legacyId' = ?", id.to_s).first
   end
 
   def html_url
