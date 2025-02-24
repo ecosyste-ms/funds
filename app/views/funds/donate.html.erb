@@ -127,6 +127,8 @@
 
   <% elsif params[:OrderId].present? %>
 
+    <%= debug @transaction %>
+
     <div class="row">
       <div class="col-12 col-lg-8">
 
@@ -138,7 +140,7 @@
                 <div class="stat-card mt-4">
                   <div class="stat-card-body">
                     <span class="stat-card-title color-green-dark">
-                      <%= number_to_currency @transaction.amount %>
+                      <%= number_to_currency @transaction.amount, unit: "$", precision: 2 %>
                     </span>
                     <span class="stat-card-text small">Your donation</span>
                   </div>
