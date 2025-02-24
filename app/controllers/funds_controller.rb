@@ -5,7 +5,7 @@ class FundsController < ApplicationController
   end
 
   def search
-    @funds = Fund.search(params[:query])
+    @funds = Fund.search(params[:query]).order('projects_count DESC')
     @pagy, @funds = pagy(@funds)
   end
 
