@@ -246,12 +246,11 @@ class Fund < ApplicationRecord
   end
 
   def sync_opencollective_project
-    return unless featured?
+    return unless opencollective_project_id.present? || featured?
     if opencollective_project_id.present?
       fetch_opencollective_project
     else
       setup_opencollective_project
-      update_social_links
     end
     setup_webhook
     sync_transactions
@@ -339,7 +338,6 @@ class Fund < ApplicationRecord
   end
 
   def setup_opencollective_project
-    return unless featured?
     return if opencollective_project_id.present?
   
     file = download_image(logo_url)
@@ -370,7 +368,6 @@ class Fund < ApplicationRecord
           slug: oc_project_slug,
           description: "Supporting maintainers and communities in the #{name} ecosystem.",
           tags: ["open-source", "community", "fund", slug],
-          socialLinks: { website: "https://funds.ecosyste.ms/funds/#{slug}" },
           image: nil # Placeholder for the file reference
         }
       }
@@ -412,6 +409,7 @@ class Fund < ApplicationRecord
         self.opencollective_project_id = project_data['id']
         self.opencollective_project = project_data
         save
+        update_social_links
         return project_data
       else
         raise "Project creation failed"

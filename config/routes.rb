@@ -21,6 +21,7 @@ Rails.application.routes.draw do
     member do
       get :transactions
       get :donate
+      post :setup
     end
     resources :allocations, only: [:show] do |allocations|
       member do

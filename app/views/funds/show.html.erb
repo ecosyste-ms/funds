@@ -15,6 +15,10 @@
         <p><%= @fund.description %></p>
         <% if @fund.open_collective_project_url.present? %>
           <%= link_to "Fund the #{@fund.name} Ecosystem on Open Collective", donate_fund_path(@fund), class: 'btn btn-success btn-fund-header-cta dark-shadow rounded-pill mb-3' %>
+        <% else %>
+          <%= form_with url: setup_fund_path(@fund), method: :post, class: 'd-inline' do %>
+            <%= submit_tag "Fund the #{@fund.name} Ecosystem on Open Collective", class: 'btn btn-success btn-fund-header-cta dark-shadow rounded-pill mb-3' %>
+          <% end %>
         <% end %>
 
         <div class="fund-header-stats">

@@ -23,6 +23,15 @@ class FundsController < ApplicationController
     end
   end
 
+  def setup
+    @fund = Fund.find_by(slug: params[:id])
+    raise ActiveRecord::RecordNotFound unless @fund
+
+    @fund.setup_opencollective_project
+    raise ActiveRecord::RecordNotFound unless @fund.oc_project_slug
+    redirect_to donate_fund_path(@fund)
+  end
+
   def donate
     @fund = Fund.find_by(slug: params[:id])
     raise ActiveRecord::RecordNotFound unless @fund
