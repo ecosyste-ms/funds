@@ -102,6 +102,19 @@
 
       <iframe src="<%= @fund.open_collective_project_embed_url(redirect_url: request.original_url) %>" style="width: 100%; min-height: 100vh;" sandbox="allow-scripts allow-top-navigation"></iframe>
 
+      <script>
+        window.addEventListener('message', event => {
+          if (event.origin.endsWith('<%= ENV['OPENCOLLECTIVE_DOMAIN'] %>')) {
+            console.log(event); 
+            if (event.data && event.data.event === 'success') {
+              const url = new URL(window.location.href);
+              url.searchParams.set('OrderId', event.data.payload.order.id);
+              window.location.href = url.toString();
+            }
+          }
+        });
+      </script>
+
       </div>
       <div class="col-12 col-lg-4 page-content">
         <h3 class="mt-lg-0">How donating works</h3>
