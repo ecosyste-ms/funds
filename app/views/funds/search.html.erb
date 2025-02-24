@@ -41,6 +41,7 @@
             </div>
           </div>
         <% end %>
+        <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>
       <% else %>
           <div class="row">
             <div class="col-md-4">
@@ -54,12 +55,10 @@
               <a href="mailto:hello@oscollective.org" class="btn btn-primary">Contact us</a>
             </div>
           </div>
-
       <% end %>
     <% else %>
       <div class="listing-controls rounded p-3 mb-5"><p class="mb-0">Searching <strong><%= Fund.count %></strong> funds</p></div>
     <% end %>
-      <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>
     </div>
     <div class="col-lg-3">
       <% if @funds.any? %>
