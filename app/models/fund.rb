@@ -219,14 +219,18 @@ class Fund < ApplicationRecord
     "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{ENV['OPENCOLLECTIVE_PARENT_SLUG']}/projects/#{oc_project_slug}"
   end
 
-  def open_collective_project_embed_url
+  def open_collective_project_embed_url(redirect_url: nil)
     return nil if opencollective_project_id.blank?
-    "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/embed/#{ENV['OPENCOLLECTIVE_PARENT_SLUG']}/projects/#{oc_project_slug}/donate?hideSteps=false&hideFAQ=true&hideHeader=false"
+    url = "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/embed/#{ENV['OPENCOLLECTIVE_PARENT_SLUG']}/projects/#{oc_project_slug}/donate?hideSteps=false&hideFAQ=true&hideHeader=false"
+    url += "&redirect=#{redirect_url}" if redirect_url.present?
+    url
   end
 
-  def open_collective_project_donate_url
+  def open_collective_project_donate_url(redirect_url: nil)
     return nil if opencollective_project_id.blank?
-    "#{open_collective_project_url}/donate"
+    url = "#{open_collective_project_url}/donate"
+    url += "?redirect=#{redirect_url}" if redirect_url.present?
+    url
   end
 
   def invoice_mailto_url
