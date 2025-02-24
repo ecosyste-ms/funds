@@ -164,3 +164,28 @@
   color: $color-white;
   padding: 0.25rem 0.5rem;
 }
+
+.home-search { 
+	background-color: $color-grey-light;
+  z-index: 100;
+  position: relative;
+  .container {
+   
+  }
+  h2 {
+    @include media-breakpoint-up(md) {
+      text-align: right;
+    }
+  }
+  form {
+    max-width: 455px;
+  }
+}
+
+.home-search__wrapper {
+  
+  @include media-breakpoint-up(md) {
+    display: flex;
+    justify-content: center;
+  }
+}

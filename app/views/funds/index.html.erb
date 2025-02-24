@@ -63,6 +63,25 @@
     </div>
   </div>
 </div>
+<div class="home-search py-5">
+  <div class="container text-center">
+    <div class="row">
+      <div class="home-search__wrapper">
+
+        <h2 class="h1 extra-bold mb-4 me-3 mt-3">Find a fund</h2>
+
+        <%= form_tag search_funds_path, method: :get, class: "mb-4 mt-3" do %>
+          <label for="query" class="ps-3 mb-2 visually-hidden">Fund name</label>
+          <div class="input-group rounded-input-group">
+            <%= text_field_tag :query, params[:query], class: "form-control form-control-lg", placeholder: "eg. Django" %>
+            <button type="submit" class="btn btn-lg btn-danger pe-4">Search</button>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% end %>
 <div class="container">
 
   <div class="row my-5">
