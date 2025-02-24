@@ -229,6 +229,10 @@ class Fund < ApplicationRecord
     "#{open_collective_project_url}/donate"
   end
 
+  def invoice_mailto_url
+    "mailto:hello@oscollective.org?subject=#{name} Fund Invoice&body=Please send an invoice for the #{name} Fund to the following address:"
+  end
+
   def oc_project_slug
     "oc-#{slug}-fund"
   end
