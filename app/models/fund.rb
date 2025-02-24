@@ -15,6 +15,9 @@ class Fund < ApplicationRecord
 
   def self.search(query)
     where("name ILIKE :query OR description ILIKE :query", query: "%#{query}%")
+      .left_joins(:allocations)
+      .group("funds.id")
+      .order("COUNT(allocations.id) DESC")
   end
 
   def self.sync_least_recently_synced    
