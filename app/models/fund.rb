@@ -662,5 +662,6 @@ class Fund < ApplicationRecord
     transactions.donations.map{|t| {name: t.account_name, slug: t.account, image_url: t.account_image_url, amount: t.amount}}
       .group_by { |t| t[:slug] }
       .map { |slug, txns| { slug: slug, name: txns.first[:name], image_url: txns.first[:image_url], amount: txns.sum { |t| t[:amount] } } }
+      .sort_by { |f| -f[:amount] }
   end
 end
