@@ -100,7 +100,7 @@
     <div class="row">
       <div class="col-12 col-lg-8">
 
-      <iframe src="<%= @fund.open_collective_project_embed_url(redirect_url: request.original_url) %>" style="width: 100%; min-height: 100vh;" sandbox="allow-scripts allow-top-navigation"></iframe>
+      <iframe src="<%= @fund.open_collective_project_embed_url(redirect_url: request.original_url) %>" style="width: 100%; min-height: 100vh;"></iframe>
 
       <script>
         window.addEventListener('message', event => {
