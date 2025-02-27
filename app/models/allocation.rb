@@ -19,6 +19,10 @@ class Allocation < ApplicationRecord
     completed_at.present?
   end
 
+  def complete!
+    update!(completed_at: Time.now)
+  end
+
   def calculate_funded_projects
     # TODO: Only calculate if the fund has over a certain amount of money
   
