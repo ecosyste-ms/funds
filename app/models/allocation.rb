@@ -23,6 +23,26 @@ class Allocation < ApplicationRecord
     update!(completed_at: Time.now)
   end
 
+  def complete_payout_total_cents
+    project_allocations.select(&:success?).sum(&:amount_cents)
+  end
+
+  def complete_payout_projects_count
+    project_allocations.select(&:success?).length
+  end
+
+  def completed_github_sponsored_projects_count
+    project_allocations.select(&:success?).map(&:funding_source).select{|fs| fs.platform == 'github.com'}.length
+  end
+
+  def completed_open_collective_projects_count
+    project_allocations.select(&:success?).map(&:funding_source).select{|fs| fs.platform == 'opencollcetive.com'}.length
+  end
+
+  def completed_other_projects_count
+    project_allocations.select(&:success?).map(&:funding_source).approved.reject{|fs| ['opencollective.com', 'github.com'].include?(fs.platform) }.length
+  end
+
   def latest?
     fund.allocations.order(created_at: :desc).first == self
   end

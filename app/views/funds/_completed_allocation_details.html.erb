@@ -1,0 +1,65 @@
+<h3 class="fw-normal fs-6">Allocation Details</h3>
+  <div class="fund-stat-bar fund-stat-bar--allocation-stat-bar mb-2 mb-md-3">
+    <div class="stat-card mb-2">
+      <div class="stat-card-body">
+        <span class="stat-card-title"><%= number_to_currency @allocation.complete_payout_total_cents/100.0 %></span>
+        <span class="stat-card-text extra-small">Total funded</span>
+      </div>
+    </div>
+
+    <div class="stat-card mb-2">
+      <div class="stat-card-body">
+        <span class="stat-card-title"><%= @allocation.funders_count %></span>
+        <span class="stat-card-text extra-small">Funders</span>
+      </div>
+    </div>
+
+    <div class="stat-card mb-2">
+      <div class="stat-card-body">
+        <span class="stat-card-title"><%= @allocation.complete_payout_projects_count %></span>
+        <span class="stat-card-text extra-small">Projects</span>
+      </div>
+    </div>
+  </div> 
+</div> 
+
+<div class="col-md-7 col-xl-12">
+  <h3 class="fw-normal fs-6">Distribution Details</h3>
+  <div class="fund-stat-bar fund-stat-bar--allocation-stat-bar mb-4 mb-md-5">
+    <% if @allocation.completed_github_sponsored_projects_count > 0 %>
+      <div class="stat-card mb-2">
+        <div class="stat-card-body">
+          <span class="stat-card-title"><%= @allocation.completed_github_sponsored_projects_count %></span>
+          <span class="stat-card-text extra-small">GitHub Sponsors</span>
+        </div>
+      </div>
+    <% end %>
+
+    <% if @allocation.open_collective_projects_count > 0 %>
+      <div class="stat-card mb-2">
+        <div class="stat-card-body">
+          <span class="stat-card-title"><%= @allocation.open_collective_projects_count %></span>
+          <span class="stat-card-text extra-small">Open Collective</span>
+        </div>
+      </div>
+    <% end %>
+  
+    <% if @allocation.other_projects_count > 0 %>
+      <div class="stat-card mb-2">
+        <div class="stat-card-body">
+          <span class="stat-card-title"><%= @allocation.other_projects_count %></span>
+          <span class="stat-card-text extra-small" data-bs-toggle="tooltip" data-bs-title="ecosyste.ms supports most funding platforms like Patreon, Kofi, and GoFundMe.">Other sources <a href="#"><%= bootstrap_icon 'info-circle', width: 14, height: 14 %></a></span>
+        </div>
+      </div>
+    <% end %>
+  
+    <% if @allocation.invited_projects_count > 0%>
+      <div class="stat-card mb-2">
+        <div class="stat-card-body">
+          <span class="stat-card-title"><%= @allocation.invited_projects_count %></span>
+          <span class="stat-card-text extra-small" data-bs-toggle="tooltip" data-bs-title="ecosyste.ms has contacted maintainers to direct this contribution to their preferred platform or payment method.">Projects invited <a href="#"><%= bootstrap_icon 'info-circle', width: 14, height: 14 %></a></span>
+        </div>
+      </div>
+    <% end %>
+  </div> 
+</div> 
