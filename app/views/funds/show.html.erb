@@ -175,7 +175,7 @@
             <tbody>
               <% @project_allocations.each_with_index do |project_allocation, i| %>
                 <% next if project_allocation.project_url.nil? %>
-                <% next if @allocation.completed? && !project_allocation.paid? %>
+                <% next if @allocation.completed? && !project_allocation.success? %>
 
                 <!-- Main Row -->
                 <tr class="clickable-row <%= 'row-rejected' if project_allocation.project_funding_rejected %>" data-bs-toggle="collapse" data-bs-target="#details-<%= i %>" role="button" aria-controls="#details-<%= i %>">

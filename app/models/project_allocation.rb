@@ -582,7 +582,12 @@ class ProjectAllocation < ApplicationRecord
   end
 
   def status
+    return 'REJECTED' if funding_rejected?
     return invitation.status if invitation.present?
     return 'PAID' if find_transaction.present?
+  end
+
+  def success?
+    ['APPROVED', 'PAID'].include?(status)
   end
 end
