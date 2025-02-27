@@ -32,15 +32,15 @@ class Allocation < ApplicationRecord
   end
 
   def completed_github_sponsored_projects_count
-    project_allocations.select(&:success?).map(&:funding_source).select{|fs| fs.platform == 'github.com'}.length
+    project_allocations.select(&:success?).map(&:funding_source).compact.select{|fs| fs.platform == 'github.com'}.length
   end
 
   def completed_open_collective_projects_count
-    project_allocations.select(&:success?).map(&:funding_source).select{|fs| fs.platform == 'opencollcetive.com'}.length
+    project_allocations.select(&:success?).map(&:funding_source).compact.select{|fs| fs.platform == 'opencollcetive.com'}.length
   end
 
   def completed_other_projects_count
-    project_allocations.select(&:success?).map(&:funding_source).approved.reject{|fs| ['opencollective.com', 'github.com'].include?(fs.platform) }.length
+    project_allocations.select(&:success?).map(&:funding_source).compact.approved.reject{|fs| ['opencollective.com', 'github.com'].include?(fs.platform) }.length
   end
 
   def latest?
