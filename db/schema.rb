@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_20_121322) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_27_112922) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -27,6 +27,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_20_121322) do
     t.json "max_values"
     t.json "weights"
     t.integer "minimum_allocation_cents"
+    t.datetime "completed_at"
     t.index ["fund_id"], name: "index_allocations_on_fund_id"
   end
 

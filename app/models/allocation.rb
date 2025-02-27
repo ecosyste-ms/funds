@@ -5,6 +5,7 @@ class Allocation < ApplicationRecord
   has_many :funding_sources, through: :project_allocations
 
   scope :displayable, -> { where('funded_projects_count > 0') }
+  scope :completed, -> { where.not(completed_at: nil) }
 
   def to_s
     name
@@ -12,6 +13,10 @@ class Allocation < ApplicationRecord
 
   def name
     created_at.strftime('%Y-%m')
+  end
+
+  def completed?
+    completed_at.present?
   end
 
   def calculate_funded_projects
