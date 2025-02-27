@@ -225,4 +225,13 @@ class Invitation < ApplicationRecord
       update!(status: response_body['data']['processExpense']['status'])
     end
   end
+
+  def status
+    'DELETED' if deleted_at.present?
+    data['status']
+  end
+
+  def legacy_order_id
+    data['legacyId']
+  end
 end

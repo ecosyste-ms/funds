@@ -567,4 +567,17 @@ class ProjectAllocation < ApplicationRecord
   def invitation_accepted?
     invitation.present? && invitation.accepted_at.present?
   end
+
+  def potential_transactions
+    Transaction.where(amount: -(amount_cents)/100.0)
+  end
+
+  def find_transaction
+    # if invitation use its data['legacyId']
+    if potential_transactions.length == 1
+      return potential_transactions.first
+    else
+      potential_transactions.select{|t| t.account == funding_source.name }.first
+    end
+  end
 end
