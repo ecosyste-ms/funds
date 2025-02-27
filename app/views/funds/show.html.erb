@@ -204,7 +204,9 @@
                         <% elsif project_allocation.funding_source && project_allocation.funding_source.approved? %>
                           <p><%= bootstrap_icon 'piggy-bank-fill', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> <%= link_to project_allocation.funding_source.url, project_allocation.funding_source.url, target: :_blank %></p>
                         <% else %>
-                          <% if project_allocation.invitation.present? %>
+                          <% if project_allocation.success? %>
+                            <p><%= bootstrap_icon 'piggy-bank-fill', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> Paid</p>
+                          <% elsif project_allocation.invitation.present? %>
                             <% if project_allocation.project_funding_rejected %>
                               <p><%= bootstrap_icon 'piggy-bank-fill', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> Invitation Rejected on <%= project_allocation.invitation.rejected_at.strftime('%B %d, %Y') %></p>
                             <% elsif project_allocation.invitation_accepted? %>
