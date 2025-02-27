@@ -227,7 +227,7 @@ class Invitation < ApplicationRecord
   end
 
   def status
-    'DELETED' if deleted_at.present?
+    return 'DELETED' if deleted_at.present?
     data['status']
   end
 
