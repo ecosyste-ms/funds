@@ -23,6 +23,10 @@ class Allocation < ApplicationRecord
     update!(completed_at: Time.now)
   end
 
+  def latest?
+    fund.allocations.order(created_at: :desc).first == self
+  end
+
   def calculate_funded_projects
     # TODO: Only calculate if the fund has over a certain amount of money
   

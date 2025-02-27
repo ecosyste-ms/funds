@@ -55,7 +55,14 @@
   <div class="row">
   <% if @allocation %>
   <div class="fund-section-header mb-3 mb-md-5">
-    <h2 class="h1 extra-bold"><%= @allocation.created_at.strftime('%B %d, %Y') %> <span class="badge badge-info">Latest</span></h2>
+    <h2 class="h1 extra-bold">
+      <%= @allocation.created_at.strftime('%B %d, %Y') %> 
+      <% if @allocation.completed? %>
+        <span class="badge bg-success">Completed</span>
+      <% elsif @allocation.latest? %>
+        <span class="badge bg-info">Latest</span>
+      <% end %>
+    </h2>
   </div>
     
   <div class="row">
