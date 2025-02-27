@@ -514,8 +514,7 @@ class ProjectAllocation < ApplicationRecord
   end
 
   def decline_deadline
-    # created_at + 14.days
-    DateTime.parse("2025-01-24") + 14.days # temp for first allocation
+    created_at + 14.days
   end
 
   def allocation_payout_date
