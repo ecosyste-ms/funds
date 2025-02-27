@@ -580,4 +580,9 @@ class ProjectAllocation < ApplicationRecord
       potential_transactions.select{|t| t.account == funding_source.name }.first
     end
   end
+
+  def status
+    return invitation.status if invitation.present?
+    return 'PAID' if find_transaction.present?
+  end
 end
