@@ -2,9 +2,9 @@
   <div class="row mt-md-3">
     <div class="col-md-5 col-xl-12">
       <% if @allocation.completed? %>
-        <%= render 'completed_allocation_details' %>
+        <%= render 'allocations/completed_allocation_details' %>
       <% else %>
-        <%= render 'allocation_details' %>
+        <%= render 'allocations/allocation_details' %>
       <% end %>
     </div> 
   </div> 
