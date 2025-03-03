@@ -17,6 +17,10 @@ class Allocation < ApplicationRecord
     created_at.strftime('%B-%Y')
   end
 
+  def to_param
+    slug
+  end
+
   def set_slug
     self.slug = name.parameterize
   end
