@@ -1,182 +1,31 @@
 <% @meta_title = @fund.name %>
 <% @meta_description = @fund.description %>
 
-<div class="fund-header purple-grad-bg  mb-5 pt-4 pb-4">
-  <div class="container">
-    <div class="row">
-      <% if @fund.logo_url.present? %>
-        <div class="col-md-1 mb-3 pt-3">
-          <img src="<%= @fund.logo_url %>" alt="" class="img-fluid fund-logo" onerror="this.style.display='none'">
-        </div>
-      <% end %>
-      <div class="<% if @fund.logo_url.present? %>col-md-11<% end %>">
-   
-        <h1 class="display-1 extra-bold"><%= @fund.name %></h1>
-        <p><%= @fund.description %></p>
-        <% if @fund.open_collective_project_url.present? %>
-          <%= link_to "Fund the #{@fund.name} Ecosystem on Open Collective", donate_fund_path(@fund), class: 'btn btn-success btn-fund-header-cta dark-shadow rounded-pill mb-3' %>
-        <% else %>
-          <%= form_with url: setup_fund_path(@fund), method: :post, class: 'd-inline' do %>
-            <%= submit_tag "Fund the #{@fund.name} Ecosystem on Open Collective", class: 'btn btn-success btn-fund-header-cta dark-shadow rounded-pill mb-3' %>
-          <% end %>
-        <% end %>
-
-        <div class="fund-header-stats">
-          <div class="fund-stat-bar mb-2 mb-md-3">
-            <div class="stat-card mb-2">
-              <div class="stat-card-body">
-                <span class="stat-card-title"><%= number_to_currency (@allocation.try(:total_cents) || 0)/100.0 %></span>
-                <span class="stat-card-text small">Total funded</span>
-              </div>
-            </div>
-
-            <div class="stat-card mb-2">
-              <div class="stat-card-body">
-                <span class="stat-card-title"><%= @allocation.try(:funders_count) || 0 %></span>
-                <span class="stat-card-text small">Funders</span>
-              </div>
-            </div>
-
-            <div class="stat-card mb-2">
-              <div class="stat-card-body">
-                <span class="stat-card-title"><%= @allocation.try(:funded_projects_count) || 0 %></span>
-                <span class="stat-card-text small">Projects</span>
-              </div>
-            </div>
-          </div> 
-        </div>
-        
-      </div>
-    </div>
-  </div>
-</div>
+<%= render 'funds/header' %>
 
 <div class="container">
   <div class="row">
-  <% if @allocation %>
-  <div class="fund-section-header mb-3 mb-md-5">
-    <h2 class="h1 extra-bold">
-      <%= @allocation.created_at.strftime('%B %d, %Y') %> 
-      <% if @allocation.completed? %>
-        <span class="badge bg-success">Completed</span>
-      <% elsif @allocation.latest? %>
-        <span class="badge bg-info">Latest</span>
-      <% end %>
-    </h2>
-  </div>
-    
-  <div class="row">
-    <div class="col-xl-3">
-      <div class="row mt-md-3">
-        <div class="col-md-5 col-xl-12">
+    <% if @allocation %>
+      <div class="fund-section-header mb-3 mb-md-5">
+        <h2 class="h1 extra-bold">
+          <%= @allocation.created_at.strftime('%B %d, %Y') %> 
           <% if @allocation.completed? %>
-            <%= render 'completed_allocation_details' %>
-          <% else %>
-            <%= render 'allocation_details' %>
+            <span class="badge bg-success">Completed</span>
+          <% elsif @allocation.latest? %>
+            <span class="badge bg-info">Latest</span>
           <% end %>
-        </div> 
-      </div> 
-    </div>
-
-    <div class="col-xl-9">
-      <h2>Funded by</h2>
-      <div class="row mt-4 mb-5">
-      <% @fund.funders.each do |account| %>
-        <div class="col">
-          <a href="<%= "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{account[:slug]}" %>" class="block-link block-link--spesh">
-            <div class="fund-funder card text-center">
-              <div class="fund-funder__avatar card-img-top">
-                <%= image_tag(account[:image_url], class: 'img-fluid rounded-circle') %>
-              </div>
-              <div class="fund-funder__details card-body">
-                <h3 class="fund-funder__name card-title spesh-link"><%= account[:name] %></h3>
-                <p class="small card-text"><%= number_to_currency account[:amount] %></p>
-              </div>
-            </div>
-          </a>
-        </div>
-      <% end %>
+        </h2>
       </div>
-      <figure>
-        <figcaption id="table-caption" class="mb-4">
-          <h2>Funding allocation</h2>
-        </figcaption>
-        <div class="table-wrapper table-responsive-lg" role="group" tabindex="0" aria-labelledby="table-caption">
-          <table class="table">
-            <thead>
-              <tr>
-                <th># <span class="visually-hidden">Rank</span></th>
-                <th>Project</th>
-                <th>Amount</th>
-                <th>Downloads</th>
-                <th>Dependent Repos</th>
-                <th>Dependent Packages</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @project_allocations.reject{|pa| pa.project_url.nil? || @allocation.completed? && !pa.success? }.each_with_index do |project_allocation, i| %>
+      
+      <div class="row">
+        <%= render 'allocations/details' %>
 
-                <!-- Main Row -->
-                <tr class="clickable-row <%= 'row-rejected' if project_allocation.project_funding_rejected %>" data-bs-toggle="collapse" data-bs-target="#details-<%= i %>" role="button" aria-controls="#details-<%= i %>">
-                  <td><%= i + 1 %></td>
-                  <td><%= link_to project_allocation.project_name, project_allocation.project_url, target: :_blank %></td>
-                  <td><%= number_to_currency project_allocation.amount_cents / 100.0 %></td>
-                  <td>
-                    <%= number_to_human(project_allocation.project_downloads, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %>
-                  </td>
-                  <td>
-                    <%= number_to_human(project_allocation.project_dependent_repos, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %>
-                  </td>
-                  <td>
-                    <%= number_to_human(project_allocation.project_dependent_packages, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %>
-                  </td>
-                </tr>
-
-                <!-- Expandable Row -->
-                <tr id="details-<%= i %>" class="collapse">
-                  <td colspan="6">
-                    <div class="collapse" id="details-<%= i %>">
-                      <div class="p-4 well">
-                        <p><%= bootstrap_icon 'git', width: 18, height: 18 %> <span class="visually-hidden">Repository:</span> <%= link_to project_allocation.project_url, project_allocation.project_url, target: :_blank %></p>
-                        <% if project_allocation.project_funding_rejected %>
-                          <p><%= bootstrap_icon 'piggy-bank-fill', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> Funding Rejected</p>
-                        <% elsif project_allocation.funding_source && project_allocation.funding_source.approved? %>
-                          <p><%= bootstrap_icon 'piggy-bank-fill', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> <%= link_to project_allocation.funding_source.url, project_allocation.funding_source.url, target: :_blank %></p>
-                        <% else %>
-                          <% if project_allocation.success? %>
-                            <p><%= bootstrap_icon 'piggy-bank-fill', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> Paid</p>
-                          <% elsif project_allocation.invitation.present? %>
-                            <% if project_allocation.project_funding_rejected %>
-                              <p><%= bootstrap_icon 'piggy-bank-fill', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> Invitation Rejected on <%= project_allocation.invitation.rejected_at.strftime('%B %d, %Y') %></p>
-                            <% elsif project_allocation.invitation_accepted? %>
-                              <p><%= bootstrap_icon 'piggy-bank-fill', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> Invitation Accepted on <%= project_allocation.invitation.accepted_at.strftime('%B %d, %Y') %></p>
-                            <% else %>
-                              <p><%= bootstrap_icon 'piggy-bank-fill', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> Invitation Pending</p>
-                            <% end %>
-                          <% else %>
-                            <p><%= bootstrap_icon 'piggy-bank-fill', width: 18, height: 18 %> <span class="visually-hidden">Funding:</span> Contacting Maintainer</p>
-                          <% end %>
-                        <% end %>  
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        </div>
-      </figure>
-    <% else%>
-      <div class="row align-items-center">
-        <div class="col-lg-6">
-          <%= image_tag("coming-soon.svg", alt: "", class: "img-fluid", size: "500x460") %>
-        </div>
-        <div class="col-lg-6">
-          <h2>Coming soon</h2>
-          <p>Contact us about supporting the <%= @fund.name %> Ecosystem.</p>
-          <p><a href="mailto:hello@oscollective.org " class="btn btn-primary">Contact us</a></p>
-        </div>
-      </div>
+        <div class="col-xl-9">
+          <%= render 'funds/funders' %>
+        
+          <%= render 'allocations/table' %>
+    <% else %>
+      <%= render 'funds/blank_slate' %>
     <% end %>
     </div>
     <p class="text-end mt-3">

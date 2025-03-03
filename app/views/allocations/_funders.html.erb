@@ -1,0 +1,18 @@
+<h2>Funded by</h2>
+<div class="row mt-4 mb-5">
+  <% @allocation.funders.each do |account| %>
+    <div class="col">
+      <a href="<%= "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{account[:slug]}" %>" class="block-link block-link--spesh">
+        <div class="fund-funder card text-center">
+          <div class="fund-funder__avatar card-img-top">
+            <%= image_tag(account[:image_url], class: 'img-fluid rounded-circle') %>
+          </div>
+          <div class="fund-funder__details card-body">
+            <h3 class="fund-funder__name card-title spesh-link"><%= account[:name] %></h3>
+            <p class="small card-text"><%= number_to_currency account[:amount] %></p>
+          </div>
+        </div>
+      </a>
+    </div>
+  <% end %>
+</div>

@@ -1,99 +1,50 @@
-<div class="container-sm">
-  <h1><%= link_to @fund, fund_path(@fund) %>: <%= @allocation.name %></h1>
+<% @meta_title = "#{@fund.name} - #{@allocation.created_at.strftime('%B %d, %Y')}" %>
+<% @meta_description = @fund.description %>
 
-  <% if @allocation.funded_projects_count > 0 %>
+<%= render 'funds/header' %>
 
-    <p>
-      Total available: <%= number_to_currency(@allocation.total_cents/100) %><br/>
-      Total allocated: <%= number_to_currency(@allocation.total_allocated_cents/100) %><br/>
-      Projects: <%= @allocation.funded_projects_count %><br/>    
-      Projects with Funding Sources: <%= @allocation.project_allocations.with_funding_source.count %><br/>
-      Minimum: <%= number_to_currency @allocation.minimum_allocation_cents/100.0 %><br/>
-    </p>
-
-    <b>Weights</b>
-    <ul>
-      <% @allocation.weights.each do |name, weight| %>
-        <li><%= name.humanize %>: <%= weight %></li>
+<div class="container">
+  <div class="row">
+  <% if @allocation %>
+  <div class="fund-section-header mb-3 mb-md-5">
+    <h2 class="h1 extra-bold">
+      <%= @allocation.created_at.strftime('%B %d, %Y') %> 
+      <% if @allocation.completed? %>
+        <span class="badge bg-success">Completed</span>
+      <% elsif @allocation.latest? %>
+        <span class="badge bg-info">Latest</span>
       <% end %>
-    </ul>
+    </h2>
+  </div>
+    
+  <div class="row">
+    <%= render 'allocations/details' %>
 
-    <h3>Projects</h3>
-
-    <table class="table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Project</th>
-          <th>Amount</th>
-          <th>Score</th>
-          <th>Downloads</th>
-          <th>Dependent Repos</th>
-          <th>Dependent Pkgs</th>
-          <th>Platform</th>
-        </tr>
-        </tr>
-      </thead>
-      <tbody>
-        <% @project_allocations.each_with_index do |project_allocation, i| %>
-          <% next if project_allocation.project.nil? %>
-          <tr>
-            <td><%= i+1 %></td>
-            <td><%= link_to project_allocation.project, project_allocation.project, target: :_blank %></td>
-            <td>$<%= project_allocation.amount_cents/100.0 %></td>
-            <td><%= project_allocation.score.round(4) %></td>
-            <td><%= number_with_delimiter project_allocation.project.downloads(@fund.registry_name) %></td>
-            <td><%= number_with_delimiter project_allocation.project.dependent_repos_count(@fund.registry_name) %></td>
-            <td><%= number_with_delimiter project_allocation.project.dependent_packages_count(@fund.registry_name) %></td>
-            <td>
-              <% if project_allocation.funding_source && project_allocation.funding_source.approved? %>
-                <%= link_to project_allocation.funding_source, project_allocation.funding_source %>
-              <% else %>
-                Unknown
-              <% end %>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-
-    <h3>Funding Sources</h3>
-
-    <div class='row'>
-      <% @allocation.group_projects_by_funding_source_and_platform.group_by{|i,j| i[0] }.each do |platform, sources| %>
-          <table class="table">
-            <thead>
-              <tr>
-                <th><%= link_to platform, export_fund_allocation_path(@fund, @allocation, platform: platform) %></th>
-                <th>Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% sources.each do |platform_and_source, total_cents|%>
-                <% source = platform_and_source[1] %>
-                <tr>
-                  <td>
-                    <%= link_to source.name, source.url %>
-                    <% if source.platform == 'opencollective.com' && source.collective.present? %>
-                      (Host: <%= source.host %>)
-                    <% end %>
-                  </td>
-                  <td><%= number_to_currency(total_cents/100.0) %></td>
-                </tr>
-              <% end %>
-            </tbody>
-            <tfoot>
-              <tr>
-                <td>Total</td>
-                <td><%= number_to_currency(sources.sum{|source, total_cents| total_cents}/100.0) %></td>
-              </tr>
-            </tfoot>
-          </table>
-      <% end %>
+    <div class="col-xl-9">
+      <%= render 'allocations/funders' %>
+      <%= render 'allocations/table' %>
+    <% else%>
+      <div class="row align-items-center">
+        <div class="col-lg-6">
+          <%= image_tag("coming-soon.svg", alt: "", class: "img-fluid", size: "500x460") %>
+        </div>
+        <div class="col-lg-6">
+          <h2>Coming soon</h2>
+          <p>Contact us about supporting the <%= @fund.name %> Ecosystem.</p>
+          <p><a href="mailto:hello@oscollective.org " class="btn btn-primary">Contact us</a></p>
+        </div>
+      </div>
+    <% end %>
     </div>
-  <% else %>
-    <p>
-      This allocation has no funded projects.
+    <p class="text-end mt-3">
+      <small class='text-muted'>
+      Projects considered for this fund
+      <% if @fund.registry_name %>
+        are the most critical packages published to <strong><%= @fund.registry_name %></strong>.
+      <% else %>
+        have one of the following topics or keywords: <strong><%= @fund.all_keywords.join(', ') %></strong>.
+      <% end %>
+      </small>
     </p>
-  <% end %>
+  </div>
 </div>

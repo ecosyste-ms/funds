@@ -2,14 +2,18 @@ require 'csv'
 
 class AllocationsController < ApplicationController
   def show
-    @fund = Fund.find_by(slug: params[:fund_id])
-    @allocation = @fund.allocations.find_by(slug: params[:id])
-    @project_allocations = @allocation.project_allocations.includes(:project, :funding_source).order('amount_cents desc').where('amount_cents >= 1')
+    @fund = Fund.find_by!(slug: params[:fund_id])
+    @allocation = @fund.allocations.find_by!(slug: params[:id])
+    @project_allocations = @allocation.project_allocations.includes(:funding_source, :invitation)
+                                                             .order('amount_cents desc')
+                                                             .where('amount_cents >= 1')
+                                                             .joins(:project)
+                                                             .select('project_allocations.*, projects.name as project_name, projects.url as project_url, projects.total_downloads as project_downloads, projects.total_dependent_repos as project_dependent_repos, projects.total_dependent_packages as project_dependent_packages, projects.funding_rejected as project_funding_rejected')
   end
 
   def export
-    @fund = Fund.find_by(slug: params[:fund_id])
-    @allocation = @fund.allocations.find_by(slug: params[:id])
+    @fund = Fund.find_by!(slug: params[:fund_id])
+    @allocation = @fund.allocations.find_by!(slug: params[:id])
     @platform = params[:platform]
     @host = params[:host]
 
@@ -34,8 +38,8 @@ class AllocationsController < ApplicationController
   end
 
   def export_github_sponsors
-    @fund = Fund.find_by(slug: params[:fund_id])
-    @allocation = @fund.allocations.find_by(slug: params[:id])
+    @fund = Fund.find_by!(slug: params[:fund_id])
+    @allocation = @fund.allocations.find_by!(slug: params[:id])
 
     csv_data = @allocation.github_sponsors_csv_export
 

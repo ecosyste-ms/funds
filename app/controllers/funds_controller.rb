@@ -10,7 +10,7 @@ class FundsController < ApplicationController
   end
 
   def show
-    @fund = Fund.find_by(slug: params[:id])
+    @fund = Fund.find_by!(slug: params[:id])
     raise ActiveRecord::RecordNotFound unless @fund
 
     @allocation = @fund.allocations.order('created_at DESC').first
@@ -24,7 +24,7 @@ class FundsController < ApplicationController
   end
 
   def setup
-    @fund = Fund.find_by(slug: params[:id])
+    @fund = Fund.find_by!(slug: params[:id])
     raise ActiveRecord::RecordNotFound unless @fund
 
     @fund.setup_opencollective_project
@@ -33,7 +33,7 @@ class FundsController < ApplicationController
   end
 
   def donate
-    @fund = Fund.find_by(slug: params[:id])
+    @fund = Fund.find_by!(slug: params[:id])
     raise ActiveRecord::RecordNotFound unless @fund
 
     @allocation = @fund.allocations.order('created_at DESC').first
@@ -51,7 +51,7 @@ class FundsController < ApplicationController
   end
 
   def transactions
-    @fund = Fund.find_by(slug: params[:id])
+    @fund = Fund.find_by!(slug: params[:id])
     @transactions = @fund.transactions
     @pagy, @transactions = pagy(@transactions)
   end

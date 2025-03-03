@@ -87,7 +87,7 @@ funds.each do |fund|
 
 end
 
-f = Fund.find_by(slug: 'ruby')
+f = Fund.find_by!(slug: 'ruby')
 
 Transaction.create({
   fund: f,
