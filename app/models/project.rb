@@ -150,17 +150,17 @@ class Project < ApplicationRecord
   end
 
   def repos_ping_url
-    return unless repository.present?
+    return unless repository.present? && repository['host'].present?
     "https://repos.ecosyste.ms/api/v1/hosts/#{repository['host']['name']}/repositories/#{repository['full_name']}/ping"
   end
 
   def issues_ping_url
-    return unless repository.present?
+    return unless repository.present? && repository['host'].present?
     "https://issues.ecosyste.ms/api/v1/hosts/#{repository['host']['name']}/repositories/#{repository['full_name']}/ping"
   end
 
   def commits_ping_url
-    return unless repository.present?
+    return unless repository.present? && repository['host'].present?
     "https://commits.ecosyste.ms/api/v1/hosts/#{repository['host']['name']}/repositories/#{repository['full_name']}/ping"
   end
 
