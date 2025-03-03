@@ -7,12 +7,18 @@ class Allocation < ApplicationRecord
   scope :displayable, -> { where('funded_projects_count > 0') }
   scope :completed, -> { where.not(completed_at: nil) }
 
+  before_create :set_slug
+
   def to_s
     name
   end
 
   def name
-    created_at.strftime('%Y-%m')
+    created_at.strftime('%B-%Y')
+  end
+
+  def set_slug
+    self.slug = name.parameterize
   end
 
   def completed?
