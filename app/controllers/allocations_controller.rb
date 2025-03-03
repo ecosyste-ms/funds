@@ -9,7 +9,7 @@ class AllocationsController < ApplicationController
 
   def export
     @fund = Fund.find_by(slug: params[:fund_id])
-    @allocation = @fund.allocations.find(params[:id])
+    @allocation = @fund.allocations.find_by(slug: params[:id])
     @platform = params[:platform]
     @host = params[:host]
 
