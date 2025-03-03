@@ -173,7 +173,7 @@ class Project < ApplicationRecord
   end
 
   def owner_ping_url
-    return unless repository.present?
+    return unless repository.present? && repository['host'].present?
     "https://repos.ecosyste.ms/api/v1/hosts/#{repository['host']['name']}/owners/#{repository['owner']}/ping"
   end
 
