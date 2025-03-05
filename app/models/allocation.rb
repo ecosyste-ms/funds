@@ -328,7 +328,7 @@ class Allocation < ApplicationRecord
   end
   
   def send_invitations
-    project_allocations.select{|pa| pa.funding_source.blank?}.each do |pa|
+    project_allocations.select{|pa| pa.funding_source.blank? || !pa.funding_source.approved? }.each do |pa|
       pa.send_invitation
     end
   end

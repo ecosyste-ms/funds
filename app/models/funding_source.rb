@@ -10,6 +10,8 @@ class FundingSource < ApplicationRecord
   scope :platform, ->(platform) { where(platform: platform) }
   scope :approved, -> { where(platform: APPROVED_PLATFORMS) }
   
+  scope :with_project_allocations, -> { where('EXISTS (SELECT 1 FROM project_allocations WHERE project_allocations.funding_source_id = funding_sources.id)') }
+
   def self.open_collective_github_sponsors_mapping
     @open_collective_github_sponsors_mapping ||= begin
       url = 'https://raw.githubusercontent.com/opencollective/opencollective-tools/refs/heads/main/github-sponsors/csv-import-mapping.json'
@@ -79,6 +81,7 @@ class FundingSource < ApplicationRecord
 
   def sync
     fetch_collective
+    fetch_github_sponsors
     update(last_synced_at: Time.now)
   end
 
