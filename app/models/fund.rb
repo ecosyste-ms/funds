@@ -9,6 +9,8 @@ class Fund < ApplicationRecord
 
   scope :project_legacy_id, ->(id) { where("opencollective_project->>'legacyId' = ?", id) }
 
+  scope :with_project, -> { where.not(opencollective_project_id: nil) }
+
   scope :featured, -> { where(featured: true) }
   scope :not_featured, -> { where(featured: false) }
   scope :short_names, -> { where("LENGTH(name) < ?", 20) }
@@ -489,11 +491,11 @@ class Fund < ApplicationRecord
   end
 
   def total_expenses
-    transactions.expenses.sum(:net_amount)
+    transactions.expenses.sum(:net_amount).round(2)
   end
 
   def current_balance
-    transactions.sum(:net_amount)
+    transactions.sum(:net_amount).round(2)
   end
 
   def total_donors
