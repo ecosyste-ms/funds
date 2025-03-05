@@ -71,7 +71,7 @@ class Allocation < ApplicationRecord
     normalized_metrics, maxs = fetch_project_metrics(projects)
     scores, total_score = calculate_scores(normalized_metrics, weights)
   
-    allocations = total_score.zero? ? allocate_funds_evenly(scores) : allocate_funds_by_score(scores, total_score)
+    allocations, _, _ = total_score.zero? ? allocate_funds_evenly(scores) : allocate_funds_by_score(scores, total_score)
   
     distribute_leftover_funds(allocations) unless total_score.zero?
   
@@ -136,7 +136,9 @@ class Allocation < ApplicationRecord
   end
   
   def distribute_leftover_funds(allocations)
-    total_allocated = allocations.sum { |a| a[:allocation] }
+    puts allocations.inspect
+
+    total_allocated = allocations.sum { |a| a[:allocation].to_i }
     leftover = total_cents - total_allocated
   
     allocations.first[:allocation] += leftover if leftover.positive?
