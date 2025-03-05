@@ -136,9 +136,7 @@ class Allocation < ApplicationRecord
   end
   
   def distribute_leftover_funds(allocations)
-    puts allocations.inspect
-
-    total_allocated = allocations.sum { |a| a[:allocation].to_i }
+    total_allocated = allocations.sum { |a| a[:allocation] }
     leftover = total_cents - total_allocated
   
     allocations.first[:allocation] += leftover if leftover.positive?
