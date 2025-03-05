@@ -531,6 +531,7 @@ class ProjectAllocation < ApplicationRecord
   def send_invitation
     return if funding_source.present?
     return if invitation.present?
+    return if funding_rejected?
     
     invitation = create_invite
     
