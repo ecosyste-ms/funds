@@ -37,7 +37,7 @@ class Fund < ApplicationRecord
   end
 
   def default_minimum_for_allocation_cents
-    100_00
+    1000_00
   end
 
   def minimum_for_allocation_cents
