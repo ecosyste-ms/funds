@@ -82,12 +82,12 @@
                 <span class='invitation-status label-rejected'>Rejected</span>
               <% elsif invitation.deleted_at.present? %>
                 <span class='invitation-status label-deleted'>Deleted</span>
-              <% elsif invitation.status != 'DRAFT' %>
+              <% elsif invitation.status.nil? %>
+                <span class='invitation-status label-pending'>Pending</span>
+              <% else %>
                 <span class='invitation-status label-info'>
                   <%= link_to invitation.status, invitation.html_url %>
                 </span>
-              <% else %>
-                <span class='invitation-status label-pending'>Pending</span>
               <% end %>
             </td>
           </tr>
