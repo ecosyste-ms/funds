@@ -228,10 +228,12 @@ class Invitation < ApplicationRecord
 
   def status
     return 'DELETED' if deleted_at.present?
+    return nil if data.blank?
     data['status']
   end
 
   def legacy_order_id
+    return nil if data.blank?
     data['legacyId']
   end
 end
