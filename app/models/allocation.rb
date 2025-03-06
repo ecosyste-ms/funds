@@ -6,6 +6,7 @@ class Allocation < ApplicationRecord
 
   scope :displayable, -> { where('funded_projects_count > 0') }
   scope :completed, -> { where.not(completed_at: nil) }
+  scope :not_completed, -> { where(completed_at: nil) }
 
   validates_uniqueness_of :slug, scope: :fund_id
 
