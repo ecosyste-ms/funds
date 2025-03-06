@@ -73,7 +73,7 @@ class Allocation < ApplicationRecord
   
     allocations, _, _ = total_score.zero? ? allocate_funds_evenly(scores) : allocate_funds_by_score(scores, total_score)
   
-    distribute_leftover_funds(allocations) unless total_score.zero?
+    distribute_leftover_funds(allocations, scores) unless total_score.zero?
   
     save_project_allocations(allocations, minimum_allocation, maxs, weights)
   end
@@ -115,6 +115,10 @@ class Allocation < ApplicationRecord
     end
   end
   
+  def max_allocation
+    (max_allocation_percentage * total_cents).to_i
+  end
+
   def allocate_funds_by_score(scores, total_score)
     allocations = []
     total_allocated = 0
@@ -123,6 +127,13 @@ class Allocation < ApplicationRecord
     scores.each do |score|
       allocation_amount = (score[:score] * total_cents) / total_score
       allocation_amount = (allocation_amount / 100) * 100 # Round to whole dollars
+  
+      # Cap allocation per project
+      if allocation_amount > max_allocation
+        leftover_funds += (allocation_amount - max_allocation)
+        allocation_amount = max_allocation
+      end
+  
       total_allocated += allocation_amount
   
       if allocation_amount < default_minimum_allocation
@@ -132,14 +143,42 @@ class Allocation < ApplicationRecord
       end
     end
   
+    # Redistribute any leftover funds
+    distribute_leftover_funds(allocations, scores) unless leftover_funds.zero?
+  
     [allocations, total_allocated, leftover_funds]
   end
   
-  def distribute_leftover_funds(allocations)
+  def max_allocation_percentage
+    read_attribute(:max_allocation_percentage) || 0.10 # Default to 10%
+  end
+  
+  def distribute_leftover_funds(allocations, scores)
     total_allocated = allocations.sum { |a| a[:allocation] }
     leftover = total_cents - total_allocated
   
-    allocations.first[:allocation] += leftover if leftover.positive?
+    return if leftover.zero?
+  
+    # Find projects that haven't been allocated anything yet
+    allocated_project_ids = allocations.map { |a| a[:project_id] }
+    unallocated_scores = scores.reject { |s| allocated_project_ids.include?(s[:project_id]) }
+  
+    # Sort by score to prioritize high-scoring projects
+    unallocated_scores.sort_by! { |s| -s[:score] }
+  
+    new_allocations = []
+  
+    unallocated_scores.each do |score|
+      break if leftover < default_minimum_allocation # Stop if not enough funds remain
+  
+      allocation_amount = [leftover, default_minimum_allocation].min
+      leftover -= allocation_amount
+  
+      new_allocations << { project_id: score[:project_id], allocation: allocation_amount, score: score[:score], funding_source_id: score[:funding_source_id] }
+    end
+  
+    # Add new allocations to existing ones
+    allocations.concat(new_allocations)
   end
   
   def save_project_allocations(allocations, minimum_allocation, maxs, weights)
@@ -214,7 +253,7 @@ class Allocation < ApplicationRecord
   end
 
   def find_possible_projects
-    fund.possible_projects.active.with_license
+    fund.possible_projects.active.with_license.includes(:funding_source)
   end
 
   def export_to_csv
