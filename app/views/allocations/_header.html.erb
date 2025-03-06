@@ -1,0 +1,32 @@
+<div class="fund-section-header mb-3 mb-md-5 d-flex justify-content-between align-items-center">
+  <h2 class="h1 extra-bold mb-0">
+    <%= @allocation.created_at.strftime('%B %d, %Y') %> 
+    <% if @allocation.completed? %>
+      <span class="badge bg-success">Completed</span>
+    <% elsif @allocation.latest? %>
+      <span class="badge bg-info">Latest</span>
+    <% end %>
+  </h2>
+
+  <div class="dropdown">
+    <a class="dropdown-toggle spesh-link" type="button" id="allocationsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+      <%= @allocation.created_at.strftime('%B %Y') %> 
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="allocationsDropdown">
+      <% grouped_allocations = @fund.allocations.order(created_at: :desc).group_by { |allocation| allocation.created_at.year } %>
+      <% grouped_allocations.each_with_index do |(year, allocations), index| %>
+        <li><h6 class="dropdown-header"><%= year %></h6></li>
+        <% allocations.each do |allocation| %>
+          <li>
+            <a class="dropdown-item" href="<%= fund_allocation_path(@fund, allocation) %>">
+              <%= allocation.created_at.strftime('%B %Y') %>
+            </a>
+          </li>
+        <% end %>
+        <% if index < grouped_allocations.size - 1 %>
+          <li><hr class="dropdown-divider"></li>
+        <% end %>
+      <% end %>
+    </ul>
+  </div>
+</div>
