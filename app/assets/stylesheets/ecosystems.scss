@@ -513,7 +513,7 @@ body {
 
 .purple-grad-bg  {
   background-color: $color-purple-dark;
-  background: linear-gradient(0deg, $color-purple-dark 50%, $color-purple 100%);
+  background: linear-gradient(0deg, $color-purple-dark 0%, $color-purple 50%);
   color: $color-white;
 }
 
