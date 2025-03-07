@@ -4,7 +4,7 @@
     <% if @allocation.completed? %>
       <span class="badge bg-success">Completed</span>
     <% elsif @allocation.latest? %>
-      <span class="badge bg-info">Latest</span>
+      <span class="badge bg-primary">Latest</span>
     <% end %>
   </h2>
 
@@ -15,7 +15,7 @@
     <ul class="dropdown-menu" aria-labelledby="allocationsDropdown">
       <% grouped_allocations = @fund.allocations.order(created_at: :desc).group_by { |allocation| allocation.created_at.year } %>
       <% grouped_allocations.each_with_index do |(year, allocations), index| %>
-        <li><h6 class="dropdown-header"><%= year %></h6></li>
+        <li><p class="dropdown-header"><%= year %></p></li>
         <% allocations.each do |allocation| %>
           <li>
             <a class="dropdown-item" href="<%= fund_allocation_path(@fund, allocation) %>">

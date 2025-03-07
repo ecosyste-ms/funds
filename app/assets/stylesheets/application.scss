@@ -94,9 +94,6 @@
       margin-right: 0;
     }
   }
-  .stat-card-title {
-    @include font-size(1.625rem);
-  }
 }
 
 .fund-section-header {
@@ -113,7 +110,12 @@
   .container {
     position: relative;
   }
+  .inverted-nav {
+    border-top: 3px solid $color-purple-dark;
+  }
 }
+
+
 
 .fund-logo {
   max-width: 100px;
@@ -182,9 +184,24 @@
 }
 
 .home-search__wrapper {
-  
   @include media-breakpoint-up(md) {
     display: flex;
     justify-content: center;
   }
+}
+
+.inverted-nav {
+	.nav-link {
+		color: $color-white;
+    &.disabled {
+      color: $color-purple-light;
+    }
+    &.active {
+      background-color: adjust-color($color-purple-dark, $saturation: -15%, $lightness: -15%);
+      border-bottom: 1px solid $color-purple;
+    }
+    &:hover, &:active, &:focus {
+      background-color: adjust-color($color-purple-dark, $saturation: -15%, $lightness: -7.5%);
+    }
+	}
 }
