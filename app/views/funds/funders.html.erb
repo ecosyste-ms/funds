@@ -5,23 +5,73 @@
 
 <div class="container">
   <div class="row">
-
-  <h2>Funded by</h2>
-  <div class="row mt-4 mb-5">
-    <% @fund.funders.each do |account| %>
-      <div class="col">
-        <a href="<%= "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{account[:slug]}" %>" class="block-link block-link--spesh">
-          <div class="fund-funder card text-center">
-            <div class="fund-funder__avatar card-img-top">
-              <%= image_tag(account[:image_url], class: 'img-fluid rounded-circle') %>
-            </div>
-            <div class="fund-funder__details card-body">
-              <h3 class="fund-funder__name card-title spesh-link"><%= account[:name] %></h3>
-              <p class="small card-text"><%= number_to_currency account[:amount] %></p>
-            </div>
+    <div class="fund-section-header mb-3 mb-md-5 d-flex justify-content-between align-items-center">
+      <h2 class="h1 extra-bold">Funders</h1>
+    </div>
+    <div class="col-xl-3">
+      <div class="fund-stat-bar fund-stat-bar--allocation-stat-bar mb-2 mb-md-3">
+        <div class="stat-card mb-2">
+          <div class="stat-card-body">
+            <span class="stat-card-title">todo: 5</span>
+            <span class="stat-card-text">Funders</span>
           </div>
-        </a>
-      </div>
-    <% end %>
+        </div>
+
+        <div class="stat-card mb-2">
+          <div class="stat-card-body">
+            <span class="stat-card-title">todo: 1</span>
+            <span class="stat-card-text">Repeat funders</span>
+          </div>
+        </div>
+
+        <div class="stat-card mb-2">
+          <div class="stat-card-body">
+            <span class="stat-card-title">todo: 4</span>
+            <span class="stat-card-text">One-off funders</span>
+          </div>
+        </div>
+      </div> 
+    </div>
+
+    <div class="col-xl-9">
+      <figure>
+        <div class="table-wrapper table-responsive-lg" role="group" tabindex="0" aria-labelledby="table-caption">
+          <table class="table">
+            <thead>
+              <tr>
+                <th># <span class="visually-hidden">Rank</span></th>
+                <th>Name</th>
+                <th>Total funded</th>
+                <th>Allocations</th>
+                <th>Profile</th>
+              </tr>
+            </thead>
+            <tbody>
+            
+
+            
+            <% @fund.funders.each_with_index do |account, i| %>
+              <tr class="">
+                <td><%= i + 1 %></td>
+                <td><%= image_tag(account[:image_url], class: 'img-fluid rounded-circle me-3', height: '36', width: '36') %><%= account[:name] %></td>
+                <td><%= number_to_currency account[:amount] %></td>
+                <td>
+                  todo: 3
+                </td>
+                <td>
+                <a href="<%= "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{account[:slug]}" %>" class="block-link block-link--spesh">Open Collective <%= bootstrap_icon 'box-arrow-up-right', width: 16, height: 16 %> </a>
+                </td>
+                
+              </tr>
+            <% end %>
+
+            </tbody>
+          </table>
+        </div>
+      </figure>
+    </div>
   </div>
 </div>
+
+
+

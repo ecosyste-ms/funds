@@ -1,11 +1,5 @@
-<div class="col-xl-3">
-  <div class="row mt-md-3">
-    <div class="col-md-5 col-xl-12">
-      <% if @allocation.completed? %>
-        <%= render 'allocations/completed_allocation_details' %>
-      <% else %>
-        <%= render 'allocations/allocation_details' %>
-      <% end %>
-    </div> 
-  </div> 
-</div>
+<% if @allocation.completed? %>
+  <%= render 'allocations/completed_allocation_details' %>
+<% else %>
+  <%= render 'allocations/allocation_details' %>
+<% end %>
