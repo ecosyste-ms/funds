@@ -18,7 +18,7 @@ class Admin::InvitationsController < Admin::ApplicationController
     @invitations = scope
       .select('invitations.*, projects.url, projects.name as project_name, funds.name as fund_name, funds.slug as fund_slug')
       .joins(project_allocation: [:project, :fund])
-      .includes(project_allocation: :project)
+      .includes(project_allocation: [:project, :fund])
 
     if params[:sort] == "amount"
       @invitations = @invitations.order("project_allocation.amount_cents #{params[:order] || 'asc'}")
