@@ -1,10 +1,24 @@
 class Admin::InvitationsController < Admin::ApplicationController
   def index
-    @invitations = Invitation
+    dates = Invitation.group_by_month(:created_at, reverse: true).count
+    @dates = dates.map { |date, count| [date, count] }.to_h
+
+    if params[:month] && params[:year]
+      month = params[:month].to_i
+      year = params[:year].to_i
+      @selected_date = Time.zone.local(year, month)
+    else
+      month = @dates.keys.first.month
+      year = @dates.keys.first.year
+      @selected_date = Time.zone.local(year, month)
+    end
+  
+    scope = Invitation.where(created_at: Time.zone.local(year, month)..Time.zone.local(year, month).end_of_month)
+
+    @invitations = scope
       .select('invitations.*, projects.url, projects.name as project_name, funds.name as fund_name, funds.slug as fund_slug')
       .joins(project_allocation: [:project, :fund])
       .includes(project_allocation: :project)
-      
 
     if params[:sort] == "amount"
       @invitations = @invitations.order("project_allocation.amount_cents #{params[:order] || 'asc'}")
