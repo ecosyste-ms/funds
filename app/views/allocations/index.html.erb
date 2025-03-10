@@ -1,0 +1,30 @@
+<% @meta_title = @fund.name %>
+<% @meta_description = @fund.description %>
+
+<%= render 'funds/header' %>
+
+<div class="container">
+  <div class="row">
+
+  <h2>Allocations</h2>
+
+  <div class="row mt-4 mb-5">
+    <% @fund.allocations.each do |allocation| %>
+      <div class="col">
+        <a href="<%= fund_allocation_path(@fund, allocation) %>" class="block-link
+block-link--spesh">
+          <div class="fund-funder card text-center">
+            <div class="fund-funder__avatar card-img-top">
+              <%= image_tag(allocation.fund.logo_url, class: 'img-fluid
+rounded-circle') %>
+            </div>
+            <div class="fund-funder__details card-body">
+              <h3 class="fund-funder__name card-title spesh-link"><%= allocation.to_s %></h3>
+              <p class="small card-text"><%= number_to_currency allocation.total_cents/100.0 %></p>
+            </div>
+          </div>
+        </a>
+      </div>
+    <% end %>
+  </div>
+</div>
