@@ -14,7 +14,7 @@
         Rejected: <%= @invitations.select { |i| i.rejected_at.present? }.count %> (<%= (@invitations.select { |i| i.rejected_at.present? }.count.to_f / @invitations.length * 100).round(2) %>%)
       </li>
       <li class="list-inline-item">
-        Rejected: <%= @invitations.select { |i| i.deleted_at.present? }.count %> (<%= (@invitations.select { |i| i.deleted_at.present? }.count.to_f / @invitations.length * 100).round(2) %>%)
+        Deleted: <%= @invitations.select { |i| i.deleted_at.present? }.count %> (<%= (@invitations.select { |i| i.deleted_at.present? }.count.to_f / @invitations.length * 100).round(2) %>%)
       </li>
       <li class="list-inline-item">
         Added funding.yml: <%= @invitations.select { |i| i.project.funding_links.any? }.count %> (<%= (@invitations.select { |i| i.project.funding_links.any? }.count.to_f / @invitations.length * 100).round(2) %>%)
@@ -86,7 +86,7 @@
                 <span class='invitation-status label-pending'>Pending</span>
               <% else %>
                 <span class='invitation-status label-info'>
-                  <%= link_to invitation.status, invitation.html_url %>
+                  <%= link_to invitation.status.try(:humanize), invitation.html_url %>
                 </span>
               <% end %>
             </td>

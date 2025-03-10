@@ -615,6 +615,10 @@ body {
   background-color: $color-grey-dark
 }
 
+.label-deleted{
+  background-color: $color-grey-light;
+}
+
 .tooltip {
 	max-width: 400px !important;
 	white-space: normal; 
