@@ -45,18 +45,25 @@
         
       </div>
     </div>
-    <% if @allocation %>
     <div class="row">
       <div class="col-12">
           <nav class="inverted-nav mt-2 pt-4">
-            <ul class="nav nav-pills">
+            <ul class="nav nav-pills me-3">
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="#">Allocations</a>
+                <a class="nav-link me-3 active" aria-current="page" href="<%= fund_path(@fund) %>">Overview</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link me-3" aria-current="page" href="<%= fund_allocations_path(@fund) %>">Allocations</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link me-3" aria-current="page" href="<%= funders_fund_path(@fund) %>">Funders</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link me-3" aria-current="page" href="<%= fund_projects_path(@fund) %>">Projects</a>
               </li>
             </ul>
           </nav>
       </div>
     </div>
-    <% end %>
   </div>
 </div>

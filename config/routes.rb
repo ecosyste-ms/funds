@@ -21,9 +21,10 @@ Rails.application.routes.draw do
     member do
       get :transactions
       get :donate
+      get :funders
       post :setup
     end
-    resources :allocations, only: [:show] do |allocations|
+    resources :allocations, only: [:show, :index] do |allocations|
       member do
         get :export
         get :export_github_sponsors

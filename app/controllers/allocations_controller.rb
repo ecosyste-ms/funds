@@ -1,6 +1,12 @@
 require 'csv'
 
 class AllocationsController < ApplicationController
+  def index
+    @fund = Fund.find_by!(slug: params[:fund_id])
+    @allocations = @fund.allocations.order(:created_at)
+    @pagy, @allocations = pagy(@allocations)
+  end
+
   def show
     @fund = Fund.find_by!(slug: params[:fund_id])
     @allocation = @fund.allocations.find_by!(slug: params[:id])

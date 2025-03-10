@@ -55,4 +55,10 @@ class FundsController < ApplicationController
     @transactions = @fund.transactions
     @pagy, @transactions = pagy(@transactions)
   end
+
+
+  def funders
+    @fund = Fund.find_by!(slug: params[:id])
+    @funders = @fund.funders
+  end
 end
