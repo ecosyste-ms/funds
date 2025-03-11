@@ -2,6 +2,20 @@
   <div class="row">
     <h2>Invitations Admin</h2>
 
+    <div class="dropdown mb-3">
+      <button class="btn btn-secondary dropdown-toggle" type="button" id="monthYearDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        <%= @selected_date.strftime('%B %Y') %>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="monthYearDropdown">
+        <% @dates.keys.each do |date| %>
+          <% parsed_date = Date.parse(date.to_s) %>
+          <li>
+            <%= link_to "#{parsed_date.strftime('%B %Y')}", admin_invitations_path(month: parsed_date.month, year: parsed_date.year), class: "dropdown-item" %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+
     <ul class='list-inline'>
       <li class="list-inline-item">Total: <%= @invitations.length %></li>
       <li class="list-inline-item">
@@ -86,7 +100,7 @@
                 <span class='invitation-status label-pending'>Pending</span>
               <% else %>
                 <span class='invitation-status label-info'>
-                  <%= link_to invitation.status.try(:humanize), invitation.html_url %>
+                  <%= link_to invitation.status.try(:humanize), invitation.html_url, class: 'text-decoration-none' %>
                 </span>
               <% end %>
             </td>

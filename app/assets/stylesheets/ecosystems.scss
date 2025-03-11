@@ -622,7 +622,16 @@ body {
 }
 
 .label-deleted{
-  background-color: $color-grey-light;
+  background-color: $color-grey;
+  color: $color-black !important;
+}
+
+.label-info {
+  background-color: $color-orange;
+  a {
+    // remove box shadow
+    box-shadow: none;
+  }
 }
 
 .tooltip {

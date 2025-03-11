@@ -169,6 +169,8 @@ GEM
     google-protobuf (4.30.0-x86_64-linux)
       bigdecimal
       rake (>= 13)
+    groupdate (6.5.1)
+      activesupport (>= 7)
     hashdiff (1.1.2)
     htmlentities (4.3.4)
     i18n (1.14.7)
@@ -411,6 +413,7 @@ DEPENDENCIES
   faraday-follow_redirects
   faraday-multipart
   faraday-retry
+  groupdate
   jbuilder
   jquery-rails
   mocha
@@ -503,6 +506,7 @@ CHECKSUMS
   google-protobuf (4.30.0-x86-linux) sha256=d1d709b096ca38621ee611111025a28a2cec15110658532115086f4dd0bdd31a
   google-protobuf (4.30.0-x86_64-darwin) sha256=135195ff560031018e31b1b7b8cb935e60e3731c2ec257a1a7750e3bd3b7a7d9
   google-protobuf (4.30.0-x86_64-linux) sha256=a5b3f1a7e7bc832249a136d20c2d520e693c2340d682e32bc73fe8e28190148d
+  groupdate (6.5.1) sha256=a0a78d051a510d61864fe987f00089d8f03739741eadc41e6ad4ea6f786da110
   hashdiff (1.1.2) sha256=2c30eeded6ed3dce8401d2b5b99e6963fe5f14ed85e60dd9e33c545a44b71a77
   htmlentities (4.3.4) sha256=125a73c6c9f2d1b62100b7c3c401e3624441b663762afa7fe428476435a673da
   i18n (1.14.7) sha256=ceba573f8138ff2c0915427f1fc5bdf4aa3ab8ae88c8ce255eb3ecf0a11a5d0f
