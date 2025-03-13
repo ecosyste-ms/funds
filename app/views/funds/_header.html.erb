@@ -22,21 +22,27 @@
           <div class="fund-stat-bar mb-2 mb-md-3">
             <div class="stat-card mb-2">
               <div class="stat-card-body">
-                <span class="stat-card-title"><%= number_to_currency (@allocation.try(:total_cents) || 0)/100.0 %></span>
+                <span class="stat-card-title">
+                  <%= number_to_currency @fund.total_donation_amount %>
+                </span>
                 <span class="stat-card-text small">Total funded</span>
               </div>
             </div>
 
             <div class="stat-card mb-2">
               <div class="stat-card-body">
-                <span class="stat-card-title"><%= @allocation.try(:funders_count) || 0 %></span>
+                <span class="stat-card-title">
+                  <%= @fund.funders.length %>
+                </span>
                 <span class="stat-card-text small">Funders</span>
               </div>
             </div>
 
             <div class="stat-card mb-2">
               <div class="stat-card-body">
-                <span class="stat-card-title"><%= @allocation.try(:funded_projects_count) || 0 %></span>
+                <span class="stat-card-title">
+                  <%= @fund.funded_projects_count %>
+                </span>
                 <span class="stat-card-text small">Projects</span>
               </div>
             </div>
@@ -50,18 +56,16 @@
           <nav class="inverted-nav mt-2 pt-4">
             <ul class="nav nav-pills me-3">
               <li class="nav-item">
-                <a class="nav-link me-3 active" aria-current="page" href="<%= fund_path(@fund) %>">Overview</a>
+                <a class="nav-link me-3 <%= 'active' if action_name == 'show' %>" aria-current="page" href="<%= fund_path(@fund) %>">Overview</a>
               </li>
-              <!--
               <li class="nav-item">
-                <a class="nav-link me-3" aria-current="page" href="<%= fund_allocations_path(@fund) %>">Allocations</a>
+                <a class="nav-link me-3 <%= 'active' if controller_name == 'allocations' %>" aria-current="page" href="<%= fund_allocations_path(@fund) %>">Allocations</a>
               </li> 
-              -->
               <li class="nav-item">
-                <a class="nav-link me-3" aria-current="page" href="<%= funders_fund_path(@fund) %>">Funders</a>
+                <a class="nav-link me-3 <%= 'active' if action_name == 'funders' %>" aria-current="page" href="<%= funders_fund_path(@fund) %>">Funders</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link me-3" aria-current="page" href="<%= fund_projects_path(@fund) %>">Projects</a>
+                <a class="nav-link me-3 <%= 'active' if controller_name == 'projects' %>" aria-current="page" href="<%= fund_projects_path(@fund) %>">Projects</a>
               </li>
             </ul>
           </nav>

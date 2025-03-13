@@ -668,10 +668,54 @@ class Fund < ApplicationRecord
     transactions.donations.distinct.pluck(:account_name)
   end
 
+  def largest_donation_amount
+    transactions.donations.maximum(:amount)
+  end
+
+  def average_donation_amount
+    transactions.donations.average(:amount)
+  end
+
+  def total_donation_amount
+    transactions.donations.sum(:amount)
+  end
+
   def funders
-    transactions.donations.map{|t| {name: t.account_name, slug: t.account, image_url: t.account_image_url, amount: t.amount}}
+    @funders ||= transactions.donations.map{|t| {name: t.account_name, slug: t.account, image_url: t.account_image_url, amount: t.amount}}
       .group_by { |t| t[:slug] }
-      .map { |slug, txns| { slug: slug, name: txns.first[:name], image_url: txns.first[:image_url], amount: txns.sum { |t| t[:amount] } } }
+      .map { |slug, txns| { slug: slug, name: txns.first[:name], image_url: txns.first[:image_url], donations_count: txns.length, amount: txns.sum { |t| t[:amount] } } }
       .sort_by { |f| -f[:amount] }
+  end
+
+  def repeat_funders
+    funders.select{|f| f[:donations_count] > 1}
+  end
+
+  def single_funders
+    funders.select{|f| f[:donations_count] == 1}
+  end
+
+  def funded_project_ids
+    project_allocations.paid.pluck(:project_id).uniq
+  end
+
+  def funded_projects
+    Project.where(id: funded_project_ids)
+  end
+
+  def funded_projects_count
+    funded_project_ids.length
+  end
+
+  def funded_project_downloads
+    funded_projects.sum(:total_downloads)
+  end
+
+  def funded_project_dependent_repos
+    funded_projects.sum(:total_dependent_repos)
+  end
+
+  def funded_project_dependent_packages
+    funded_projects.sum(:total_dependent_packages)
   end
 end

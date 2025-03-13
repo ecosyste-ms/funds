@@ -1,6 +1,9 @@
-<div class="container-sm">
-  <h1><%= link_to @fund, fund_path(@fund) %>: Possible Projects</h1>
+<% @meta_title = @fund.name %>
+<% @meta_description = @fund.description %>
 
+<%= render 'funds/header' %>
+
+<div class="container-sm">
   <%= render @projects %>
   <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>  
 </div>
