@@ -718,4 +718,8 @@ class Fund < ApplicationRecord
   def funded_project_dependent_packages
     funded_projects.sum(:total_dependent_packages)
   end
+
+  def latest_allocation
+    allocations.order(created_at: :desc).first
+  end
 end

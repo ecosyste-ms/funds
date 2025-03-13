@@ -56,10 +56,10 @@
           <nav class="inverted-nav mt-2 pt-4">
             <ul class="nav nav-pills me-3">
               <li class="nav-item">
-                <a class="nav-link me-3 <%= 'active' if action_name == 'show' %>" aria-current="page" href="<%= fund_path(@fund) %>">Overview</a>
+                <a class="nav-link me-3 <%= 'active' if controller_name == 'funds' && action_name == 'show' %>" aria-current="page" href="<%= fund_path(@fund) %>">Overview</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link me-3 <%= 'active' if controller_name == 'allocations' %>" aria-current="page" href="<%= fund_allocations_path(@fund) %>">Allocations</a>
+                <a class="nav-link me-3 <%= 'active' if controller_name == 'allocations' %>" aria-current="page" href="<%= fund_allocation_path(@fund, @fund.latest_allocation) %>">Allocations</a>
               </li> 
               <li class="nav-item">
                 <a class="nav-link me-3 <%= 'active' if action_name == 'funders' %>" aria-current="page" href="<%= funders_fund_path(@fund) %>">Funders</a>
