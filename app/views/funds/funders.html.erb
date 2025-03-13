@@ -12,21 +12,27 @@
       <div class="fund-stat-bar fund-stat-bar--allocation-stat-bar mb-2 mb-md-3">
         <div class="stat-card mb-2">
           <div class="stat-card-body">
-            <span class="stat-card-title">todo: 5</span>
+            <span class="stat-card-title">
+              <%= @fund.funders.length %>
+            </span>
             <span class="stat-card-text">Funders</span>
           </div>
         </div>
 
         <div class="stat-card mb-2">
           <div class="stat-card-body">
-            <span class="stat-card-title">todo: 1</span>
+            <span class="stat-card-title">
+              <%= @fund.repeat_funders.length %>
+            </span>
             <span class="stat-card-text">Repeat funders</span>
           </div>
         </div>
 
         <div class="stat-card mb-2">
           <div class="stat-card-body">
-            <span class="stat-card-title">todo: 4</span>
+            <span class="stat-card-title">
+              <%= @fund.single_funders.length %>
+            </span>
             <span class="stat-card-text">One-off funders</span>
           </div>
         </div>
@@ -42,7 +48,7 @@
                 <th># <span class="visually-hidden">Rank</span></th>
                 <th>Name</th>
                 <th>Total funded</th>
-                <th>Allocations</th>
+                <th>Donations</th>
                 <th>Profile</th>
               </tr>
             </thead>
@@ -56,7 +62,7 @@
                 <td><%= image_tag(account[:image_url], class: 'img-fluid rounded-circle me-3', height: '36', width: '36') %><%= account[:name] %></td>
                 <td><%= number_to_currency account[:amount] %></td>
                 <td>
-                  todo: 3
+                  <%= account[:donations_count] %>
                 </td>
                 <td>
                 <a href="<%= "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{account[:slug]}" %>" class="block-link block-link--spesh">Open Collective <%= bootstrap_icon 'box-arrow-up-right', width: 16, height: 16 %> </a>

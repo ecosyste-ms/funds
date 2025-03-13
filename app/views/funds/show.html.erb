@@ -125,7 +125,9 @@
 
         <div class="stat-card mb-4">
           <div class="stat-card-body">
-            <span class="stat-card-title stat-card-title--large">todo: 98</span>
+            <span class="stat-card-title stat-card-title--large">
+              <%= @fund.funders.length %>
+            </span>
             <span class="stat-card-text">Funders</span>
           </div>
         </div>
@@ -135,7 +137,9 @@
 
             <div class="stat-card mb-2">
               <div class="stat-card-body">
-                <span class="stat-card-title stat-card-title--small">todo: 34</span>
+                <span class="stat-card-title stat-card-title--small">
+                  <%= @fund.repeat_funders.length %>
+                </span>
                 <span class="stat-card-text stat-card-text--small">Repeat funders</span>
               </div>
             </div>
@@ -145,7 +149,9 @@
 
             <div class="stat-card mb-2">
               <div class="stat-card-body">
-                <span class="stat-card-title stat-card-title--small">todo: 64</span>
+                <span class="stat-card-title stat-card-title--small">
+                  <%= @fund.single_funders.length %>
+                </span>
                 <span class="stat-card-text stat-card-text--small">One-off funders</span>
               </div>
             </div>

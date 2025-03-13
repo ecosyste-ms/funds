@@ -669,9 +669,17 @@ class Fund < ApplicationRecord
   end
 
   def funders
-    transactions.donations.map{|t| {name: t.account_name, slug: t.account, image_url: t.account_image_url, amount: t.amount}}
+    @funders ||= transactions.donations.map{|t| {name: t.account_name, slug: t.account, image_url: t.account_image_url, amount: t.amount}}
       .group_by { |t| t[:slug] }
-      .map { |slug, txns| { slug: slug, name: txns.first[:name], image_url: txns.first[:image_url], amount: txns.sum { |t| t[:amount] } } }
+      .map { |slug, txns| { slug: slug, name: txns.first[:name], image_url: txns.first[:image_url], donations_count: txns.length, amount: txns.sum { |t| t[:amount] } } }
       .sort_by { |f| -f[:amount] }
+  end
+
+  def repeat_funders
+    funders.select{|f| f[:donations_count] > 1}
+  end
+
+  def single_funders
+    funders.select{|f| f[:donations_count] == 1}
   end
 end

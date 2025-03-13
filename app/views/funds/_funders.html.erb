@@ -8,7 +8,7 @@
 		<th># <span class="visually-hidden">Rank</span></th>
 		<th>Name</th>
 		<th>Total funded</th>
-		<th>Allocations</th>
+		<th>Donations</th>
 		<th>Profile</th>
 	  </tr>
 	</thead>
@@ -22,7 +22,7 @@
 		<td><%= image_tag(account[:image_url], class: 'img-fluid rounded-circle me-3', height: '36', width: '36') %><%= account[:name] %></td>
 		<td><%= number_to_currency account[:amount] %></td>
 		<td>
-		  todo: 3
+		  <%= account[:donations_count] %>
 		</td>
 		<td>
 		<a href="<%= "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{account[:slug]}" %>" class="block-link block-link--spesh">Open Collective <%= bootstrap_icon 'box-arrow-up-right', width: 16, height: 16 %> </a>
