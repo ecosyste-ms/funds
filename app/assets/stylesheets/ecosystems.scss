@@ -702,6 +702,12 @@ body {
 	a {
 	  text-decoration: none;
 	  color: $color-black;
+    &:hover,
+    &:active,
+    &:focus {
+      color: $color-purple-dark;
+      text-decoration: underline;
+    }
 	}
 }
   
@@ -713,6 +719,9 @@ body {
   
 .listing__details {
 	@include font-size(0.875rem);
+  .badge {
+    @include font-size(1em);
+  }
 }
   
 .listing__time {

@@ -1,41 +1,28 @@
-<div class="card mb-3 project d-flex" id="project_<%= project.id %>">
-  <div class="card-body pb-1">
-    <div class="d-flex">
-      
-      <div class="flex-grow-1 ms-3 text-break">
-        <h5 class='card-title'>
-          <%= link_to project, project_path(project) %>
-        </h5>
-      
-        <p class="card-subtitle mb-2 text-muted">
-          <%= project.description %>
-        </p>
 
-        <% if project.keywords.any? %>
-          <p>
-            <% project.keywords.each do |keyword| %>
-              <span class="badge bg-light text-dark">
-                <%= keyword %>
-              </span>
-            <% end %>
-          </p>
-        <% end %>
 
-        
-        <p class="card-subtitle mb-2 text-muted"><i><small>
-          <% if project.published_at %>
-            Released: <%= project.published_at.strftime("%d %b %Y") %>
-            - 
-            <% end %>
-          <i class="bi bi-star-fill"></i> <%= number_with_delimiter project.stars %> 
-        </small></i></p>
-        
-      </div>
-      <div class="flex-shrink-0">
-        <a href='<%= project.owner_html_url %>' target='_blank'>
-          <img src="<%= project.avatar_url %>" class="rounded ms-3 mb-3" height='60' width='60' onerror="this.style.display='none'">
-        </a>
-      </div>  
+<div class="card mb-4 pb-4 listing d-flex flex-row align-items-center">
+  <a href='<%= project.owner_html_url %>' target='_blank' class="align-self-start mt-3">
+    <img src="<%= project.avatar_url %>" height='60' width='60' onerror="this.style.display='none'"  >
+  </a>
+	<div class="card-body p-0 ms-3">
+    <div class="text-muted float-end listing__time">
+      <% if project.published_at %>
+        Released: <%= project.published_at.strftime("%d %b %Y") %>
+      <% end %>
     </div>
-  </div>
+		<h3 class="card-title listing__title mt-3">
+		 <%= link_to project, project_path(project) %> <span class="listing__meta"><%= project.description %></span>
+		</h3>
+		<div class="mt-3 listing__details">
+      <div class="d-flex flex-wrap align-items-top">
+        <% if project.keywords.any? %>
+          <% project.keywords.each do |keyword| %>
+            <span class="badge bg-light text-dark me-2 mb-2">
+              <%= keyword %>
+            </span>
+          <% end %>
+      <% end %>
+      </div>
+		</div>
+	</div>
 </div>
