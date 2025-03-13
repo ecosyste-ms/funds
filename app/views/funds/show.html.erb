@@ -20,7 +20,9 @@
 
         <div class="stat-card mb-4">
           <div class="stat-card-body">
-            <span class="stat-card-title stat-card-title--large">todo: $1,638.234.09</span>
+            <span class="stat-card-title stat-card-title--large">
+              <%= number_to_currency @fund.total_donation_amount %>
+            </span>
             <span class="stat-card-text">Total funded</span>
           </div>
         </div>
@@ -30,7 +32,9 @@
 
             <div class="stat-card mb-2">
               <div class="stat-card-body">
-                <span class="stat-card-title stat-card-title--small">todo: $38.234.09</span>
+                <span class="stat-card-title stat-card-title--small">
+                  <%= number_to_currency @fund.average_donation_amount %>
+                </span>
                 <span class="stat-card-text stat-card-text--small">Average donation</span>
               </div>
             </div>
@@ -40,7 +44,9 @@
 
             <div class="stat-card mb-2">
               <div class="stat-card-body">
-                <span class="stat-card-title stat-card-title--small">todo: $1,638.234.09</span>
+                <span class="stat-card-title stat-card-title--small">
+                  <%= number_to_currency @fund.largest_donation_amount %>
+                </span>
                 <span class="stat-card-text stat-card-text--small">Largest donation</span>
               </div>
             </div>
@@ -50,7 +56,9 @@
 
             <div class="stat-card mb-2">
               <div class="stat-card-body">
-                <span class="stat-card-title stat-card-title--small">todo: 3</span>
+                <span class="stat-card-title stat-card-title--small">
+                  <%= @fund.allocations.count %>
+                </span>
                 <span class="stat-card-text stat-card-text--small">Allocations</span>
               </div>
             </div>
@@ -72,7 +80,9 @@
 
         <div class="stat-card mb-4">
           <div class="stat-card-body">
-            <span class="stat-card-title stat-card-title--large">todo: 224</span>
+            <span class="stat-card-title stat-card-title--large">
+              <%= @fund.funded_projects_count %>
+            </span>
             <span class="stat-card-text">Projects</span>
           </div>
         </div>
@@ -82,7 +92,9 @@
 
             <div class="stat-card mb-2">
               <div class="stat-card-body">
-                <span class="stat-card-title stat-card-title--small">todo: 2,118,183</span>
+                <span class="stat-card-title stat-card-title--small">
+                  <%= number_with_delimiter @fund.funded_project_downloads %>
+                </span>
                 <span class="stat-card-text stat-card-text--small">Downloads</span>
               </div>
             </div>
@@ -92,7 +104,9 @@
 
             <div class="stat-card mb-2">
               <div class="stat-card-body">
-                <span class="stat-card-title stat-card-title--small">todo: 223</span>
+                <span class="stat-card-title stat-card-title--small">
+                  <%= number_with_delimiter @fund.funded_project_dependent_repos %>
+                </span>
                 <span class="stat-card-text stat-card-text--small">Dependent repos</span>
               </div>
             </div>
@@ -102,7 +116,9 @@
 
             <div class="stat-card mb-2">
               <div class="stat-card-body">
-                <span class="stat-card-title stat-card-title--small">todo: 554</span>
+                <span class="stat-card-title stat-card-title--small">
+                  <%= number_with_delimiter @fund.funded_project_dependent_packages %>
+                </span>
                 <span class="stat-card-text stat-card-text--small">Dependent packages</span>
               </div>
             </div>
