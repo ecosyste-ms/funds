@@ -176,16 +176,16 @@
         </div>
 
         <div class="mt-4">
-          <h3 class="h4 mb-4">Top funders</h3>
+          <h3 class="h4 mb-3">Top funders</h3>
           <% @fund.funders.take(3).each do |account| %>
             <!-- Your code for each account -->
-            <div class="d-flex align-items-center mb-4">
+            <div class="d-flex align-items-center mb-3">
             <div class="funder-icon me-2 d-flex align-items-center justify-content-center">
               <a href="<%= "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{account[:slug]}" %>"><%= image_tag(account[:image_url], class: 'img-fluid rounded-circle me-2', height: '56', width: '56') %></a>
             </div>
-            <div class="mb-3  ">
+            <div class="">
               <div><a href="<%= "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{account[:slug]}" %>" class="spesh-link fw-bold"><%= account[:name] %></a></div>
-              <span><%= number_to_currency account[:amount] %></span>
+              <span class="small"><%= number_to_currency account[:amount] %></span>
             </div>
           </div>
           <% end %>
