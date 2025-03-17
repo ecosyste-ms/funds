@@ -37,6 +37,10 @@ class ProjectAllocation < ApplicationRecord
     funding_source && funding_source.approved?
   end
 
+  def minimum_funding_source_amount_met?
+    funding_source && funding_source.minimum_donation_ammount_cents <= amount_cents
+  end
+
   def is_osc_collective?
     funding_source && funding_source.platform == 'opencollective.com' && funding_source.host == 'opensource'
   end
@@ -89,7 +93,7 @@ class ProjectAllocation < ApplicationRecord
       puts "  Sending to non-OSC collective: #{funding_source.name}"
       send_draft_expense_invitation_to_collective(collective_slug, amount_cents, non_osc_collective_expense_invite_description)
       update!(paid_at: Time.now)
-    elsif approved_funding_source?
+    elsif approved_funding_source? && minimum_funding_source_amount_met?
       puts "  Sending to approved funding source: #{funding_source.url}"
       proxy_collective = find_or_create_proxy_collective(funding_source.url)
       proxy_collective.set_payout_method
