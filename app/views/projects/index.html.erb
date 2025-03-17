@@ -3,7 +3,39 @@
 
 <%= render 'funds/header' %>
 
-<div class="container-sm">
-  <%= render @projects %>
-  <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>  
+
+<div class="container">
+<div class="fund-section-header mb-3 mb-md-5 d-flex justify-content-between align-items-center">
+  <h2 class="h1 extra-bold mb-0">
+    Projects
+  </h2>
+</div>
+  <div class="row">
+    <div class="col-lg-3">
+      <p>There are 1231 projects in the <%= @fund.name %> ecosystem. We have invited 245 for funding, of which 98 have accepted.</p>
+      <p>Funding invitations are based on the amount of donations available in an allocation. Read more about how ecosyste.ms funding works <a href="<%= overview_path %>" class="spesh-link">in our overview</a></p>
+    </div>
+    <div class="col-lg-9">
+      <div class="table-wrapper table-responsive-lg" role="group" tabindex="0" aria-labelledby="table-caption">
+        <figure>
+          <table class="table">
+          <thead>
+            <tr>
+            <th># <span class="visually-hidden">Rank</span></th>
+            <th>Project</th>
+            <th>Amount</th>
+            <th>Downloads</th>
+            <th>Dependent Repos</th>
+            <th>Dependent Packages</th>
+            </tr>
+          </thead>
+          <tbody>
+            <%= render @projects %>
+          </tbody>
+          </table>
+        </figure>
+        <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>  
+      </div>
+    </div>
+  </div>
 </div>
