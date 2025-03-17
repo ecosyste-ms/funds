@@ -696,7 +696,7 @@ class Fund < ApplicationRecord
   end
 
   def funded_project_ids
-    project_allocations.paid.pluck(:project_id).uniq
+    project_allocations.funding_not_rejected.paid.pluck(:project_id).uniq
   end
 
   def funded_projects

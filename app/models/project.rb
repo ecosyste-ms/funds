@@ -855,4 +855,8 @@ class Project < ApplicationRecord
     return committer_emails.first if committer_emails.present?
     return nil
   end
+
+  def total_allocated
+    project_allocations.sum(&:amount_cents)
+  end
 end

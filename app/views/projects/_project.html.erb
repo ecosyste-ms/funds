@@ -5,7 +5,7 @@
   </td>
 
 	<td>
-    $1,232,232
+    <%= number_to_currency(project.total_allocated / 100.0) %>
 	</td>
   <td>
     <%= number_to_human(project.total_downloads, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %>
