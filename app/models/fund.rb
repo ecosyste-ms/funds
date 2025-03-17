@@ -695,8 +695,12 @@ class Fund < ApplicationRecord
     funders.select{|f| f[:donations_count] == 1}
   end
 
+  def attempted_project_count
+    project_allocations.pluck(:project_id).uniq.length
+  end
+
   def funded_project_ids
-    project_allocations.paid.pluck(:project_id).uniq
+    project_allocations.funding_not_rejected.paid.pluck(:project_id).uniq
   end
 
   def funded_projects

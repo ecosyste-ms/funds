@@ -3,7 +3,39 @@
 
 <%= render 'funds/header' %>
 
-<div class="container-sm">
-  <%= render @projects %>
-  <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>  
+
+<div class="container">
+<div class="fund-section-header mb-3 mb-md-5 d-flex justify-content-between align-items-center">
+  <h2 class="h1 extra-bold mb-0">
+    Projects
+  </h2>
+</div>
+  <div class="row">
+    <div class="col-lg-3">
+      <p>We’ve sourced, indexed, and packaged millions of open source components into curated funds dedicated to supporting the work of the most critical projects in their respective ecosystems.</p>
+      <p>We’ve identified <strong><%= number_with_delimiter @fund.possible_projects.count %></strong> projects critical to the <%= @fund.name %> ecosystem, of which we have distributed <strong>$<%= @fund.total_distributed_cents/100.0 %></strong> to the top <strong><%= @fund.funded_projects_count %></strong>.</p>
+      <p>Read more about how ecosyste.ms funding works <a href="<%= overview_path %>" class="spesh-link">in our overview</a></p>
+    </div>
+    <div class="col-lg-9">
+      <div class="table-wrapper table-responsive-lg" role="group" tabindex="0" aria-labelledby="table-caption">
+        <figure>
+          <table class="table">
+          <thead>
+            <tr>
+              <th>Project</th>
+              <th>Amount</th>
+              <th>Downloads</th>
+              <th>Dependent Repos</th>
+              <th>Dependent Packages</th>
+            </tr>
+          </thead>
+          <tbody>
+            <%= render @projects %>
+          </tbody>
+          </table>
+        </figure>
+        <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>  
+      </div>
+    </div>
+  </div>
 </div>
