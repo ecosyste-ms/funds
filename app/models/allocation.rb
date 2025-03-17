@@ -337,7 +337,8 @@ class Allocation < ApplicationRecord
   end
 
   def transaction_start_date
-    created_at - 1.month
+    "1st december 2024".to_date # temporary fix for the date issue
+    # created_at - 1.month
   end
 
   def transaction_end_date
