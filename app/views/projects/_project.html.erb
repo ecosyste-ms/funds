@@ -1,23 +1,20 @@
 <tr class="">
-	<td>1</td>
 	<td>
-
-      <img src="<%= project.avatar_url %>" height='36' width='36' onerror="this.style.display='none'" class="me-3" >
-
+    <img src="<%= project.avatar_url %>" height='36' width='36' onerror="this.style.display='none'" class="me-3" >
     <%= link_to project, project.url %> 
   </td>
 
 	<td>
     $1,232,232
 	</td>
-	<td>
-	  938M
-	</td>
   <td>
-    181k 
+    <%= number_to_human(project.total_downloads, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %>
   </td>
   <td>
-    236k
-	</td>
+    <%= number_to_human(project.total_dependent_repos, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %>
+  </td>
+  <td>
+    <%= number_to_human(project.total_dependent_packages, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %>
+  </td>
 </tr>
 
