@@ -12,7 +12,7 @@
 </div>
   <div class="row">
     <div class="col-lg-3">
-      <p>There are 1231 projects in the <%= @fund.name %> ecosystem. We have invited 245 for funding, of which 98 have accepted.</p>
+      <p>There are <%= number_with_delimiter @fund.possible_projects.count %> critical projects in the <%= @fund.name %> ecosystem. We have invited <%= @fund.attempted_project_count %> for funding, of which <%= @fund.funded_projects_count %> have accepted.</p>
       <p>Funding invitations are based on the amount of donations available in an allocation. Read more about how ecosyste.ms funding works <a href="<%= overview_path %>" class="spesh-link">in our overview</a></p>
     </div>
     <div class="col-lg-9">
