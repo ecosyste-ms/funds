@@ -15,7 +15,6 @@
         <table class="table">
         <thead>
           <tr>
-            <th># <span class="visually-hidden">Rank</span></th>
             <th>Project</th>
             <th>Downloads</th>
             <th>Dependent Repos</th>
@@ -23,12 +22,11 @@
           </tr>
         </thead>
         <tbody>
-        <%= render collection: @projects, partial: 'blank_slate_projects' %>
-
+          <%= render partial: 'blank_slate_projects', collection: @projects, as: :project %>
         </tbody>
         </table>
       </figure>
-      
+      <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>  
     </div>
     </div>
 </div>

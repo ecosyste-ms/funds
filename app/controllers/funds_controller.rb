@@ -20,6 +20,9 @@ class FundsController < ApplicationController
                                                              .where('amount_cents >= 1')
                                                              .joins(:project)
                                                              .select('project_allocations.*, projects.name as project_name, projects.url as project_url, projects.total_downloads as project_downloads, projects.total_dependent_repos as project_dependent_repos, projects.total_dependent_packages as project_dependent_packages, projects.funding_rejected as project_funding_rejected')
+    else
+      @projects = @fund.possible_projects.active.with_license.order('total_downloads desc, total_dependent_repos desc, total_dependent_packages desc').limit(1000)
+      @pagy, @projects = pagy(@projects)
     end
   end
 
