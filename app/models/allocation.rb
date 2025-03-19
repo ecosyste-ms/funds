@@ -320,6 +320,14 @@ class Allocation < ApplicationRecord
     end
   end
 
+  def total_github_sponsors_amount
+    project_allocations.select { |pa| pa.funding_source&.platform == 'github.com' }.sum(&:amount_cents)
+  end
+
+  def self.total_github_sponsors_amount(allocations)
+    allocations.flat_map(&:project_allocations).select { |pa| pa.funding_source&.platform == 'github.com' }.sum(&:amount_cents)
+  end
+
   def self.github_sponsors_csv_export(allocations)
     CSV.generate do |csv|
       csv << ['Maintainer username', 'Sponsorship amount in USD']
