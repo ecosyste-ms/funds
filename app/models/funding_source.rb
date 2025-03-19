@@ -124,7 +124,7 @@ class FundingSource < ApplicationRecord
     response = conn.get
     return unless response.success?
     self.collective = JSON.parse(response.body)
-    self.save
+    self.save if changed?
   end
 
   def fetch_github_sponsors
@@ -140,7 +140,7 @@ class FundingSource < ApplicationRecord
     response = conn.get
     return unless response.success?
     self.github_sponsors = JSON.parse(response.body)
-    self.save
+    self.save if changed?
   rescue
     nil
   end
