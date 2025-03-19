@@ -27,8 +27,11 @@ class ProjectAllocation < ApplicationRecord
   def update_funding_source
     return if Time.now > allocation_payout_date
     return if project.funding_rejected?
-    return unless project.funding_source && project.funding_source.approved?
-    self.funding_source_id = project.funding_source_id
+    if project.funding_source && project.funding_source.approved?
+      self.funding_source_id = project.funding_source_id
+    else
+      self.funding_source_id = nil
+    end
     save if changed?
   end
 
