@@ -751,8 +751,14 @@ class Project < ApplicationRecord
     'communitybridge.org', 'tidelift.com', 'buymeacoffee.com', 'paypal.com', 'paypal.me','givebutter.com', 'polar.sh']
   end
 
+  def extract_funding_domain(url)
+    URI.parse(url).host.gsub(/^www\./, '').gsub('paypal.me', 'paypal.com')
+  rescue
+    nil
+  end
+
   def unique_funding_domains
-    funding_links.map{|u| URI.parse(u).host.gsub(/^www\./, '').gsub('paypal.me', 'paypal.com') rescue nil }.compact.uniq
+    funding_links.map{|u| extract_funding_domain(u) }.compact.uniq
   end
 
   def preferred_funding_platform
@@ -794,15 +800,15 @@ class Project < ApplicationRecord
 
   def find_or_create_funding_source
     if preferred_funding_link.present?
-      set_funding_source(preferred_funding_link, preferred_funding_platform)
+      set_funding_source(preferred_funding_link)
     else
       self.update(funding_source_id: nil)
     end
   end
 
-  def set_funding_source(url, platform)
+  def set_funding_source(url)
     source = FundingSource.find_or_initialize_by(url: url.strip.chomp).tap do |fs|
-      fs.platform = platform
+      fs.platform = extract_funding_domain(url)
       fs.save
     end
     self.update(funding_source_id: source.id) if source.persisted?
