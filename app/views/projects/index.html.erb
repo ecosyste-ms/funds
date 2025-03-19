@@ -13,7 +13,7 @@
   <div class="row">
     <div class="col-lg-3">
       <p>We’ve sourced, indexed, and packaged millions of open source components into curated funds dedicated to supporting the work of the most critical projects in their respective ecosystems.</p>
-      <p>We’ve identified <strong><%= number_with_delimiter @fund.possible_projects.count %></strong> projects critical to the <%= @fund.name %> ecosystem, of which we have distributed <strong>$<%= @fund.total_distributed_cents/100.0 %></strong> to the top <strong><%= @fund.funded_projects_count %></strong>.</p>
+      <p>We’ve identified <strong><%= number_with_delimiter @fund.possible_projects.count %></strong> projects critical to the <%= @fund.name %> ecosystem, of which we have distributed <strong>$<%= @fund.total_distributed_cents/100.0 %></strong> to the most critical <strong><%= @fund.funded_projects_count %></strong>.</p>
       <p>Read more about how ecosyste.ms funding works <a href="<%= overview_path %>" class="spesh-link">in our overview</a></p>
     </div>
     <div class="col-lg-9">
