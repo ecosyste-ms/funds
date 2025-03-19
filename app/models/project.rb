@@ -789,8 +789,11 @@ class Project < ApplicationRecord
   end
 
   def find_or_create_funding_source
-    return nil unless preferred_funding_link.present?
-    set_funding_source(preferred_funding_link, preferred_funding_platform)
+    if preferred_funding_link.present?
+      set_funding_source(preferred_funding_link, preferred_funding_platform)
+    else
+      self.update(funding_source_id: nil)
+    end
   end
 
   def set_funding_source(url, platform)
