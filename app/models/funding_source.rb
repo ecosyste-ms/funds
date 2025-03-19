@@ -22,6 +22,16 @@ class FundingSource < ApplicationRecord
     end
   end
 
+  def self.github_sponsors_logins
+    @github_sponsors_logins ||= begin
+      url = 'https://sponsors.ecosyste.ms/api/v1/accounts/sponsor_logins'
+      response = Faraday.get(url)
+      JSON.parse(response.body)
+    rescue
+      []  
+    end
+  end
+
   def self.has_open_collective_alternative?(name)
     FundingSource.open_collective_github_sponsors_mapping[name]
   end

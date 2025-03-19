@@ -655,15 +655,21 @@ class Project < ApplicationRecord
 
   def clean_funding_links(links)
     links.reject do |link|
-      # Skip invalid URLs or GitHub links that are not sponsor links
       begin
-        # Ensure the link has a valid scheme; add https:// if missing
         link.strip!
         link = "https://#{link}" unless link =~ /\Ahttps?:\/\//
         uri = URI.parse(link)
         invalid_url = !(uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS))
+        
+        if link.include?('github.com/sponsors/')
+          username = link.split('/').last
+          invalid_github_sponsor = !FundingSource.github_sponsors_logins.include?(username.downcase)
+        else
+          invalid_github_sponsor = false
+        end
+        
         non_sponsor_github_link = link.include?('github.com') && !link.include?('github.com/sponsors')
-        invalid_url || non_sponsor_github_link
+        invalid_url || non_sponsor_github_link || invalid_github_sponsor
       rescue URI::InvalidURIError
         true
       end
