@@ -4,21 +4,192 @@
 <%= render 'funds/header' %>
 
 <div class="container">
-  <div class="row">
-    <% if @allocation %>
-    <div class="col-lg-8">
-
-      <div class="well p-4 mb-4">
-        <div class="row">
-          <div class="col-lg-9">
-            <h2 class="h4"><%= bootstrap_icon 'cash-coin', width: 20, height: 20, class: 'flex-shrink-0 me-2' %> Funding</h2>
-          </div>
-          <div class="col-lg-3 text-lg-end">
-            <p><a href="<%= fund_allocations_path(@fund) %>" class="spesh-link">View all allocations</a></p>
+  
+  <% if @allocation %>
+    <div class="well p-4 mb-4">
+      <div class="row">
+        <div class="col-lg-12">
+          <h2 class="h4"><%= bootstrap_icon 'box', width: 20, height: 20, class: 'flex-shrink-0 me-2' %> Projects</h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3 col-xl-2">
+          <div class="stat-card mb-4">
+            <div class="stat-card-body">
+              <span class="stat-card-title stat-card-title--large">
+                <%= @fund.funded_projects_count %>
+              </span>
+              <span class="stat-card-text">Projects</span>
+            </div>
           </div>
         </div>
+        <div class="col-md-4 col-xl-2">
+          <div class="stat-card mt-4 mb-2">
+            <div class="stat-card-body">
+              <span class="stat-card-title stat-card-title--small">
+                <%= number_with_delimiter @fund.funded_project_downloads %>
+              </span>
+              <span class="stat-card-text stat-card-text--small">Downloads</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 col-xl-2">
+          <div class="stat-card mt-4 mb-2">
+            <div class="stat-card-body">
+              <span class="stat-card-title stat-card-title--small">
+                <%= number_with_delimiter @fund.funded_project_dependent_repos %>
+              </span>
+              <span class="stat-card-text stat-card-text--small">Dependent repos</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 col-xl-2">
+          <div class="stat-card mt-4 mb-2">
+            <div class="stat-card-body">
+              <span class="stat-card-title stat-card-title--small">
+                <%= number_with_delimiter @fund.funded_project_dependent_packages %>
+              </span>
+              <span class="stat-card-text stat-card-text--small">Dependent packages</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-9 col-xl-6">
+          <p>Using data from 
+          <strong><%= number_to_human(@fund.funded_project_dependent_packages, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %></strong>
+          tracked packages and 
+          <strong><%= number_to_human(@fund.funded_project_dependent_repos, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %></strong> tracked repositories weve determined that the following 
+          <strong><%= @fund.funded_projects_count %></strong> projects, representing 80% of measurable usage, are the most critical in the <strong><%= @fund.name %></strong> ecosystem.</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <figure>
+            <figcaption id="table-caption" class="mb-4">
+              <h2 class="visually-hidden">Projects</h2>
+            </figcaption>
+            <div class="table-wrapper table-responsive-lg" role="group" tabindex="0" aria-labelledby="table-caption">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Project</th>
+                    <th>Amount</th>
+                    <th>Downloads</th>
+                    <th>Dependent Repos</th>
+                    <th>Dependent Packages</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="">
+                    <td>
+                      <img src="https://github.com/django.png" height='36' width='36' onerror="this.style.display='none'" class="me-3" >
+                      Django
+                    </td>
+                    <td>
+                      $4,904.41
+                    </td>
+                    <td>
+                      20M
+                    </td>
+                    <td>
+                      115K
+                    </td>
+                    <td>
+                      2.66K
+                    </td>
+                  </tr>
+                  <tr class="">
+                    <td>
+                      <img src="https://github.com/django.png" height='36' width='36' onerror="this.style.display='none'" class="me-3" >
+                      Django
+                    </td>
+                    <td>
+                      $4,904.41
+                    </td>
+                    <td>
+                      20M
+                    </td>
+                    <td>
+                      115K
+                    </td>
+                    <td>
+                      2.66K
+                    </td>
+                  </tr>
+                  <tr class="">
+                  <td>
+                    <img src="https://github.com/django.png" height='36' width='36' onerror="this.style.display='none'" class="me-3" >
+                    Django
+                  </td>
+                  <td>
+                    $4,904.41
+                  </td>
+                  <td>
+                    20M
+                  </td>
+                  <td>
+                    115K
+                  </td>
+                  <td>
+                    2.66K
+                  </td>
+                </tr>
+                <tr class="">
+                  <td>
+                    <img src="https://github.com/django.png" height='36' width='36' onerror="this.style.display='none'" class="me-3" >
+                    Django
+                  </td>
+                  <td>
+                    $4,904.41
+                  </td>
+                  <td>
+                    20M
+                  </td>
+                  <td>
+                    115K
+                  </td>
+                  <td>
+                    2.66K
+                  </td>
+                </tr>
+                <tr class="">
+                  <td>
+                    <img src="https://github.com/django.png" height='36' width='36' onerror="this.style.display='none'" class="me-3" >
+                    Django
+                  </td>
+                  <td>
+                    $4,904.41
+                  </td>
+                  <td>
+                    20M
+                  </td>
+                  <td>
+                    115K
+                  </td>
+                  <td>
+                    2.66K
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </figure>
+        </div>
+      </div>
+    
+      <p><a href="<%= fund_projects_path(@fund) %>" class="spesh-link">View all projects</a></p>
+    </div>
 
-        <div class="stat-card mb-4">
+    <div class="well p-4 mb-4">
+      <div class="row">
+        <div class="col-lg-12">
+          <h2 class="h4"><%= bootstrap_icon 'cash-coin', width: 20, height: 20, class: 'flex-shrink-0 me-2' %> Funding</h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3 col-xl-3">
+          <div class="stat-card mb-4">
           <div class="stat-card-body">
             <span class="stat-card-title stat-card-title--large">
               <%= number_to_currency @fund.total_donation_amount %>
@@ -26,174 +197,157 @@
             <span class="stat-card-text">Total funded</span>
           </div>
         </div>
-
-        <div class="row">
-          <div class="col-md-4 col-xl-3">
-
-            <div class="stat-card mb-2">
-              <div class="stat-card-body">
-                <span class="stat-card-title stat-card-title--small">
-                  <%= number_to_currency @fund.average_donation_amount %>
-                </span>
-                <span class="stat-card-text stat-card-text--small">Average donation</span>
-              </div>
+        </div>
+        <div class="col-md-3 col-xl-3">
+          <div class="stat-card mb-4">
+            <div class="stat-card-body">
+              <span class="stat-card-title stat-card-title--large">
+                <%= @fund.funded_projects_count %>
+              </span>
+              <span class="stat-card-text">Projects</span>
             </div>
-
-          </div>
-          <div class="col-md-4 col-xl-3">
-
-            <div class="stat-card mb-2">
-              <div class="stat-card-body">
-                <span class="stat-card-title stat-card-title--small">
-                  <%= number_to_currency @fund.largest_donation_amount %>
-                </span>
-                <span class="stat-card-text stat-card-text--small">Largest donation</span>
-              </div>
-            </div>
-          
-          </div>
-          <div class="col-md-4 col-xl-3">
-
-            <div class="stat-card mb-2">
-              <div class="stat-card-body">
-                <span class="stat-card-title stat-card-title--small">
-                  <%= @fund.allocations.count %>
-                </span>
-                <span class="stat-card-text stat-card-text--small">Allocations</span>
-              </div>
-            </div>
-
           </div>
         </div>
-
-      </div> <!-- well ends -->
-
-      <div class="well p-4 mb-4">
-        <div class="row">
-          <div class="col-lg-8">
-            <h2 class="h4"><%= bootstrap_icon 'box', width: 20, height: 20, class: 'flex-shrink-0 me-2' %> Projects</h2>
-          </div>
-          <div class="col-lg-4 text-lg-end">
-            <p><a href="<%= fund_projects_path(@fund) %>" class="spesh-link">View all projects</a></p>
-          </div>
-        </div>
-
-        <div class="stat-card mb-4">
-          <div class="stat-card-body">
-            <span class="stat-card-title stat-card-title--large">
-              <%= @fund.funded_projects_count %>
-            </span>
-            <span class="stat-card-text">Projects</span>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-md-4 col-xl-3">
-
-            <div class="stat-card mb-2">
-              <div class="stat-card-body">
-                <span class="stat-card-title stat-card-title--small">
-                  <%= number_with_delimiter @fund.funded_project_downloads %>
-                </span>
-                <span class="stat-card-text stat-card-text--small">Downloads</span>
-              </div>
+        <div class="col-md-3 col-xl-3">
+          <div class="stat-card mb-4">
+            <div class="stat-card-body">
+              <span class="stat-card-title stat-card-title--large">
+                <%= @fund.funders.length %>
+              </span>
+              <span class="stat-card-text">Funders</span>
             </div>
-
-          </div>
-          <div class="col-md-4 col-xl-3">
-
-            <div class="stat-card mb-2">
-              <div class="stat-card-body">
-                <span class="stat-card-title stat-card-title--small">
-                  <%= number_with_delimiter @fund.funded_project_dependent_repos %>
-                </span>
-                <span class="stat-card-text stat-card-text--small">Dependent repos</span>
-              </div>
-            </div>
-          
-          </div>
-          <div class="col-md-4 col-xl-4">
-
-            <div class="stat-card mb-2">
-              <div class="stat-card-body">
-                <span class="stat-card-title stat-card-title--small">
-                  <%= number_with_delimiter @fund.funded_project_dependent_packages %>
-                </span>
-                <span class="stat-card-text stat-card-text--small">Dependent packages</span>
-              </div>
-            </div>
-
           </div>
         </div>
+      </div>         
+  
 
-      </div> <!-- well ends -->
-    </div>
-    <div class="col-lg-4">
-      <div class="well p-4 mb-4">
-        <div class="row">
-          <div class="col-lg-7">
-            <h2 class="h4"><%= bootstrap_icon 'wallet', width: 20, height: 20, class: 'flex-shrink-0 me-2' %> Funders</h2>
-          </div>
-          <div class="col-lg-5 text-lg-end">
-            <p><a href="<%= funders_fund_path(@fund) %>" class="spesh-link">View all funders</a></p>
-          </div>
-        </div>
+      <div class="row">
+        <div class="col-md-4 col-xl-3">
 
-        <div class="stat-card mb-4">
-          <div class="stat-card-body">
-            <span class="stat-card-title stat-card-title--large">
-              <%= @fund.funders.length %>
-            </span>
-            <span class="stat-card-text">Funders</span>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-md-4 col-lg-6">
-
-            <div class="stat-card mb-2">
-              <div class="stat-card-body">
-                <span class="stat-card-title stat-card-title--small">
-                  <%= @fund.repeat_funders.length %>
-                </span>
-                <span class="stat-card-text stat-card-text--small">Repeat funders</span>
-              </div>
+          <div class="stat-card mb-2">
+            <div class="stat-card-body">
+              <span class="stat-card-title stat-card-title--small">
+              $638,234.09
+              </span>
+              <span class="stat-card-text stat-card-text--small">Total distributed</span>
             </div>
-
           </div>
-          <div class="col-md-4 col-lg-6">
 
-            <div class="stat-card mb-2">
-              <div class="stat-card-body">
-                <span class="stat-card-title stat-card-title--small">
-                  <%= @fund.single_funders.length %>
-                </span>
-                <span class="stat-card-text stat-card-text--small">One-off funders</span>
-              </div>
-            </div>
-          
-          </div>
         </div>
+        <div class="col-md-4 col-xl-3">
 
-        <div class="mt-4">
-          <h3 class="h4 mb-3">Top funders</h3>
-          <% @fund.funders.take(3).each do |account| %>
+          <div class="stat-card mb-2">
+            <div class="stat-card-body">
+              <span class="stat-card-title stat-card-title--small">
+              $638,234.09
+              </span>
+              <span class="stat-card-text stat-card-text--small">In progress</span>
+            </div>
+          </div>
+        
+        </div>
+        <div class="col-md-4 col-xl-3">
+
+          <div class="stat-card mb-2">
+            <div class="stat-card-body">
+              <span class="stat-card-title stat-card-title--small">
+                <%= @fund.allocations.count %>
+              </span>
+              <span class="stat-card-text stat-card-text--small">Completed allocations</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-9 col-xl-6">
+          <p>Donations are distributed on a monthly basis directly to the maintainers and communities behind these projects, where they choose to receive them. Funds are allocated on the basis of a projects criticality, and the total amount of funds available to distribute in a given month. </p>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          <figure>
+            <figcaption id="table-caption" class="mb-4">
+              <h2 class="visually-hidden">Projects</h2>
+            </figcaption>
+            <div class="table-wrapper table-responsive-lg" role="group" tabindex="0" aria-labelledby="table-caption">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th># <span class="visually-hidden">Number</span></th>
+                    <th>Amount</th>
+                    <th>Allocated</th>
+                    <th>Distributed</th>
+                    <th>Funded projects</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="">
+                    <td>
+                      2
+                    </td>
+                    <td>
+                      $6,715.31
+                    </td>
+                    <td>
+                      March 6, 2025
+                    </td>
+                    <td>
+                      March 20, 2025
+                    </td>
+                    <td>
+                      115
+                    </td>
+                  </tr>
+                  <tr class="">
+                    <td>
+                      1
+                    </td>
+                    <td>
+                      $10,163.43
+                    </td>
+                    <td>
+                      December 9, 2024
+                    </td>
+                    <td>
+                      December 23, 2024
+                    </td>
+                    <td>
+                      56
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </figure>
+        </div>
+      </div>
+
+      <p><a href="<%= fund_allocations_path(@fund) %>" class="spesh-link">View all allocations</a></p>
+
+    
+      <h2 class="h4 mt-5">Top funders</h2>
+      <p>These organisations and individuals are committed to supporting the software we use, not just the software we see. </p>
+
+      <div class="row">
+        <% @fund.funders.take(3).each do |account| %>
+          <div class="col-md-4 col-lg-3">
             <!-- Your code for each account -->
             <div class="d-flex align-items-center mb-3">
-            <div class="funder-icon me-2 d-flex align-items-center justify-content-center">
-              <a href="<%= "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{account[:slug]}" %>"><%= image_tag(account[:image_url], class: 'img-fluid rounded-circle me-2', height: '56', width: '56') %></a>
-            </div>
-            <div class="">
-              <div><a href="<%= "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{account[:slug]}" %>" class="spesh-link fw-bold"><%= account[:name] %></a></div>
-              <span class="small"><%= number_to_currency account[:amount] %></span>
+              <div class="funder-icon me-2 d-flex align-items-center justify-content-center">
+                <a href="<%= "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{account[:slug]}" %>"><%= image_tag(account[:image_url], class: 'img-fluid rounded-circle me-2', height: '56', width: '56') %></a>
+              </div>
+              <div class="">
+                <div><a href="<%= "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{account[:slug]}" %>" class="spesh-link fw-bold"><%= account[:name] %></a></div>
+                <span class="small"><%= number_to_currency account[:amount] %></span>
+              </div>
             </div>
           </div>
-          <% end %>
-        </div>
-
-      </div> <!-- well ends -->
+        <% end %>
+      </div>
     </div>
-  </div>
+
     <% else %>
       <%= render 'funds/blank_slate' %>
     <% end %>
@@ -207,5 +361,5 @@
       <% end %>
       </small>
     </p>
-  </div> 
 </div>
+
