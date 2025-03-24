@@ -27,7 +27,7 @@
           <div class="stat-card mt-4 mb-2">
             <div class="stat-card-body">
               <span class="stat-card-title stat-card-title--small">
-                <%= number_with_delimiter @fund.possible_project_downloads %>
+                <%= number_to_human(@fund.possible_project_downloads, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %>
               </span>
               <span class="stat-card-text stat-card-text--small">Downloads</span>
             </div>
@@ -37,7 +37,7 @@
           <div class="stat-card mt-4 mb-2">
             <div class="stat-card-body">
               <span class="stat-card-title stat-card-title--small">
-                <%= number_with_delimiter @fund.possible_project_dependent_repos %>
+                <%= number_to_human(@fund.possible_project_dependent_repos, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %>
               </span>
               <span class="stat-card-text stat-card-text--small">Dependent repos</span>
             </div>
@@ -47,7 +47,7 @@
           <div class="stat-card mt-4 mb-2">
             <div class="stat-card-body">
               <span class="stat-card-title stat-card-title--small">
-                <%= number_with_delimiter @fund.possible_project_dependent_packages %>
+                <%= number_to_human(@fund.possible_project_dependent_packages, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %>
               </span>
               <span class="stat-card-text stat-card-text--small">Dependent packages</span>
             </div>
@@ -194,40 +194,22 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr class="">
-                    <td>
-                      2
-                    </td>
-                    <td>
-                      $6,715.31
-                    </td>
-                    <td>
-                      March 6, 2025
-                    </td>
-                    <td>
-                      March 20, 2025
-                    </td>
-                    <td>
-                      115
-                    </td>
-                  </tr>
-                  <tr class="">
-                    <td>
-                      1
-                    </td>
-                    <td>
-                      $10,163.43
-                    </td>
-                    <td>
-                      December 9, 2024
-                    </td>
-                    <td>
-                      December 23, 2024
-                    </td>
-                    <td>
-                      56
-                    </td>
-                  </tr>
+                  <% allocations = @fund.allocations.order('created_at desc') %>
+                  <% allocations.each_with_index do |allocation, index| %>
+                    <tr class="">
+                      <td><%= allocations.length - index %></td>
+                      <td><%= number_to_currency (allocation.total_allocated_cents/100.0).round(2) %></td>
+                      <td><%= allocation.created_at.strftime('%B %-d, %Y') %></td>
+                      <td>
+                        <% if allocation.completed_at %>
+                        <%= allocation.completed_at.strftime('%B %-d, %Y') %>
+                        <% else %>
+                        In progress
+                        <% end %>
+                      </td>
+                      <td><%= allocation.projects.count %></td>
+                    </tr>
+                  <% end %>
                 </tbody>
               </table>
             </div>
