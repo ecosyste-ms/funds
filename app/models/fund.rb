@@ -729,6 +729,18 @@ class Fund < ApplicationRecord
     funded_projects.sum(:total_dependent_packages)
   end
 
+  def possible_project_downloads
+    possible_projects.sum(:total_downloads)
+  end
+
+  def possible_project_dependent_repos
+    possible_projects.sum(:total_dependent_repos)
+  end
+
+  def possible_project_dependent_packages
+    possible_projects.sum(:total_dependent_packages)
+  end
+
   def latest_allocation
     allocations.order(created_at: :desc).first
   end

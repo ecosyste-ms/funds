@@ -17,7 +17,7 @@
           <div class="stat-card mb-4">
             <div class="stat-card-body">
               <span class="stat-card-title stat-card-title--large">
-                <%= @fund.funded_projects_count %>
+                <%= @fund.possible_projects_count %>
               </span>
               <span class="stat-card-text">Projects</span>
             </div>
@@ -27,7 +27,7 @@
           <div class="stat-card mt-4 mb-2">
             <div class="stat-card-body">
               <span class="stat-card-title stat-card-title--small">
-                <%= number_with_delimiter @fund.funded_project_downloads %>
+                <%= number_with_delimiter @fund.possible_project_downloads %>
               </span>
               <span class="stat-card-text stat-card-text--small">Downloads</span>
             </div>
@@ -37,7 +37,7 @@
           <div class="stat-card mt-4 mb-2">
             <div class="stat-card-body">
               <span class="stat-card-title stat-card-title--small">
-                <%= number_with_delimiter @fund.funded_project_dependent_repos %>
+                <%= number_with_delimiter @fund.possible_project_dependent_repos %>
               </span>
               <span class="stat-card-text stat-card-text--small">Dependent repos</span>
             </div>
@@ -47,7 +47,7 @@
           <div class="stat-card mt-4 mb-2">
             <div class="stat-card-body">
               <span class="stat-card-title stat-card-title--small">
-                <%= number_with_delimiter @fund.funded_project_dependent_packages %>
+                <%= number_with_delimiter @fund.possible_project_dependent_packages %>
               </span>
               <span class="stat-card-text stat-card-text--small">Dependent packages</span>
             </div>
@@ -57,10 +57,10 @@
       <div class="row">
         <div class="col-md-9 col-xl-6">
           <p>Using data from 
-          <strong><%= number_to_human(@fund.funded_project_dependent_packages, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %></strong>
+          <strong><%= number_to_human(@fund.possible_project_dependent_packages, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %></strong>
           tracked packages and 
-          <strong><%= number_to_human(@fund.funded_project_dependent_repos, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %></strong> tracked repositories weve determined that the following 
-          <strong><%= @fund.funded_projects_count %></strong> projects, representing 80% of measurable usage, are the most critical in the <strong><%= @fund.name %></strong> ecosystem.</p>
+          <strong><%= number_to_human(@fund.possible_project_dependent_repos, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %></strong> tracked repositories weve determined that the following 
+          <strong><%= @fund.possible_projects_count %></strong> projects, representing 80% of measurable usage, are the most critical in the <strong><%= @fund.name %></strong> ecosystem.</p>
         </div>
       </div>
       <div class="row">
