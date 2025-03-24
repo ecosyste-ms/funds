@@ -138,7 +138,7 @@
           <div class="stat-card mb-2">
             <div class="stat-card-body">
               <span class="stat-card-title stat-card-title--small">
-              $638,234.09
+                <%= number_to_currency @fund.completed_allocations_total %>
               </span>
               <span class="stat-card-text stat-card-text--small">Total distributed</span>
             </div>
@@ -150,7 +150,7 @@
           <div class="stat-card mb-2">
             <div class="stat-card-body">
               <span class="stat-card-title stat-card-title--small">
-              $638,234.09
+                <%= number_to_currency @fund.in_progress_allocations_total %>
               </span>
               <span class="stat-card-text stat-card-text--small">In progress</span>
             </div>
@@ -162,7 +162,7 @@
           <div class="stat-card mb-2">
             <div class="stat-card-body">
               <span class="stat-card-title stat-card-title--small">
-                <%= @fund.allocations.count %>
+                <%= @fund.allocations.completed.count %>
               </span>
               <span class="stat-card-text stat-card-text--small">Completed allocations</span>
             </div>
@@ -172,7 +172,7 @@
       </div>
       <div class="row">
         <div class="col-md-9 col-xl-6">
-          <p>Donations are distributed on a monthly basis directly to the maintainers and communities behind these projects, where they choose to receive them. Funds are allocated on the basis of a projects criticality, and the total amount of funds available to distribute in a given month. </p>
+          <p>Donations are distributed on a monthly basis directly to the maintainers and communities behind these projects, where they choose to receive them. Funds are allocated on the basis of a projects criticality, and the total amount of funds available to distribute in a given month. </p>
         </div>
       </div>
 

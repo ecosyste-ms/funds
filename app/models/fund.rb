@@ -744,4 +744,12 @@ class Fund < ApplicationRecord
   def latest_allocation
     allocations.order(created_at: :desc).first
   end
+
+  def completed_allocations_total
+    (allocations.completed.sum(&:complete_payout_total_cents) / 100.0).round(2)
+  end
+
+  def in_progress_allocations_total
+    allocations.not_completed.sum(:total_cents) / 100.0
+  end
 end
