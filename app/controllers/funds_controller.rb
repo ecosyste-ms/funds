@@ -15,6 +15,12 @@ class FundsController < ApplicationController
 
     @allocation = @fund.allocations.order('created_at DESC').first
     if @allocation
+      @projects = @fund.funded_projects
+        .joins(:project_allocations)
+        .select('projects.*, SUM(project_allocations.amount_cents) AS total_amount_cents')
+        .group('projects.id')
+
+      @projects = Project.from(@projects, :projects).order('total_amount_cents DESC').includes(:project_allocations).limit(5)
       @project_allocations = @allocation.project_allocations.includes(:funding_source, :invitation)
                                                              .order('amount_cents desc, score desc')
                                                              .where('amount_cents >= 1')
