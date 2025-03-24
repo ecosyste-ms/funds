@@ -836,7 +836,7 @@ class Project < ApplicationRecord
 
     if json.present?
       collective_url = json['collective']['html_url']
-      set_funding_source(collective_url, 'opencollective.com')
+      set_funding_source(collective_url)
     end
   end
 
