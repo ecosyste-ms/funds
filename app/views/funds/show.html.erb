@@ -23,7 +23,7 @@
             </div>
           </div>
         </div>
-        <div class="col-md-4 col-xl-2">
+        <div class="col-md-3 col-xl-2">
           <div class="stat-card mt-4 mb-2">
             <div class="stat-card-body">
               <span class="stat-card-title stat-card-title--small">
@@ -33,7 +33,7 @@
             </div>
           </div>
         </div>
-        <div class="col-md-4 col-xl-2">
+        <div class="col-md-3 col-xl-2">
           <div class="stat-card mt-4 mb-2">
             <div class="stat-card-body">
               <span class="stat-card-title stat-card-title--small">
@@ -43,7 +43,7 @@
             </div>
           </div>
         </div>
-        <div class="col-md-4 col-xl-2">
+        <div class="col-md-3 col-xl-2">
           <div class="stat-card mt-4 mb-2">
             <div class="stat-card-body">
               <span class="stat-card-title stat-card-title--small">
@@ -89,7 +89,7 @@
         </div>
       </div>
     
-      <p><a href="<%= fund_projects_path(@fund) %>" class="spesh-link">View all projects</a></p>
+      <p><a href="<%= funders_fund_path(@fund) %>" class="spesh-link mt-3">View all projects</a></p>
     </div>
 
     <div class="well p-4 mb-4">
@@ -99,7 +99,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-md-3 col-xl-3">
+        <div class="col-md-6 col-xl-3">
           <div class="stat-card mb-4">
           <div class="stat-card-body">
             <span class="stat-card-title stat-card-title--large">
@@ -135,7 +135,7 @@
       <div class="row">
         <div class="col-md-4 col-xl-3">
 
-          <div class="stat-card mb-2">
+          <div class="stat-card mb-4">
             <div class="stat-card-body">
               <span class="stat-card-title stat-card-title--small">
                 <%= number_to_currency @fund.completed_allocations_total %>
@@ -147,7 +147,7 @@
         </div>
         <div class="col-md-4 col-xl-3">
 
-          <div class="stat-card mb-2">
+          <div class="stat-card mb-4">
             <div class="stat-card-body">
               <span class="stat-card-title stat-card-title--small">
                 <%= number_to_currency @fund.in_progress_allocations_total %>
@@ -159,7 +159,7 @@
         </div>
         <div class="col-md-4 col-xl-3">
 
-          <div class="stat-card mb-2">
+          <div class="stat-card mb-4">
             <div class="stat-card-body">
               <span class="stat-card-title stat-card-title--small">
                 <%= @fund.allocations.completed.count %>
@@ -217,7 +217,7 @@
         </div>
       </div>
 
-      <p><a href="<%= fund_allocations_path(@fund) %>" class="spesh-link">View all allocations</a></p>
+      <p><a href="<%= fund_allocations_path(@fund) %>" class="spesh-link mt-3">View all allocations</a></p>
 
     
       <h2 class="h4 mt-5">Top funders</h2>
@@ -239,6 +239,7 @@
           </div>
         <% end %>
       </div>
+	  <p><a href="<%= fund_projects_path(@fund) %>" class="spesh-link mt-3">View all funders</a></p>
     </div>
 
     <% else %>
