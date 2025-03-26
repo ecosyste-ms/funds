@@ -159,7 +159,14 @@ class Invitation < ApplicationRecord
   end
 
   def edit_expense(amount)
-    item = data.dig('draft', 'items')&.first
+    query = <<~GRAPHQL
+      mutation($expense: ExpenseUpdateInput!) {
+        editExpense(expense: $expense) {
+          id
+          status
+        }
+      }
+    GRAPHQL
 
     variables = {
       expense: {
