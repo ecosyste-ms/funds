@@ -160,8 +160,8 @@ class Invitation < ApplicationRecord
 
   def edit_expense(amount)
     query = <<~GRAPHQL
-      mutation($expense: ExpenseReferenceInput!, $input: ExpenseEditInput!) {
-        editExpense(expense: $expense, input: $input) {
+      mutation($expense: ExpenseUpdateInput!) {
+        editExpense(expense: $expense) {
           id
           status
         }
@@ -170,9 +170,7 @@ class Invitation < ApplicationRecord
 
     variables = {
       expense: {
-        id: data['id']
-      },
-      input: {
+        id: data['id'],
         amount: amount
       }
     }
