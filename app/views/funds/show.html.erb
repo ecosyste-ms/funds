@@ -6,15 +6,17 @@
 <div class="container">
   
   <% if @allocation %>
-    <div class="well p-4 mb-4">
+  <div class="grid-side-by-side">
+    <div class="grid-half">
+      <div class="well p-4 mb-4">
       <div class="row">
-        <div class="col-lg-12">
+        <div class="col-lg-6">
           <h2 class="h4"><%= bootstrap_icon 'box', width: 20, height: 20, class: 'flex-shrink-0 me-2' %> Projects</h2>
         </div>
       </div>
       <div class="row">
-        <div class="col-md-3 col-xl-2">
-          <div class="stat-card mb-4">
+        <div class="col-md-3 col-xl-12">
+          <div class="stat-card mb-2">
             <div class="stat-card-body">
               <span class="stat-card-title stat-card-title--large">
                 <%= @fund.possible_projects_count %>
@@ -23,7 +25,7 @@
             </div>
           </div>
         </div>
-        <div class="col-md-3 col-xl-2">
+        <div class="col-md-3 col-xl-4">
           <div class="stat-card mt-4 mb-2">
             <div class="stat-card-body">
               <span class="stat-card-title stat-card-title--small">
@@ -33,7 +35,7 @@
             </div>
           </div>
         </div>
-        <div class="col-md-3 col-xl-2">
+        <div class="col-md-3 col-xl-4">
           <div class="stat-card mt-4 mb-2">
             <div class="stat-card-body">
               <span class="stat-card-title stat-card-title--small">
@@ -43,7 +45,7 @@
             </div>
           </div>
         </div>
-        <div class="col-md-3 col-xl-2">
+        <div class="col-md-3 col-xl-4">
           <div class="stat-card mt-4 mb-2">
             <div class="stat-card-body">
               <span class="stat-card-title stat-card-title--small">
@@ -55,7 +57,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-md-9 col-xl-6">
+        <div class="col-md-9 col-xl-12 mt-4">
           <p>Using data from 
           <strong><%= number_to_human(@fund.possible_project_dependent_packages, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %></strong>
           tracked packages and 
@@ -65,182 +67,182 @@
       </div>
       <div class="row">
         <div class="col-12">
+        <div class="table-wrapper table-responsive-lg" role="group" tabindex="0" aria-labelledby="table-caption">
           <figure>
             <figcaption id="table-caption" class="mb-4">
               <h2 class="visually-hidden">Projects</h2>
             </figcaption>
-            <div class="table-wrapper table-responsive-lg" role="group" tabindex="0" aria-labelledby="table-caption">
+            
               <table class="table">
                 <thead>
                   <tr>
                     <th>Project</th>
                     <th>Amount</th>
                     <th>Downloads</th>
-                    <th>Dependent Repos</th>
-                    <th>Dependent Packages</th>
+                    <th>Repos/Packages</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <%= render @projects %>
+                  <%= render partial: "projects/project-short", collection: @projects, as: :project %>
                 </tbody>
               </table>
-            </div>
-          </figure>
+            </figure>
+          </div>
         </div>
       </div>
     
-      <p><a href="<%= funders_fund_path(@fund) %>" class="spesh-link mt-3">View all projects</a></p>
+      <p class="mt-3"><a href="<%= funders_fund_path(@fund) %>" class="spesh-link">View all projects</a></p>
+      </div>
     </div>
-
-    <div class="well p-4 mb-4">
-      <div class="row">
-        <div class="col-lg-12">
-          <h2 class="h4"><%= bootstrap_icon 'cash-coin', width: 20, height: 20, class: 'flex-shrink-0 me-2' %> Funding</h2>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-6 col-xl-3">
-          <div class="stat-card mb-4">
-          <div class="stat-card-body">
-            <span class="stat-card-title stat-card-title--large">
-              <%= number_to_currency @fund.total_donation_amount %>
-            </span>
-            <span class="stat-card-text">Total funded</span>
+    <div class="grid-half">
+      <div class="well p-4 mb-4">
+        <div class="row">
+          <div class="col-lg-12">
+            <h2 class="h4"><%= bootstrap_icon 'cash-coin', width: 20, height: 20, class: 'flex-shrink-0 me-2' %> Funding</h2>
           </div>
         </div>
-        </div>
-        <div class="col-md-3 col-xl-3">
-          <div class="stat-card mb-4">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="stat-card mb-4">
             <div class="stat-card-body">
               <span class="stat-card-title stat-card-title--large">
-                <%= @fund.funded_projects_count %>
+                <%= number_to_currency @fund.total_donation_amount %>
               </span>
-              <span class="stat-card-text">Projects</span>
+              <span class="stat-card-text">Total funded</span>
             </div>
           </div>
-        </div>
-        <div class="col-md-3 col-xl-3">
-          <div class="stat-card mb-4">
-            <div class="stat-card-body">
-              <span class="stat-card-title stat-card-title--large">
-                <%= @fund.funders.length %>
-              </span>
-              <span class="stat-card-text">Funders</span>
+          </div>
+          <div class="col-md-3 col-xl-4">
+            <div class="stat-card mb-4">
+              <div class="stat-card-body">
+                <span class="stat-card-title stat-card-title">
+                  <%= @fund.funders.length %>
+                </span>
+                <span class="stat-card-text">Funders</span>
+              </div>
             </div>
           </div>
-        </div>
-      </div>         
-  
-
-      <div class="row">
-        <div class="col-md-4 col-xl-3">
-
-          <div class="stat-card mb-4">
-            <div class="stat-card-body">
-              <span class="stat-card-title stat-card-title--small">
-                <%= number_to_currency @fund.completed_allocations_total %>
-              </span>
-              <span class="stat-card-text stat-card-text--small">Total distributed</span>
+          <div class="col-md-3 col-xl-4">
+            <div class="stat-card mb-4">
+              <div class="stat-card-body">
+                <span class="stat-card-title stat-card-title">
+                  <%= @fund.funded_projects_count %>
+                </span>
+                <span class="stat-card-text">Funded projects</span>
+              </div>
             </div>
           </div>
-
-        </div>
-        <div class="col-md-4 col-xl-3">
-
-          <div class="stat-card mb-4">
-            <div class="stat-card-body">
-              <span class="stat-card-title stat-card-title--small">
-                <%= number_to_currency @fund.in_progress_allocations_total %>
-              </span>
-              <span class="stat-card-text stat-card-text--small">In progress</span>
+          <div class="col-md-4 col-xl-4">
+            <div class="stat-card mb-4">
+              <div class="stat-card-body">
+                <span class="stat-card-title stat-card-title--small">
+                  <%= @fund.allocations.completed.count %>
+                </span>
+                <span class="stat-card-text stat-card-text--small">Completed allocations</span>
+              </div>
             </div>
           </div>
-        
-        </div>
-        <div class="col-md-4 col-xl-3">
+        </div>         
+    
+        <div class="row">
+          <div class="col-md-3 col-xl-4">
 
-          <div class="stat-card mb-4">
-            <div class="stat-card-body">
-              <span class="stat-card-title stat-card-title--small">
-                <%= @fund.allocations.completed.count %>
-              </span>
-              <span class="stat-card-text stat-card-text--small">Completed allocations</span>
+            <div class="stat-card mb-4">
+              <div class="stat-card-body">
+                <span class="stat-card-title stat-card-title--small">
+                  <%= number_to_currency @fund.completed_allocations_total %>
+                </span>
+                <span class="stat-card-text stat-card-text--small">Total distributed</span>
+              </div>
             </div>
+
           </div>
+          <div class="col-md-3 col-xl-4">
 
+            <div class="stat-card mb-4">
+              <div class="stat-card-body">
+                <span class="stat-card-title stat-card-title--small">
+                  <%= number_to_currency @fund.in_progress_allocations_total %>
+                </span>
+                <span class="stat-card-text stat-card-text--small">In progress</span>
+              </div>
+            </div>
+          
+          </div>
+          
         </div>
-      </div>
-      <div class="row">
-        <div class="col-md-9 col-xl-6">
-          <p>Donations are distributed on a monthly basis directly to the maintainers and communities behind these projects, where they choose to receive them. Funds are allocated on the basis of a projects criticality, and the total amount of funds available to distribute in a given month. </p>
+        <div class="row">
+          <div class="col-md-9 col-xl-12">
+            <p>Donations are distributed on a monthly basis directly to the maintainers and communities behind these projects, where they choose to receive them. Funds are allocated on the basis of a projects criticality, and the total amount of funds available to distribute in a given month. </p>
+          </div>
         </div>
-      </div>
 
-      <div class="row">
-        <div class="col-12">
-          <figure>
-            <figcaption id="table-caption" class="mb-4">
-              <h2 class="visually-hidden">Projects</h2>
-            </figcaption>
+        <div class="row">
+          <div class="col-12">
             <div class="table-wrapper table-responsive-lg" role="group" tabindex="0" aria-labelledby="table-caption">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th># <span class="visually-hidden">Number</span></th>
-                    <th>Amount</th>
-                    <th>Allocated</th>
-                    <th>Distributed</th>
-                    <th>Funded projects</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <% allocations = @fund.allocations.order('created_at desc') %>
-                  <% allocations.each_with_index do |allocation, index| %>
-                    <tr class="">
-                      <td><%= allocations.length - index %></td>
-                      <td><%= number_to_currency (allocation.total_allocated_cents/100.0).round(2) %></td>
-                      <td><%= allocation.created_at.strftime('%B %-d, %Y') %></td>
-                      <td>
-                        <% if allocation.completed_at %>
-                        <%= allocation.completed_at.strftime('%B %-d, %Y') %>
-                        <% else %>
-                        In progress
-                        <% end %>
-                      </td>
-                      <td><%= allocation.projects.count %></td>
+              <figure>
+                <figcaption id="table-caption" class="mb-4">
+                  <h2 class="visually-hidden">Projects</h2>
+                </figcaption>
+              
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th># <span class="visually-hidden">Number</span></th>
+                      <th>Amount</th>
+                      <th>Allocated</th>
+                      <th>Funded projects</th>
                     </tr>
-                  <% end %>
-                </tbody>
-              </table>
-            </div>
-          </figure>
-        </div>
-      </div>
-
-      <p><a href="<%= fund_allocations_path(@fund) %>" class="spesh-link mt-3">View all allocations</a></p>
-
-    
-      <h2 class="h4 mt-5">Top funders</h2>
-      <p>These organisations and individuals are committed to supporting the software we use, not just the software we see. </p>
-
-      <div class="row">
-        <% @fund.funders.take(3).each do |account| %>
-          <div class="col-md-4 col-lg-3">
-            <!-- Your code for each account -->
-            <div class="d-flex align-items-center mb-3">
-              <div class="funder-icon me-2 d-flex align-items-center justify-content-center">
-                <a href="<%= "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{account[:slug]}" %>"><%= image_tag(account[:image_url], class: 'img-fluid rounded-circle me-2', height: '56', width: '56') %></a>
-              </div>
-              <div class="">
-                <div><a href="<%= "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{account[:slug]}" %>" class="spesh-link fw-bold"><%= account[:name] %></a></div>
-                <span class="small"><%= number_to_currency account[:amount] %></span>
-              </div>
+                  </thead>
+                  <tbody>
+                    <% allocations = @fund.allocations.order('created_at desc') %>
+                    <% allocations.each_with_index do |allocation, index| %>
+                      <tr class="">
+                        <td><%= allocations.length - index %></td>
+                        <td><%= number_to_currency (allocation.total_allocated_cents/100.0).round(2) %></td>
+                        <td>
+                        <% if allocation.completed_at %>
+                          <%= allocation.completed_at.strftime('%B %-d, %Y') %>
+                          <% else %>
+                          In progress
+                          <% end %>
+                        </td>
+                        <td><%= allocation.projects.count %></td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </figure>
             </div>
           </div>
-        <% end %>
+        </div>
+
+        <p class="mt-3"><a href="<%= fund_allocations_path(@fund) %>" class="spesh-link">View all allocations</a></p>
       </div>
-	  <p><a href="<%= fund_projects_path(@fund) %>" class="spesh-link mt-3">View all funders</a></p>
     </div>
+  </div>
+  <div class="well p-4 mb-4 mt-4">
+    <h2 class="h4"><%= bootstrap_icon 'wallet', width: 20, height: 20, class: 'flex-shrink-0 me-2' %>  Top funders</h2>
+    <p>These organisations and individuals are committed to supporting the software we use, not just the software we see. </p>
+
+    <div class="row mt-4">
+      <% @fund.funders.take(3).each do |account| %>
+        <div class="col-md-4 col-lg-3">
+          <!-- Your code for each account -->
+          <div class="d-flex align-items-center mb-3">
+            <div class="funder-icon me-2 d-flex align-items-center justify-content-center">
+              <a href="<%= "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{account[:slug]}" %>"><%= image_tag(account[:image_url], class: 'img-fluid rounded-circle me-2', height: '56', width: '56') %></a>
+            </div>
+            <div class="">
+              <div><a href="<%= "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{account[:slug]}" %>" class="spesh-link fw-bold"><%= account[:name] %></a></div>
+              <span class="small"><%= number_to_currency account[:amount] %></span>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    <p class="mt-3"><a href="<%= fund_projects_path(@fund) %>" class="spesh-link mt-3">View all funders</a></p>
+  </div>
 
     <% else %>
       <%= render 'funds/blank_slate' %>

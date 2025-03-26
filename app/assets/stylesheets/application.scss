@@ -170,9 +170,6 @@
 	background-color: $color-grey-light;
   z-index: 100;
   position: relative;
-  .container {
-   
-  }
   h2 {
     @include media-breakpoint-up(md) {
       text-align: right;
@@ -191,8 +188,8 @@
 }
 
 .inverted-nav {
-	.nav-link {
-		color: $color-white;
+  .nav-link {
+    color: $color-white;
     &.disabled {
       color: $color-purple-light;
     }
@@ -203,5 +200,21 @@
     &:hover, &:active, &:focus {
       background-color: adjust-color($color-purple-dark, $saturation: -15%, $lightness: -7.5%);
     }
-	}
+  }
 }
+
+/* Layout - Side by side grid container */
+.grid-side-by-side {
+  @include media-breakpoint-up(xl) {
+    display: grid;
+    gap: $grid-gutter-width;
+    align-items: stretch; /* Ensures grid items stretch to match row height */
+    grid-template-columns: 1fr 1fr; 
+  }
+  
+  .well {
+    height: 100%;
+  }
+}
+
+  
