@@ -172,7 +172,7 @@ class Allocation < ApplicationRecord
     unallocated_scores.each do |score|
       break if leftover < default_minimum_allocation # Stop if not enough funds remain
   
-      allocation_amount = [leftover, default_minimum_allocation].min
+      allocation_amount = ([leftover, default_minimum_allocation].min / 100) * 100 # Round to whole dollars
       leftover -= allocation_amount
   
       new_allocations << { project_id: score[:project_id], allocation: allocation_amount, score: score[:score], funding_source_id: score[:funding_source_id] }
