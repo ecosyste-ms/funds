@@ -158,6 +158,43 @@ class Invitation < ApplicationRecord
     end
   end
 
+  def edit_expense(amount)
+    query = <<~GRAPHQL
+      mutation($expense: ExpenseReferenceInput!, $input: ExpenseEditInput!) {
+        editExpense(expense: $expense, input: $input) {
+          id
+          status
+        }
+      }
+    GRAPHQL
+
+    variables = {
+      expense: {
+        id: data['id']
+      },
+      input: {
+        amount: amount
+      }
+    }
+
+    payload = { query: query, variables: variables }.to_json
+
+    response = Faraday.post(
+      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+      payload,
+      { 'Content-Type' => 'application/json' }
+    )
+
+    response_body = JSON.parse(response.body)
+
+    if response_body['errors']
+      puts "Error: #{response_body['errors']}"
+    else
+      puts "Edited expense:"
+      puts JSON.pretty_generate(response_body['data']['editExpense'])
+    end
+  end
+
   def delete_expense
     query = <<~GRAPHQL
       mutation($expense: ExpenseReferenceInput!) {
@@ -225,6 +262,42 @@ class Invitation < ApplicationRecord
       update!(status: response_body['data']['processExpense']['status'])
     end
   end
+
+  def unapprove_expense
+    query = <<~GRAPHQL
+      mutation($expense: ExpenseReferenceInput!, $action: ExpenseProcessAction!) {
+        processExpense(expense: $expense, action: $action) {
+          id
+          status
+        }
+      }
+    GRAPHQL
+
+    variables = {
+      expense: {
+        id: data['id']
+      },
+      action: "UNAPPROVE"
+    }
+
+    payload = { query: query, variables: variables }.to_json
+
+    response = Faraday.post(
+      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
+      payload,
+      { 'Content-Type' => 'application/json' }
+    )
+
+    response_body = JSON.parse(response.body)
+
+    if response_body['errors']
+      puts "Error: #{response_body['errors']}"
+    else
+      puts "Unapproved expense:"
+      puts JSON.pretty_generate(response_body['data']['processExpense'])
+      update!(status: response_body['data']['processExpense']['status'])
+    end
+  end 
 
   def status
     return 'DELETED' if deleted_at.present?
