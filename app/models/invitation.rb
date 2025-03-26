@@ -169,10 +169,7 @@ class Invitation < ApplicationRecord
             amountV2: {
               valueInCents: amount,
               currency: 'USD'
-            },
-            description: item['description'],
-            incurredAt: Time.zone.now.iso8601,
-            url: nil
+            }
           }
         ]
       }
