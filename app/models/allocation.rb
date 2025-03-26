@@ -339,7 +339,7 @@ class Allocation < ApplicationRecord
         .sort_by { |_, amount_cents| -amount_cents } # Sort by amount descending
   
       grouped_allocations.each do |maintainer, amount_cents|
-        csv << [maintainer, amount_cents / 100.0]
+        csv << [maintainer, amount_cents / 100]
       end
     end
   end
