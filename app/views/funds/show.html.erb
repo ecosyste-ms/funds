@@ -19,7 +19,7 @@
           <div class="stat-card mb-2">
             <div class="stat-card-body">
               <span class="stat-card-title stat-card-title--large">
-                <%= @fund.possible_projects_count %>
+                <%= number_with_delimiter @fund.possible_projects_count %>
               </span>
               <span class="stat-card-text">Projects</span>
             </div>
@@ -62,7 +62,7 @@
           <strong><%= number_to_human(@fund.possible_project_dependent_packages, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %></strong>
           tracked packages and 
           <strong><%= number_to_human(@fund.possible_project_dependent_repos, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %></strong> tracked repositories weve determined that the following 
-          <strong><%= @fund.possible_projects_count %></strong> projects, representing 80% of measurable usage, are the most critical in the <strong><%= @fund.name %></strong> ecosystem.</p>
+          <strong><%= number_with_delimiter @fund.possible_projects_count %></strong> projects, representing 80% of measurable usage, are the most critical in the <strong><%= @fund.name %></strong> ecosystem.</p>
         </div>
       </div>
       <div class="row">
