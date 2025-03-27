@@ -199,7 +199,7 @@
                     <% allocations.each_with_index do |allocation, index| %>
                       <tr class="">
                         <td><%= allocations.length - index %></td>
-                        <td><%= number_to_currency (allocation.total_allocated_cents/100.0).round(2) %></td>
+                        <td><%= link_to number_to_currency((allocation.total_allocated_cents/100.0).round(2)), fund_allocation_path(allocation.fund, allocation) %></td>
                         <td>
                         <% if allocation.completed_at %>
                           <%= allocation.completed_at.strftime('%B %-d, %Y') %>
