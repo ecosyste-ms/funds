@@ -19,7 +19,12 @@
 	<% @fund.funders.each_with_index do |account, i| %>
 	  <tr class="">
 		<td><%= i + 1 %></td>
-		<td><%= image_tag(account[:image_url], class: 'img-fluid rounded-circle me-3', height: '36', width: '36') %><%= account[:name] %></td>
+		<td class="position-relative">
+			<%= image_tag(account[:image_url], class: 'img-fluid rounded-circle me-3 position-absolute', height: '36', width: '36') %>
+			<div class="ps-5 pt-1 pb-2">
+			  <%= account[:name] %>
+			</div> 
+		</td>
 		<td><%= number_to_currency account[:amount] %></td>
 		<td>
 		  <%= account[:donations_count] %>
