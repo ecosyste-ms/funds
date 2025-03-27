@@ -35,7 +35,7 @@
                 <h3 class="mb-3 block-link__title spesh-link"><%= fund.name %></h3>
                 <p><span class="label">Distributed</span><strong class="value"><%= number_to_currency fund.total_distributed_cents/100 %></strong></p>
                 <p><span class="label">From</span><strong class="value"><%= pluralize fund.total_donors, 'Funder'%></strong></p>
-                <p><span class="label">To</span><strong class="value"><%= pluralize fund.total_funded_projects, 'Projects' %></strong></p>
+                <p><span class="label">To</span><strong class="value"><%= pluralize fund.possible_projects_count, 'Projects' %></strong></p>
               </div>
               <div class="col-4 text-end">
                 <img src="<%= fund.logo_url %>" alt="" class="card-img-top img-fluid" onerror="this.style.display='none'" style="max-width: 60px;">
