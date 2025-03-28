@@ -215,9 +215,9 @@ class Fund < ApplicationRecord
 
   def possible_projects
     if primary_topic.present?
-      Project.keyword(all_keywords).exclude_keywords(excluded_topics).not_rejected_funding
+      Project.keyword(all_keywords).exclude_keywords(excluded_topics).not_rejected_funding.with_data
     elsif registry_name.present?
-      Project.registry_name(registry_name).not_rejected_funding
+      Project.registry_name(registry_name).not_rejected_funding.with_data
     end
   end
 

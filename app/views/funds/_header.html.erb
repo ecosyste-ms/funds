@@ -1,3 +1,6 @@
+<% @meta_title = @fund.name %>
+<% @meta_description = @fund.description %>
+
 <div class="fund-header purple-grad-bg  mb-5 pt-4 pb-4">
   <div class="container">
     <div class="row">
@@ -41,7 +44,7 @@
             <div class="stat-card mb-2">
               <div class="stat-card-body">
                 <span class="stat-card-title">
-                  <%= @fund.funded_projects_count %>
+                  <%= number_with_delimiter @fund.possible_projects_count %>
                 </span>
                 <span class="stat-card-text small">Projects</span>
               </div>

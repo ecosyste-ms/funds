@@ -31,6 +31,8 @@ class Project < ApplicationRecord
 
   scope :not_rejected_funding, -> { where(funding_rejected: false) }
 
+  scope :with_data, -> { where("total_downloads > 0 OR total_dependent_repos > 0 OR total_dependent_packages > 0") }
+
   before_save :set_name
 
   def set_name
