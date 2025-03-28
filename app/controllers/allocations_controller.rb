@@ -14,6 +14,7 @@ class AllocationsController < ApplicationController
                                                              .order('amount_cents desc, score desc')
                                                              .where('amount_cents >= 1')
                                                              .joins(:project)
+                                                             .includes(:project, :funding_source)
                                                              .select('project_allocations.*, projects.name as project_name, projects.url as project_url, projects.total_downloads as project_downloads, projects.total_dependent_repos as project_dependent_repos, projects.total_dependent_packages as project_dependent_packages, projects.funding_rejected as project_funding_rejected')
   end
 

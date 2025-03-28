@@ -26,7 +26,7 @@
                 <h2 class="card-title">As an individual</h2>
                 <p class="card-text">Donate instantly with a credit card, or log in to use Open Collective</p>
                 <p class="card-text mt-4"><a href="<%= donate_fund_path(@fund, embed: true) %>" class="btn btn-primary rounded-pill me-md-3">Donate instantly</a>
-                <a href="<%= @fund.open_collective_project_donate_url(redirect_url: request.original_url) %>" class="btn btn-success rounded-pill mt-3 mt-md-0 mt-lg-3 mt-xl-0">Donate with Open Collective</a></p>
+                <a href="<%= @fund.open_collective_project_donate_url(redirect_url: request.original_url) %>" class="btn btn-success rounded-pill mt-3 mt-md-0  mt-xl-0">Donate with Open Collective</a></p>
               </div>
             </div>
           </div>
@@ -42,7 +42,7 @@
                 <h2 class="card-title">On behalf of an organisation</h2>
                 <p class="card-text">Request an invoice or vendor registration, or donate on behalf of your organisation with your Open Collective account</p>
                 <p class="card-text mt-4"><a href="<%= @fund.invoice_mailto_url %>" class="btn btn-danger rounded-pill me-md-3">Request an invoice</a>
-                <a href="<%= @fund.open_collective_project_donate_url(redirect_url: request.original_url) %>" class="btn btn-success rounded-pill  mt-3 mt-md-0 mt-lg-3 mt-xl-0">Donate with Open Collective</a></p>
+                <a href="<%= @fund.open_collective_project_donate_url(redirect_url: request.original_url) %>" class="btn btn-success rounded-pill  mt-3 mt-md-0 mt-xl-0">Donate with Open Collective</a></p>
               </div>
             </div>
           </div>

@@ -20,7 +20,12 @@
           <!-- Main Row -->
           <tr class="clickable-row <%= 'row-rejected' if project_allocation.project_funding_rejected %>" data-bs-toggle="collapse" data-bs-target="#details-<%= i %>" role="button" aria-controls="#details-<%= i %>">
             <td><%= i + 1 %></td>
-            <td><%= link_to project_allocation.project_name, project_allocation.project_url, target: :_blank %></td>
+            <td class="position-relative">
+              <img src="<%= project_allocation.project.avatar_url %>" height='36' width='36' onerror="this.style.display='none'" class="me-3 position-absolute" loading="lazy" >
+              <div class="ps-5 pt-1 pb-2">
+                <%= link_to project_allocation.project, project_allocation.project.url %>
+              </div> 
+            </td>
             <td><%= number_to_currency project_allocation.amount_cents / 100.0 %></td>
             <td>
               <%= number_to_human(project_allocation.project_downloads, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %>
