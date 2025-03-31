@@ -408,6 +408,7 @@ class ProjectAllocation < ApplicationRecord
           slug: vendor.slug
         },
         payoutMethod: { type: "ACCOUNT_BALANCE" },
+        tags: [vendor.platform, "ecosystem-fund"],
         accountingCategory: "3vjrkx5l-mnv904qj-jmq8bwa7-zdygoe3d" # 7032 - "Expenses - Donations & Sponsorships"
       }
     }
