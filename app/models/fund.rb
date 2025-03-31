@@ -19,7 +19,13 @@ class Fund < ApplicationRecord
     where("name ILIKE :query OR description ILIKE :query", query: "%#{query}%")
       .left_joins(:allocations)
       .group("funds.id")
-      .order("COUNT(allocations.id) DESC")
+      .order(Arel.sql(<<~SQL.squish))
+        CASE
+          WHEN LOWER(name) = LOWER('#{query}') THEN 0
+          ELSE 1
+        END,
+        COUNT(allocations.id) DESC
+      SQL
   end
 
   def self.sync_least_recently_synced    
