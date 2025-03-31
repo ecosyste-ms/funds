@@ -20,7 +20,7 @@
 	  <tr class="">
 		<td><%= i + 1 %></td>
 		<td class="position-relative">
-			<%= image_tag(account[:image_url], class: 'img-fluid rounded-circle me-3 position-absolute', height: '36', width: '36', loading: 'lazy') %>
+			<%= image_tag(account[:image_url], class: 'img-fluid rounded-circle me-3 position-absolute', height: '36', width: '36', loading: 'lazy', alt: account[:name]) %>
 			<div class="ps-5 pt-1 pb-2">
 			  <%= account[:name] %>
 			</div> 

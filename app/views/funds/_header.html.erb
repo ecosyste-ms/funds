@@ -6,7 +6,7 @@
     <div class="row">
       <% if @fund.logo_url.present? %>
         <div class="col-md-1 mb-3 pt-3">
-          <img src="<%= @fund.logo_url %>" alt="" class="img-fluid fund-logo" onerror="this.style.display='none'">
+          <img src="<%= @fund.logo_url %>" alt="<%= @fund.name %> logo" class="img-fluid fund-logo" onerror="this.style.display='none'">
         </div>
       <% end %>
       <div class="<% if @fund.logo_url.present? %>col-md-11<% end %>">

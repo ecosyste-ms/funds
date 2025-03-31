@@ -38,7 +38,7 @@
                 <p><span class="label">To</span><strong class="value"><%= pluralize fund.possible_projects_count, 'Projects' %></strong></p>
               </div>
               <div class="col-4 text-end">
-                <img src="<%= fund.logo_url %>" alt="" class="card-img-top img-fluid" onerror="this.style.display='none'" style="max-width: 60px;">
+                <img src="<%= fund.logo_url %>" alt="<%= fund.name %> logo" class="card-img-top img-fluid" onerror="this.style.display='none'" style="max-width: 60px;">
               </div>
             </div>
           </a>
@@ -51,7 +51,7 @@
       <% @funds.each do |fund| %>
         <div class="col-lg">
           <a href="<%= fund_path(fund) %>" class="fund-card fund-card--small card text-center block-link">
-            <img src="<%= fund.logo_url %>" class="card-img-top" onerror="this.style.display='none'">
+            <img src="<%= fund.logo_url %>" class="card-img-top" onerror="this.style.display='none'" alt="<%= fund.name %> logo">
             <div class="card-body">
               <h3 class="card-title block-link__title">
                 <%= fund.name %>
@@ -96,25 +96,25 @@
     </div>
     <div class="row mb-5 how-it-works">
       <div class="col-md-6 col-xl-3">
-        <%= image_tag("fund.svg", alt: "", size: "64x56") %>
+        <%= image_tag("fund.svg", alt: "Sponsorship icon", size: "64x56") %>
         <h3 class="h4 mt-3 mb-4">Sponsor the technology you rely on</h3>
         <p class="small">Choose from our curated funds, called ecosystems, dedicated to supporting the work of critical projects and maintainers within their respective communities.</p>
       </div>
 
       <div class="col-md-6 col-xl-3">
-        <%= image_tag("moving-money.svg", alt: "", size: "64x56") %>
+        <%= image_tag("moving-money.svg", alt: "Fair distribution icon", size: "64x56") %>
         <h3 class="h4 mt-3 mb-4">We give projects their fair share</h3>
         <p class="small">We allocate the funding  to projects according to their usage among the other dependencies in their ecosystem.</p>
       </div>
 
       <div class="col-md-6 col-xl-3 ">
-        <%= image_tag("wallet.svg", alt: "", size: "64x56") %>
+        <%= image_tag("wallet.svg", alt: "Payment choice icon", size: "64x56") %>
         <h3 class="h4 mt-3 mb-4">Projects choose how to get paid</h3>
         <p class="small">Projects collect their funding however they want to (minus a 10% fee) using their chosen financial tools.</p>
       </div>
 
       <div class="col-md-6 col-xl-3 ">
-        <%= image_tag("magnifying-glass.svg", alt: "", size: "64x56") %>
+        <%= image_tag("magnifying-glass.svg", alt: "Transparency icon", size: "64x56") %>
         <h3 class="h4 mt-3 mb-4">Open, transparent, accountable</h3>
         <p class="small">You see where your money went, and how it has been spent, and the impact of your financial support.</p>
 

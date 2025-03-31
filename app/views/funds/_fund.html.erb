@@ -1,6 +1,6 @@
 <div class="col">
   <div class="card" >
-    <img src="<%= fund.logo_url %>" class="card-img-top" onerror="this.style.display='none'">
+    <img src="<%= fund.logo_url %>" class="card-img-top" onerror="this.style.display='none'" alt="<%= fund.name %> logo">
     <div class="card-body">
       <h5 class="card-title">
         <%= link_to fund.name, fund_path(fund) %>

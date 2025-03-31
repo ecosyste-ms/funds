@@ -22,7 +22,7 @@
         <% @funds.each do |fund| %>
           <div class="card mb-4 pb-4 listing d-flex flex-row align-items-center">
             <a href="<%= fund_path(fund) %>">
-              <img src="<%= fund.logo_url %>" alt="" class="card-img img-fluid" onerror="this.style.display='none'" style="max-width: 60px;">
+              <img src="<%= fund.logo_url %>" alt="<%= fund.name %> logo" class="card-img img-fluid" onerror="this.style.display='none'" style="max-width: 60px;">
             </a>
             <div class="card-body p-0 ms-3">
               <h3 class="card-title listing__title mt-3">

@@ -21,7 +21,7 @@
           <tr class="clickable-row <%= 'row-rejected' if project_allocation.project_funding_rejected %>" data-bs-toggle="collapse" data-bs-target="#details-<%= i %>" role="button" aria-controls="#details-<%= i %>">
             <td><%= i + 1 %></td>
             <td class="position-relative">
-              <img src="<%= project_allocation.project.avatar_url %>" height='36' width='36' onerror="this.style.display='none'" class="me-3 position-absolute" loading="lazy" >
+              <img src="<%= project_allocation.project.avatar_url %>" height='36' width='36' onerror="this.style.display='none'" class="me-3 position-absolute" loading="lazy" alt="<%= project_allocation.project %> logo">
               <div class="ps-5 pt-1 pb-2">
                 <%= link_to project_allocation.project, project_allocation.project.url %>
               </div> 
