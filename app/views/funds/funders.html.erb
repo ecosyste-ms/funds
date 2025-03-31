@@ -70,7 +70,7 @@
                   <%= account[:donations_count] %>
                 </td>
                 <td>
-                <a href="<%= "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{account[:slug]}" %>" class="block-link block-link--spesh">Open Collective <%= bootstrap_icon 'box-arrow-up-right', width: 16, height: 16 %> </a>
+                <a href="<%= "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{account[:slug]}" %>" class="block-link block-link--spesh" aria-label="View <%= account[:name] %> on Open Collective (opens in new tab)">Open Collective <%= bootstrap_icon 'box-arrow-up-right', width: 16, height: 16, 'aria-hidden': true %> </a>
                 </td>
                 
               </tr>

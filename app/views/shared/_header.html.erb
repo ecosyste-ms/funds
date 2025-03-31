@@ -46,7 +46,7 @@
 			<label for="query" class="ps-3 mb-2 visually-hidden">Fund name</label>
 			<div class="input-group rounded-input-group">
 			  <%= text_field_tag :query, params[:query], class: "form-control form-control", placeholder: "Find a fund" %>
-			  <button type="submit" class="btn btn-danger pe-4">Search</button>
+			  <button type="submit" class="btn btn-danger pe-4" aria-label="Find a fund">Search</button>
 			</div>
 			<% end %>
         </div>

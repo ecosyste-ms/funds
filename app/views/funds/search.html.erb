@@ -6,7 +6,7 @@
       <label for="query" class="ps-3 mb-2">Fund name</label>
     <div class="input-group rounded-input-group" style="max-width: 500px;">
       <%= text_field_tag :query, params[:query], class: "form-control form-control-lg", placeholder: "eg. Django" %>
-      <button type="submit" class="btn btn-lg btn-danger pe-4">Search</button>
+      <button type="submit" class="btn btn-lg btn-danger pe-4" aria-label="Search funds">Search</button>
     </div>
     <% end %>
   </div>
@@ -57,7 +57,7 @@
               <p>Try amending your search to use more general terms</p>
               <h2 class="h4 mt-5">Can’t find your fund?</h2>
               <p class="small">Contact us to talk about adding a new fund</p>
-              <a href="mailto:hello@oscollective.org" class="btn btn-primary">Contact us</a>
+              <a href="mailto:hello@oscollective.org" class="btn btn-primary" aria-label="Contact Open Source Collective via email">Contact us</a>
             </div>
           </div>
       <% end %>
@@ -69,7 +69,7 @@
       <% if @funds.any? %>
         <h2 class="h4">Can’t find your fund?</h2>
         <p class="small">Contact us to talk about adding a new fund</p>
-        <a href="mailto:hello@oscollective.org" class="btn btn-primary">Contact us</a>
+        <a href="mailto:hello@oscollective.org" class="btn btn-primary" aria-label="Contact Open Source Collective via email">Contact us</a>
       <% end %>
     </div>
   </div>
