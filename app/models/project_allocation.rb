@@ -397,7 +397,7 @@ class ProjectAllocation < ApplicationRecord
     GQL
   
     variables = {
-      account: { slug: fund.oc_project_slug },          # Collective initiating the expense draft
+      account: { slug: fund.oc_project_slug },
       expense: {
         description: expense_invite_title,
         longDescription: description,
@@ -407,7 +407,8 @@ class ProjectAllocation < ApplicationRecord
         payee: {
           slug: vendor.slug
         },
-        payoutMethod: { type: "ACCOUNT_BALANCE" }       # Specify payout method, adjust if needed
+        payoutMethod: { type: "ACCOUNT_BALANCE" },
+        accountingCategory: "3vjrkx5l-mnv904qj-jmq8bwa7-zdygoe3d" # 7032 - "Expenses - Donations & Sponsorships"
       }
     }
     payload = { query: query, variables: variables }.to_json
