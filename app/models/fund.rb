@@ -28,7 +28,7 @@ class Fund < ApplicationRecord
     end
   end
 
-  before_save :set_possible_projects_count
+  before_update :set_possible_projects_count
 
   def set_possible_projects_count
     self.possible_projects_count = possible_projects.count
