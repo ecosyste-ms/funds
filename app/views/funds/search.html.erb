@@ -6,7 +6,7 @@
       <label for="query" class="ps-3 mb-2">Fund name</label>
     <div class="input-group rounded-input-group" style="max-width: 500px;">
       <%= text_field_tag :query, params[:query], class: "form-control form-control-lg", placeholder: "eg. Django" %>
-      <button type="submit" class="btn btn-lg btn-danger pe-4">Search</button>
+      <button type="submit" class="btn btn-lg btn-danger pe-4" aria-label="Search funds">Search</button>
     </div>
     <% end %>
   </div>
@@ -22,7 +22,7 @@
         <% @funds.each do |fund| %>
           <div class="card mb-4 pb-4 listing d-flex flex-row align-items-center">
             <a href="<%= fund_path(fund) %>">
-              <img src="<%= fund.logo_url %>" alt="" class="card-img img-fluid" onerror="this.style.display='none'" style="max-width: 60px;">
+              <img src="<%= fund.logo_url %>" alt="<%= fund.name %> logo" class="card-img img-fluid" onerror="this.style.display='none'" style="max-width: 60px;">
             </a>
             <div class="card-body p-0 ms-3">
               <h3 class="card-title listing__title mt-3">
@@ -57,7 +57,7 @@
               <p>Try amending your search to use more general terms</p>
               <h2 class="h4 mt-5">Can’t find your fund?</h2>
               <p class="small">Contact us to talk about adding a new fund</p>
-              <a href="mailto:hello@oscollective.org" class="btn btn-primary">Contact us</a>
+              <a href="mailto:hello@oscollective.org" class="btn btn-primary" aria-label="Contact Open Source Collective via email">Contact us</a>
             </div>
           </div>
       <% end %>
@@ -69,7 +69,7 @@
       <% if @funds.any? %>
         <h2 class="h4">Can’t find your fund?</h2>
         <p class="small">Contact us to talk about adding a new fund</p>
-        <a href="mailto:hello@oscollective.org" class="btn btn-primary">Contact us</a>
+        <a href="mailto:hello@oscollective.org" class="btn btn-primary" aria-label="Contact Open Source Collective via email">Contact us</a>
       <% end %>
     </div>
   </div>

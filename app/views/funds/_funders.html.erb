@@ -20,7 +20,7 @@
 	  <tr class="">
 		<td><%= i + 1 %></td>
 		<td class="position-relative">
-			<%= image_tag(account[:image_url], class: 'img-fluid rounded-circle me-3 position-absolute', height: '36', width: '36', loading: 'lazy') %>
+			<%= image_tag(account[:image_url], class: 'img-fluid rounded-circle me-3 position-absolute', height: '36', width: '36', loading: 'lazy', alt: account[:name]) %>
 			<div class="ps-5 pt-1 pb-2">
 			  <%= account[:name] %>
 			</div> 
@@ -30,7 +30,7 @@
 		  <%= account[:donations_count] %>
 		</td>
 		<td>
-		<a href="<%= "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{account[:slug]}" %>" class="block-link block-link--spesh">Open Collective <%= bootstrap_icon 'box-arrow-up-right', width: 16, height: 16 %> </a>
+		<a href="<%= "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{account[:slug]}" %>" class="block-link block-link--spesh" aria-label="View <%= account[:name] %> on Open Collective (opens in new tab)">Open Collective <%= bootstrap_icon 'box-arrow-up-right', width: 16, height: 16, 'aria-hidden': true %> </a>
 		</td>
 		
 	  </tr>
