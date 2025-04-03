@@ -136,7 +136,7 @@ GEM
       multipart-post (~> 2.0)
     faraday-net_http (3.4.0)
       net-http (>= 0.5.0)
-    faraday-retry (2.3.0)
+    faraday-retry (2.3.1)
       faraday (~> 2.0)
     ffi (1.17.1)
     ffi (1.17.1-aarch64-linux-gnu)
@@ -240,7 +240,7 @@ GEM
     ostruct (0.6.1)
     pagy (9.3.4)
     pg (1.5.9)
-    pg_query (6.0.0)
+    pg_query (6.1.0)
       google-protobuf (>= 3.25.3)
     pghero (3.6.2)
       activerecord (>= 6.1)
@@ -487,7 +487,7 @@ CHECKSUMS
   faraday-follow_redirects (0.3.0) sha256=d92d975635e2c7fe525dd494fcd4b9bb7f0a4a0ec0d5f4c15c729530fdb807f9
   faraday-multipart (1.1.0) sha256=856b0f1c7316a4d6c052dd2eef5c42f887d56d93a171fe8880da1af064ca0751
   faraday-net_http (3.4.0) sha256=a1f1e4cd6a2cf21599c8221595e27582d9936819977bbd4089a601f24c64e54a
-  faraday-retry (2.3.0) sha256=7e17d1738e256cfdacadfb5558bb9a62b7b5054784fe8072c4e967c313677acc
+  faraday-retry (2.3.1) sha256=4004faa21f41fc5360d359bc79889fc58fb7fae0ce93bfb737a784ac76805c03
   ffi (1.17.1) sha256=26f6b0dbd1101e6ffc09d3ca640b2a21840cc52731ad8a7ded9fb89e5fb0fc39
   ffi (1.17.1-aarch64-linux-gnu) sha256=c5d22cb545a3a691d46060f1343c461d1a8d38c3fd71b96b4cbbe6906bf1fd38
   ffi (1.17.1-aarch64-linux-musl) sha256=88b9d6ae905d21142df27c94bb300042c1aae41b67291885f600eaad16326b1d
@@ -544,7 +544,7 @@ CHECKSUMS
   ostruct (0.6.1) sha256=09a3fb7ecc1fa4039f25418cc05ae9c82bd520472c5c6a6f515f03e4988cb817
   pagy (9.3.4) sha256=b058e064bd02237e76d591e90fadc02c795426dd51f90d0c51089558bf3ab5f7
   pg (1.5.9) sha256=761efbdf73b66516f0c26fcbe6515dc7500c3f0aa1a1b853feae245433c64fdc
-  pg_query (6.0.0) sha256=fbf09a4e900cee1d61e2bbfda1fefdbc35bc83c5f1c7ae1be1c6ffc5ae0f5c04
+  pg_query (6.1.0) sha256=8b005229e209f12c5887c34c60d0eb2a241953b9475b53a9840d24578532481e
   pghero (3.6.2) sha256=0520429820a6c209e32d39471fe09ea270f73f0a8f6154897c408fb02f2e5896
   popper_js (2.11.8) sha256=f4b0be717fc0d50bdb3dbbc55788525a9e0e8f640b76c9971fc34ee609eadbd2
   pp (0.6.2) sha256=947ec3120c6f92195f8ee8aa25a7b2c5297bb106d83b41baa02983686577b6ff
