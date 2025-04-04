@@ -127,7 +127,7 @@ class ProjectAllocation < ApplicationRecord
   
       For more information, please visit our FAQ at https://funds.ecosyste.ms/faq.
 
-      If you have any questions or need assistance, please contact us at hello@oscollective.org.
+      If you have any questions or need assistance, please contact us at support@ecosyste.ms.
   
       Thank you for your continued contributions to the #{fund.name} open source community!
     DESCRIPTION
@@ -142,7 +142,7 @@ class ProjectAllocation < ApplicationRecord
   
         For more information, please visit our FAQ at https://funds.ecosyste.ms/faq.
 
-        If you have any questions or need assistance, please contact us at hello@oscollective.org.
+        If you have any questions or need assistance, please contact us at support@ecosyste.ms.
   
         Thank you for your incredible contributions to the #{fund.name} open source community!
       DESCRIPTION
@@ -154,7 +154,7 @@ class ProjectAllocation < ApplicationRecord
   
         For more information, please visit our FAQ at https://funds.ecosyste.ms/faq.
 
-        If you have any questions or need assistance, please contact us at hello@oscollective.org.
+        If you have any questions or need assistance, please contact us at support@ecosyste.ms.
   
         Thank you for your contributions to the #{fund.name} open source community!
       DESCRIPTION
