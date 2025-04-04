@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   resources :funds, only: [:index, :show] do
     collection do
       get :search
+      get :all
     end
     member do
       get :transactions
