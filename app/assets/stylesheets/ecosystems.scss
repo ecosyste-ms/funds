@@ -61,6 +61,25 @@ $btn-color: $color-white;
 $badge-font-weight: 400;
 $badge-padding-y: 0.4em;
 
+/* Outputs our colours variables as css variables so that chart.js can access them */
+:root {
+  --es-purple: #{$color-purple};
+  --es-purple-light: #{$color-purple-light};
+  --es-purple-dark: #{$color-purple-dark};
+  --es-orange: #{$color-orange};
+  --es-orange-light: #{$color-orange-light};
+  --es-orange-dark: #{$color-orange-dark};
+  --es-green: #{$color-green};
+  --es-green-light: #{$color-green-light};
+  --es-green-dark: #{$color-green-dark};
+  --es-green-darker: #{$color-green-darker};
+  --es-black: #{$color-black};
+  --es-white: #{$color-white};
+  --es-grey-light: #{$color-grey-light};
+  --es-grey: #{$color-grey};
+  --es-grey-dark: #{$color-grey-dark};
+}
+
 @import "bootstrap"; 
 
 @mixin spesh-link (
@@ -476,6 +495,10 @@ body {
   font-size: 1rem;
 }
 
+.stat-card-text--x-small {
+  font-size: 0.875rem;
+}
+
 .stat-card-title {
   @include font-size(2.1875rem);
   font-weight: 800;
@@ -489,7 +512,17 @@ body {
   font-size: $h3-font-size;
 }
 
+.stat-card-number-neutral {
+  color: $color-purple-dark;
+}
 
+.stat-card-number-positive {
+  color: $color-green-dark;
+}
+
+.stat-card-number-negative {
+  color: $color-orange-dark;
+}
 
 .well {
   background-color: $color-grey-light;
@@ -615,6 +648,25 @@ body {
   table {
     --bs-table-bg: transparent;
   }
+}
+
+.well {
+	.table-wrapper {
+		/* Add a shadow to indicate there's more to see if you scroll */
+		background: 
+		  linear-gradient(90deg, $color-grey-light 20%, rgba(255, 255, 255, 0)),
+		  linear-gradient(90deg, rgba(255, 255, 255, 0), $color-grey-light 80%) 
+						  100% 0,
+		  radial-gradient(farthest-side at 0 0%, $color-grey, rgba(0, 0, 0, 0)),
+		  radial-gradient(farthest-side at 100% 0%, $color-grey, rgba(0, 0, 0, 0))
+						  100% 0;
+		background-repeat: no-repeat;
+		background-size: 20% 200%, 20% 200%, 8% 400%, 8% 400%;
+		background-attachment: local, local, scroll, scroll;
+		table {
+		  --bs-table-bg: transparent;
+		}
+	  }
 }
 
 .table {
