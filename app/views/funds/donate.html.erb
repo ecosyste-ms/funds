@@ -50,7 +50,7 @@
       </div>
       <div class="col-12 col-lg-4 page-content">
         <h3 class="mt-lg-0">How donating works</h3>
-        <p>Donations are allocated and distributed between the projects in this ecosystem monthly. The next allocation takes place on <strong><%= @fund.next_allocation_date.strftime('%-d %B %Y') %></strong>.</p>
+        <p>Donations are allocated and distributed between the projects in this ecosystem monthly. The next allocation takes place on <strong><%= @fund.next_allocation_date.strftime('%-d %B %Y') %></strong> if the fund has at least $1,000 in it.</p>
         <p>Projects receive their share based on a combination of observed usage amongst 240m tracked repositories and downloads for 10.7m tracked packages.</p>
         <p><a href="<%= overview_path %>">Read more in our overview</a></p>
       </div>
@@ -79,7 +79,7 @@
       </div>
       <div class="col-12 col-lg-4 page-content">
         <h3 class="mt-lg-0">How donating works</h3>
-        <p>Donations are allocated and distributed between the projects in this ecosystem monthly. The next allocation takes place on <strong><%= @fund.next_allocation_date.strftime('%-d %B %Y') %></strong>.
+        <p>Donations are allocated and distributed between the projects in this ecosystem monthly. The next allocation takes place on <strong><%= @fund.next_allocation_date.strftime('%-d %B %Y') %></strong> if the fund has at least $1,000 in it.
         </p>
         <p>Projects receive their share based on a combination of observed usage amongst 240m tracked repositories and downloads for 10.7m tracked packages.</p>
         <p><a href="<%= overview_path %>">Read more in our overview</a></p>
