@@ -758,4 +758,10 @@ class Fund < ApplicationRecord
   def in_progress_allocations_total
     allocations.not_completed.sum(:total_cents) / 100.0
   end
+
+  def next_allocation_date
+    now = Time.zone.now
+    next_month = now.day > 3 ? now.next_month : now
+    Time.zone.local(next_month.year, next_month.month, 3)
+  end
 end
