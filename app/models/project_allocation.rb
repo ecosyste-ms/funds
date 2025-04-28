@@ -310,6 +310,7 @@ class ProjectAllocation < ApplicationRecord
         draftExpenseAndInviteUser(
           account: $account,
           expense: $expense,
+          lockedFields: [AMOUNT],
           skipInvite: true
         ) {
           id
@@ -329,7 +330,7 @@ class ProjectAllocation < ApplicationRecord
     GQL
   
     variables = {
-      account: { slug: fund.oc_project_slug },          # Collective initiating the expense draft
+      account: { slug: fund.oc_project_slug },
       expense: {
         description: expense_invite_title,
         longDescription: description,
@@ -338,9 +339,12 @@ class ProjectAllocation < ApplicationRecord
         items: [{ amount: amount_cents, description: description }],
         payee: {
           slug: collective_slug,
-          isInvite: true                                # Marking as an invite for the payee collective
+          isInvite: true
         },
-        payoutMethod: { type: "ACCOUNT_BALANCE" }       # Specify payout method, adjust if needed
+        payoutMethod: { 
+          data: {},
+          isSaved: false
+         }
       }
     }
     payload = { query: query, variables: variables }.to_json
