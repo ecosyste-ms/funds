@@ -12,6 +12,11 @@ Rails.application.routes.draw do
 
   namespace :admin do
     resources :invitations, only: [:index]
+    resources :allocations, only: [:index] do
+      collection do
+        get :github_sponsors
+      end
+    end
   end
 
   resources :funds, only: [:index, :show] do
