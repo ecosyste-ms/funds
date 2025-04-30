@@ -11,4 +11,9 @@ namespace :funds do
     Fund.all.find_each(&:allocate_to_projects)
     Allocation.not_completed.find_each(&:send_invitations)
   end
+
+  task payout: :environment do
+    Allocation.not_completed.find_each(&:payout)
+    AllocationMailer.github_sponsors_csv("benjam@opencollective.com").deliver_now
+  end
 end

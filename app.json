@@ -31,6 +31,10 @@
     {
       "command": "bundle exec rake funds:run_allocations",
       "schedule": "0 12 1 * *"
+    },
+    {
+      "command": "bundle exec rake funds:payout",
+      "schedule": "0 12 15 * *"
     }
   ]
 }
