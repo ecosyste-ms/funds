@@ -16,4 +16,9 @@ namespace :funds do
     Allocation.not_completed.find_each(&:payout)
     AllocationMailer.github_sponsors_csv("benjam@opencollective.com").deliver_now
   end
+
+  task complete_allocations: :environment do
+    Invitation.delete_expired
+    Allocation.not_completed.each(&:complete!)
+  end
 end
