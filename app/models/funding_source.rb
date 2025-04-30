@@ -12,6 +12,10 @@ class FundingSource < ApplicationRecord
   
   scope :with_project_allocations, -> { where('EXISTS (SELECT 1 FROM project_allocations WHERE project_allocations.funding_source_id = funding_sources.id)') }
 
+  def self.sync_all
+    FundingSource.with_project_allocations.approved.find_each(&:sync_all)
+  end
+
   def self.open_collective_github_sponsors_mapping
     @open_collective_github_sponsors_mapping ||= begin
       url = 'https://raw.githubusercontent.com/opencollective/opencollective-tools/refs/heads/main/github-sponsors/csv-import-mapping.json'

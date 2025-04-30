@@ -14,6 +14,18 @@
     },
     {
       "command": "bundle exec rake funding_sources:update_project_allocation_funding_sources",
+      "schedule": "0 1 * * *"
+    },
+    {
+      "command": "bundle exec rake funding_sources:sync_all",
+      "schedule": "0 1 * * *"
+    },
+    {
+      "command": "bundle exec rake fund:sync_transactions",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "command": "bundle exec rake projects:sync_projects_with_allocations",
       "schedule": "0 0 * * *"
     }
   ]

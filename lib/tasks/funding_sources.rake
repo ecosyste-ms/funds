@@ -6,4 +6,8 @@ namespace :funding_sources do
   task update_project_allocation_funding_sources: :environment do
     ProjectAllocation.update_funding_sources
   end
+
+  task sync_all: :environment do
+    FundingSource.sync_all
+  end
 end
