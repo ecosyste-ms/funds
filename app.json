@@ -27,6 +27,10 @@
     {
       "command": "bundle exec rake projects:sync_projects_with_allocations",
       "schedule": "0 0 * * *"
+    },
+    {
+      "command": "bundle exec rake funds:run_allocations",
+      "schedule": "0 12 1 * *"
     }
   ]
 }
