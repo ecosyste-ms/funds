@@ -21,7 +21,7 @@
       "schedule": "0 1 * * *"
     },
     {
-      "command": "bundle exec rake fund:sync_transactions",
+      "command": "bundle exec rake funds:sync_transactions",
       "schedule": "0 0 * * *"
     },
     {
