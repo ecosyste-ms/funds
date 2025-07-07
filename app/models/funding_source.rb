@@ -1,4 +1,5 @@
 class FundingSource < ApplicationRecord
+  include EcosystemsApiClient
   validates :url, presence: true
 
   has_many :projects
@@ -29,7 +30,7 @@ class FundingSource < ApplicationRecord
   def self.github_sponsors_logins
     @github_sponsors_logins ||= begin
       url = 'https://sponsors.ecosyste.ms/api/v1/accounts/sponsor_logins'
-      response = Faraday.get(url)
+      response = ecosystems_api_request(url)
       JSON.parse(response.body)
     rescue
       []  
@@ -119,13 +120,7 @@ class FundingSource < ApplicationRecord
     return unless platform == 'opencollective.com'
 
     oc_url = "https://opencollective.ecosyste.ms/api/v1/collectives/#{name}"
-
-    conn = Faraday.new(url: oc_url) do |faraday|
-      faraday.response :follow_redirects
-      faraday.adapter Faraday.default_adapter
-    end
-
-    response = conn.get
+    response = ecosystems_api_request(oc_url)
     return unless response.success?
     self.collective = JSON.parse(response.body)
     self.save if changed?
@@ -135,13 +130,7 @@ class FundingSource < ApplicationRecord
     return unless platform == 'github.com'
 
     gh_url = "https://sponsors.ecosyste.ms/api/v1/accounts/#{name.downcase}"
-
-    conn = Faraday.new(url: gh_url) do |faraday|
-      faraday.response :follow_redirects
-      faraday.adapter Faraday.default_adapter
-    end
-
-    response = conn.get
+    response = ecosystems_api_request(gh_url)
     return unless response.success?
     self.github_sponsors = JSON.parse(response.body)
     self.save if changed?

@@ -1,4 +1,5 @@
 class Fund < ApplicationRecord
+  include EcosystemsApiClient
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true
 
@@ -57,9 +58,8 @@ class Fund < ApplicationRecord
   end
 
   def self.import_suggested_topics
-    url = "https://awesome.ecosyste.ms/api/v1/topics/suggestions?per_page=1000"
-
-    resp = Faraday.get url
+    url = "https://awesome.ecosyste.ms/api/v1/topics/suggestions"
+    resp = ecosystems_api_request(url, per_page: 1000)
     return unless resp.status == 200
 
     data = JSON.parse(resp.body)
@@ -77,8 +77,7 @@ class Fund < ApplicationRecord
 
   def self.import_from_topic(topic)
     topic_url = "https://awesome.ecosyste.ms/api/v1/topics/#{topic}"
-
-    resp = Faraday.get topic_url
+    resp = ecosystems_api_request(topic_url)
     return unless resp.status == 200
       
     topic = JSON.parse(resp.body)
@@ -139,7 +138,7 @@ class Fund < ApplicationRecord
     loop do
       break if page > 10
       puts "Fetching page #{page} of projects for #{name}"
-      resp = Faraday.get("https://packages.ecosyste.ms/api/v1/keywords/#{keyword}?per_page=100&page=#{page}")
+      resp = ecosystems_api_request("https://packages.ecosyste.ms/api/v1/keywords/#{keyword}", per_page: 100, page: page)
       break unless resp.status == 200
   
       data = JSON.parse(resp.body)
@@ -172,7 +171,7 @@ class Fund < ApplicationRecord
     page = 1
     loop do
       puts "Fetching page #{page} of projects for #{name}"
-      resp = Faraday.get("https://packages.ecosyste.ms/api/v1/registries/#{registry_name}/packages?critical=true&per_page=100&page=#{page}")
+      resp = ecosystems_api_request("https://packages.ecosyste.ms/api/v1/registries/#{registry_name}/packages", critical: true, per_page: 100, page: page)
       break unless resp.status == 200
 
       data = JSON.parse(resp.body)

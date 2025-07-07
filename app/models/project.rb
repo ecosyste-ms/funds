@@ -1,4 +1,5 @@
 class Project < ApplicationRecord
+  include EcosystemsApiClient
 
   validates :url, presence: true, uniqueness: { case_sensitive: false }
 
@@ -147,7 +148,7 @@ class Project < ApplicationRecord
 
   def ping
     ping_urls.each do |url|
-      Faraday.get(url) rescue nil
+      ecosystems_api_request(url) rescue nil
     end
   end
 
@@ -215,12 +216,7 @@ class Project < ApplicationRecord
   end
 
   def fetch_repository
-    conn = Faraday.new(url: repos_api_url) do |faraday|
-      faraday.response :follow_redirects
-      faraday.adapter Faraday.default_adapter
-    end
-
-    response = conn.get
+    response = ecosystems_api_request(repos_api_url)
     return unless response.success?
     self.repository = JSON.parse(response.body)
     self.save
@@ -246,12 +242,7 @@ class Project < ApplicationRecord
 
   def fetch_owner
     return unless owner_api_url.present?
-    conn = Faraday.new(url: owner_api_url) do |faraday|
-      faraday.response :follow_redirects
-      faraday.adapter Faraday.default_adapter
-    end
-
-    response = conn.get
+    response = ecosystems_api_request(owner_api_url)
     return unless response.success?
     self.owner = JSON.parse(response.body)
     self.save
@@ -268,21 +259,11 @@ class Project < ApplicationRecord
 
   def fetch_events
     return unless timeline_url.present?
-    conn = Faraday.new(url: timeline_url) do |faraday|
-      faraday.response :follow_redirects
-      faraday.adapter Faraday.default_adapter
-    end
-
-    response = conn.get
+    response = ecosystems_api_request(timeline_url)
     return unless response.success?
     summary = JSON.parse(response.body)
 
-    conn = Faraday.new(url: timeline_url+'?after='+1.year.ago.to_fs(:iso8601)) do |faraday|
-      faraday.response :follow_redirects
-      faraday.adapter Faraday.default_adapter
-    end
-
-    response = conn.get
+    response = ecosystems_api_request(timeline_url, after: 1.year.ago.to_fs(:iso8601))
     return unless response.success?
     last_year = JSON.parse(response.body)
 
@@ -303,12 +284,7 @@ class Project < ApplicationRecord
   end
 
   def fetch_packages
-    conn = Faraday.new(url: packages_url) do |faraday|
-      faraday.response :follow_redirects
-      faraday.adapter Faraday.default_adapter
-    end
-
-    response = conn.get
+    response = ecosystems_api_request(packages_url)
     return unless response.success?
     self.packages = JSON.parse(response.body)
     self.save
@@ -325,11 +301,7 @@ class Project < ApplicationRecord
   end
 
   def fetch_commits
-    conn = Faraday.new(url: commits_api_url) do |faraday|
-      faraday.response :follow_redirects
-      faraday.adapter Faraday.default_adapter
-    end
-    response = conn.get
+    response = ecosystems_api_request(commits_api_url)
     return unless response.success?
     self.commits = JSON.parse(response.body)
     self.save
@@ -378,11 +350,7 @@ class Project < ApplicationRecord
   end
 
   def fetch_issue_stats
-    conn = Faraday.new(url: issues_api_url) do |faraday|
-      faraday.response :follow_redirects
-      faraday.adapter Faraday.default_adapter
-    end
-    response = conn.get
+    response = ecosystems_api_request(issues_api_url)
     return unless response.success?
     self.issue_stats = JSON.parse(response.body)
     self.save
@@ -580,11 +548,7 @@ class Project < ApplicationRecord
       fetch_readme_fallback
     else
       return unless download_url.present?
-      conn = Faraday.new(url: archive_url(readme_file_name)) do |faraday|
-        faraday.response :follow_redirects
-        faraday.adapter Faraday.default_adapter
-      end
-      response = conn.get
+      response = ecosystems_api_request(archive_url(readme_file_name))
       return unless response.success?
       json = JSON.parse(response.body)
 
@@ -627,20 +591,12 @@ class Project < ApplicationRecord
   end 
 
   def sync_issues
-    conn = Faraday.new(url: issues_api_url) do |faraday|
-      faraday.response :follow_redirects
-      faraday.adapter Faraday.default_adapter
-    end
-    response = conn.get
+    response = ecosystems_api_request(issues_api_url)
     return unless response.success?
     issues_list_url = JSON.parse(response.body)['issues_url'] + '?per_page=1000&pull_request=false'
     # issues_list_url = issues_list_url + '&updated_after=' + last_synced_at.to_fs(:iso8601) if last_synced_at.present?
 
-    conn = Faraday.new(url: issues_list_url) do |faraday|
-      faraday.response :follow_redirects
-      faraday.adapter Faraday.default_adapter
-    end
-    response = conn.get
+    response = ecosystems_api_request(issues_list_url)
     return unless response.success?
     
     issues_json = JSON.parse(response.body)
@@ -828,14 +784,8 @@ class Project < ApplicationRecord
 
   def search_for_collective
     return if funding_source.present?
-    oc_url = "https://opencollective.ecosyste.ms/api/v1/projects/lookup?url=#{url}"
-
-    conn = Faraday.new(url: oc_url) do |faraday|
-      faraday.response :follow_redirects
-      faraday.adapter Faraday.default_adapter
-    end
-
-    response = conn.get
+    oc_url = "https://opencollective.ecosyste.ms/api/v1/projects/lookup"
+    response = ecosystems_api_request(oc_url, url: url)
     return unless response.success?
 
     json = JSON.parse(response.body)
