@@ -68,6 +68,10 @@ $btn-color: $color-white;
 $badge-font-weight: 400;
 $badge-padding-y: 0.4em;
 
+$card-cap-bg: $color-grey-light;
+$card-border-color: $color-grey;
+
+
 /* Outputs our colours variables as css variables so that chart.js can access them */
 :root {
   --es-purple: #{$color-purple};
@@ -253,6 +257,10 @@ hr {
   border-top: 3px solid $color-purple-light;
 }
 
+.border-purple-light {
+  border-color: $color-purple-light;
+}
+
 .container {
   @include media-breakpoint-down(md) {
     padding-left: 1.5rem;
@@ -273,13 +281,14 @@ hr {
   .text-muted {
     color: rgba(255,255,255,0.666) !important;
   }
-  a {
-    color: $color-white;
+  a,
+  .spesh-link {
+    color: $color-white !important;
     &:hover,
     &:active,
     &:focus, 
     &:visited {
-      color: $color-white;
+      color: $color-white !important;
     }
   }
 }
@@ -303,6 +312,10 @@ hr {
   .text-muted {
     color: rgba(255,255,255,0.666) !important;
   }
+}
+
+.grey-bg {
+  background-color: $color-grey-light;
 }
 
 /* Put an icon next to a link and make the whole lockup clickable */
@@ -455,18 +468,38 @@ body {
   @include media-breakpoint-up(lg) {
     margin-left: 0;
   }
-  a {
+  .nav-link {
     @include spesh-link();
     padding: 0;
   }
-  li {
+  .nav-item {
     padding: var(--bs-nav-link-padding-y) var(--bs-nav-link-padding-x);
   }
 
-.nav {
-	@include media-breakpoint-up(lg) {
-	  justify-content: end;
-	}
+  .nav {
+    @include media-breakpoint-up(lg) {
+      justify-content: end;
+    }
+  }
+
+  .dropdown {
+    padding-top:4px;
+  }
+
+  .dropdown:last-of-type {
+    padding-right: 0;
+  }
+}
+
+.user-menu__image {
+  border: 4px solid transparent;
+  [aria-expanded="true"] & {
+    border-color: $color-green;
+  }
+
+  &:hover,
+  &:focus {
+    border-color: $color-green;
   }
 }
 
@@ -941,7 +974,7 @@ body {
   width: 100%;
   max-width: 100%;
   @include media-breakpoint-up(lg) { 
-    grid-template-columns: 25% 75%;
+    grid-template-columns: 1fr 3fr;
   }
 }
 
@@ -1299,4 +1332,68 @@ a.project-badge {
     color: $color-white !important;
     background-color: $color-purple !important;
   }
+}
+
+/* Generic homepages */
+
+.generic-home__hero {
+  .lead {
+    max-width: 42rem;
+  }
+}
+
+.generic-home__hero__para {
+  max-width: 44ch;
+}
+
+.generic-home__hero--center {
+  text-align: center;
+  .lead {
+    margin: 0 auto;
+  }
+}
+
+.generic-home__hero--left {
+  
+}
+
+.generic-home__benefits {
+  p {
+    @include media-breakpoint-up(lg) {
+      max-width: 32ch;
+    }
+  }
+}
+
+.generic-home__ecosystems-banner {
+
+  padding-bottom: 300px;
+  padding-top: 3rem;
+
+  background-image: asset-url('advisories-screen.png');
+  background-size: 426px 270px; //25%
+  background-repeat: no-repeat;
+
+  background-position-x: 50%;
+  background-position-y: 107%;
+
+  @include media-breakpoint-up(md) {
+    background-size: 852px 540px; //50%
+    background-position-y: 220%;
+  }
+
+  @include media-breakpoint-up(lg) {
+    background-position-x: calc(50% + 440px);
+    background-position-y: 4rem;
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+}
+
+.scrollable-window {
+  max-height: 28rem;
+}
+
+.scrollable-window--vulnerability-list {
+
 }
