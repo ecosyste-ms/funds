@@ -36,9 +36,6 @@ gem 'premailer-rails'
 gem 'faraday-multipart'
 gem 'groupdate'
 
-group :development, :test do
-  gem "debug", platforms: %i[ mri mingw x64_mingw ]
-end
 
 group :development do
   gem "web-console"
