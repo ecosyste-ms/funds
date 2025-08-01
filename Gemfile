@@ -5,7 +5,7 @@ ruby file: ".ruby-version"
 gem "rails", "~> 8.0.0"
 gem "sprockets-rails"
 gem "pg", "~> 1.5"
-gem "puma", "~> 6.3"
+gem "puma", "~> 6.6"
 gem "jbuilder"
 gem "bootsnap", require: false
 gem "sassc-rails"
