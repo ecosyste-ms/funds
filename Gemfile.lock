@@ -430,11 +430,11 @@ DEPENDENCIES
   mocha
   ostruct
   pagy
-  pg (~> 1.5)
+  pg
   pg_query
   pghero
   premailer-rails
-  puma (~> 6.3)
+  puma
   rack-attack
   rack-attack-rate-limit
   rack-cors
