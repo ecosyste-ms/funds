@@ -831,6 +831,14 @@ class Project < ApplicationRecord
     return nil
   end
 
+  def funding_data
+    return nil unless repository.present? && repository['metadata'].present?
+    funding = repository['metadata']['funding']
+    return nil unless funding.present?
+    
+    funding.is_a?(Hash) ? funding : nil
+  end
+
   def total_allocated
     project_allocations.sum(&:amount_cents)
   end

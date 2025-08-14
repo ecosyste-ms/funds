@@ -102,11 +102,11 @@
             </ul>
           </li>
         <% end %>
-        <% if @project.repository['metadata']['funding'] %>
+        <% if @project.funding_data %>
           <li>
             Funding.yml: 
             <ul>
-              <% @project.repository['metadata']['funding'].each do |k,v| %>
+              <% @project.funding_data.each do |k,v| %>
                 <% next if v.blank? %>
                 <li>
                   <%= k.humanize %>: <%= Array(v).join(', ') %>
