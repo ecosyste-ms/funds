@@ -102,8 +102,10 @@ class ProjectAllocation < ApplicationRecord
       if proxy_collective
         puts "  Adding funds to proxy collective: #{proxy_collective.slug}" 
         expense = send_expense_to_vendor(proxy_collective, amount_cents)
-        expense.approve_expense
-        update!(paid_at: Time.now)
+        if expense
+          expense.approve_expense
+          update!(paid_at: Time.now)
+        end
       end
     elsif project && project.contact_email.present?
       puts "  Sending expense invite: #{project.contact_email}"
@@ -428,12 +430,11 @@ class ProjectAllocation < ApplicationRecord
 
     if response_body['errors']
       puts "Error: #{response_body['errors']}"
+      nil
     else
       puts "Draft expense created successfully and invitation sent:"
       puts JSON.pretty_generate(response_body['data']['createExpense'])
-      response_body['data']['createExpense']
       pp response_body
-      # TODO this doesn't record the invitation id
       Invitation.create!(project_allocation: self, email: project.contact_email, status: 'DRAFT', member_invitation_id: response_body['data']['createExpense']['legacyId'], data: response_body['data']['createExpense']) 
     end
   end
