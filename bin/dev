@@ -6,4 +6,5 @@ if ! gem list foreman -i --silent; then
   gem install foreman
 fi
 
-exec foreman start -f Procfile.dev "$@"
+[ $PORT ] || PORT=3000
+PORT=$PORT exec foreman start -f Procfile.dev "$@"
