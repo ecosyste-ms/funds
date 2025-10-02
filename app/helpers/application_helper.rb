@@ -35,4 +35,10 @@ module ApplicationHelper
     obfuscated_local = local_part[0] + '*' * (local_part.length - 2) + local_part[-1]
     "#{obfuscated_local}@#{domain}"
   end
+
+  def bootstrap_icon(symbol, options = {})
+    return "" if symbol.nil?
+    icon = BootstrapIcons::BootstrapIcon.new(symbol, options)
+    content_tag(:svg, icon.path.html_safe, icon.options)
+  end
 end
