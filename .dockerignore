@@ -47,4 +47,6 @@
 /.dockerignore
 /Dockerfile*
 
+# Ignore large database dumps and data files
+*.dump
 /data/*
