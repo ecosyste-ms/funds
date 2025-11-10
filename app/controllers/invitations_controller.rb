@@ -1,4 +1,5 @@
 class InvitationsController < ApplicationController
+  skip_before_action :verify_authenticity_token, only: [:accept, :reject]
 
   def show
     if Rails.env.development? && params[:token].blank?
