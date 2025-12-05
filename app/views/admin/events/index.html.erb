@@ -1,0 +1,85 @@
+<div class="container">
+  <h2>Audit Log</h2>
+
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <%= form_tag admin_events_path, method: :get, class: 'd-flex gap-2 flex-wrap' do %>
+        <select name="fund_id" class="form-select" style="width: auto;">
+          <option value="">All Funds</option>
+          <% @funds.each do |fund| %>
+            <option value="<%= fund.id %>" <%= 'selected' if params[:fund_id].to_s == fund.id.to_s %>><%= fund.name %></option>
+          <% end %>
+        </select>
+
+        <select name="event_type" class="form-select" style="width: auto;">
+          <option value="">All Event Types</option>
+          <% ProjectAllocationEvent::ALL_EVENTS.each do |event_type| %>
+            <option value="<%= event_type %>" <%= 'selected' if params[:event_type] == event_type %>><%= event_type.humanize %></option>
+          <% end %>
+        </select>
+
+        <select name="status" class="form-select" style="width: auto;">
+          <option value="">All Statuses</option>
+          <option value="success" <%= 'selected' if params[:status] == 'success' %>>Success</option>
+          <option value="error" <%= 'selected' if params[:status] == 'error' %>>Error</option>
+          <option value="pending" <%= 'selected' if params[:status] == 'pending' %>>Pending</option>
+        </select>
+
+        <button type="submit" class="btn btn-primary">Filter</button>
+        <% if params[:fund_id].present? || params[:event_type].present? || params[:status].present? %>
+          <%= link_to 'Clear', admin_events_path, class: 'btn btn-outline-secondary' %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <p class="text-muted"><%= @pagy.count %> events</p>
+
+      <div class="timeline">
+        <% @events.each do |event| %>
+          <div class="card mb-3">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <h6 class="mb-1">
+                    <% if event.status == 'error' %>
+                      <span class="badge bg-danger me-2">Error</span>
+                    <% elsif event.status == 'success' %>
+                      <span class="badge bg-success me-2">Success</span>
+                    <% elsif event.status == 'pending' %>
+                      <span class="badge bg-warning text-dark me-2">Pending</span>
+                    <% end %>
+                    <span class="badge bg-secondary"><%= event.event_type.humanize %></span>
+                  </h6>
+                  <p class="mb-1">
+                    <strong>Project:</strong> <%= link_to event.project.to_s, project_path(event.project_allocation.project) %>
+                    <strong class="ms-3">Fund:</strong> <%= link_to event.fund.name, admin_events_path(fund_id: event.fund_id) %>
+                    <strong class="ms-3">Allocation:</strong> <%= link_to event.allocation.name, fund_allocation_path(event.fund, event.allocation) %>
+                  </p>
+                  <% if event.message.present? %>
+                    <p class="mb-1 text-muted"><%= event.message %></p>
+                  <% end %>
+                </div>
+                <div class="text-end text-muted">
+                  <small><%= event.created_at.strftime('%Y-%m-%d %H:%M:%S') %></small>
+                  <br>
+                  <small><%= time_ago_in_words(event.created_at) %> ago</small>
+                </div>
+              </div>
+              <% if event.metadata.present? && event.metadata.any? %>
+                <details class="mt-2">
+                  <summary class="text-muted" style="cursor: pointer;">View metadata</summary>
+                  <pre class="bg-light p-2 mt-2 rounded" style="font-size: 0.8rem; max-height: 300px; overflow: auto;"><%= JSON.pretty_generate(event.metadata) %></pre>
+                </details>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <%== pagy_bootstrap_nav(@pagy) if @pagy.pages > 1 %>
+    </div>
+  </div>
+</div>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_03_19_102622) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_05_141848) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -82,6 +82,26 @@ ActiveRecord::Schema[8.1].define(version: 2025_03_19_102622) do
     t.datetime "updated_at", null: false
     t.index ["project_allocation_id"], name: "index_invitations_on_project_allocation_id"
     t.index ["token"], name: "index_invitations_on_token", unique: true
+  end
+
+  create_table "project_allocation_events", force: :cascade do |t|
+    t.bigint "allocation_id", null: false
+    t.datetime "created_at", null: false
+    t.string "event_type", null: false
+    t.bigint "fund_id", null: false
+    t.bigint "invitation_id"
+    t.text "message"
+    t.json "metadata"
+    t.bigint "project_allocation_id", null: false
+    t.string "status"
+    t.datetime "updated_at", null: false
+    t.index ["allocation_id"], name: "index_project_allocation_events_on_allocation_id"
+    t.index ["created_at"], name: "index_project_allocation_events_on_created_at"
+    t.index ["event_type"], name: "index_project_allocation_events_on_event_type"
+    t.index ["fund_id"], name: "index_project_allocation_events_on_fund_id"
+    t.index ["invitation_id"], name: "index_project_allocation_events_on_invitation_id"
+    t.index ["project_allocation_id"], name: "index_project_allocation_events_on_project_allocation_id"
+    t.index ["status"], name: "index_project_allocation_events_on_status"
   end
 
   create_table "project_allocations", force: :cascade do |t|
@@ -161,4 +181,9 @@ ActiveRecord::Schema[8.1].define(version: 2025_03_19_102622) do
     t.index ["fund_id"], name: "index_transactions_on_fund_id"
     t.index ["uuid"], name: "index_transactions_on_uuid", unique: true
   end
+
+  add_foreign_key "project_allocation_events", "allocations"
+  add_foreign_key "project_allocation_events", "funds"
+  add_foreign_key "project_allocation_events", "invitations"
+  add_foreign_key "project_allocation_events", "project_allocations"
 end
