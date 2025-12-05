@@ -17,6 +17,7 @@ Rails.application.routes.draw do
         get :github_sponsors
       end
     end
+    resources :events, only: [:index]
   end
 
   resources :funds, only: [:index, :show] do

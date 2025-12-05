@@ -1,9 +1,12 @@
 class ProjectAllocation < ApplicationRecord
+  include OpenCollectiveApi
+
   belongs_to :project
   belongs_to :allocation
   belongs_to :fund
   belongs_to :funding_source, optional: true
   has_one :invitation
+  has_many :events, class_name: 'ProjectAllocationEvent'
 
   scope :with_funding_source, -> { where.not(funding_source_id: nil) }
   scope :with_approved_funding_source, -> { joins(:funding_source).where(funding_sources: { platform: FundingSource::APPROVED_PLATFORMS }) }
@@ -87,33 +90,55 @@ class ProjectAllocation < ApplicationRecord
     return if funding_rejected?
     return if paid?
 
+    log_event('payout_started', metadata: { payout_method: payout_method_name, amount_cents: amount_cents })
+
     if is_osc_collective?
       puts "  Sending to OSC collective: #{funding_source.name}"
-      send_to_osc_collective(collective_slug, amount_cents)
-      update!(paid_at: Time.now)
+      result = send_to_osc_collective(collective_slug, amount_cents)
+      if result
+        update!(paid_at: Time.now)
+        log_event('payout_completed', message: "Sent to OSC collective: #{funding_source.name}")
+      else
+        log_event('payout_failed', status: 'error', message: "Failed to send to OSC collective: #{funding_source.name}")
+      end
     elsif is_non_osc_collective?
       puts "  Sending to non-OSC collective: #{funding_source.name}"
-      send_draft_expense_invitation_to_collective(collective_slug, amount_cents, non_osc_collective_expense_invite_description)
-      update!(paid_at: Time.now)
+      result = send_draft_expense_invitation_to_collective(collective_slug, amount_cents, non_osc_collective_expense_invite_description)
+      if result
+        update!(paid_at: Time.now)
+        log_event('payout_completed', message: "Sent to non-OSC collective: #{funding_source.name}")
+      else
+        log_event('payout_failed', status: 'error', message: "Failed to send to non-OSC collective: #{funding_source.name}")
+      end
     elsif approved_funding_source? && minimum_funding_source_amount_met?
       puts "  Sending to approved funding source: #{funding_source.url}"
       proxy_collective = find_or_create_proxy_collective(funding_source.url)
       proxy_collective.set_payout_method
       if proxy_collective
-        puts "  Adding funds to proxy collective: #{proxy_collective.slug}" 
+        puts "  Adding funds to proxy collective: #{proxy_collective.slug}"
         expense = send_expense_to_vendor(proxy_collective, amount_cents)
         if expense
           expense.approve_expense
           update!(paid_at: Time.now)
+          log_event('payout_completed', message: "Sent via proxy collective: #{proxy_collective.slug}")
+        else
+          log_event('payout_failed', status: 'error', message: "Failed to create expense for proxy collective: #{proxy_collective.slug}")
         end
+      else
+        log_event('payout_failed', status: 'error', message: "Failed to create proxy collective for: #{funding_source.url}")
       end
     elsif project && project.contact_email.present?
       puts "  Sending expense invite: #{project.contact_email}"
-      send_expense_invite
-      update!(paid_at: Time.now)
+      result = send_expense_invite
+      if result
+        update!(paid_at: Time.now)
+        log_event('payout_completed', message: "Sent expense invite to: #{project.contact_email}")
+      else
+        log_event('payout_failed', status: 'error', message: "Failed to send expense invite to: #{project.contact_email}")
+      end
     else
       puts "  No valid payout method found for #{project.to_s}"
-       # can't pay
+      log_event('payout_skipped', status: 'error', message: "No valid payout method found")
     end
   end
 
@@ -169,7 +194,7 @@ class ProjectAllocation < ApplicationRecord
     return unless project.contact_email.present?
     return if invitation.present? && invitation.member_invitation_id.present?
     return if paid?
-    
+
     query = <<~GRAPHQL
       mutation($expense: ExpenseInviteDraftInput!, $account: AccountReferenceInput!) {
         draftExpenseAndInviteUser(expense: $expense, account: $account, skipInvite: true, lockedFields: [AMOUNT, DESCRIPTION, TYPE, PAYEE]) {
@@ -202,7 +227,7 @@ class ProjectAllocation < ApplicationRecord
         currency: "USD",
         type: "INVOICE",
         payee: {
-          name: "#{project.to_s} maintainer", # TODO try to get the maintainer name
+          name: "#{project.to_s} maintainer",
           email: project.contact_email
         },
         items: [
@@ -219,27 +244,20 @@ class ProjectAllocation < ApplicationRecord
       }
     }
 
-    payload = { query: query, variables: variables }.to_json
+    response_body = oc_api_request(query: query, variables: variables, event_type: 'payout_expense_invite')
+    return nil unless response_body
 
-    response = Faraday.post(
-      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
-      payload,
-      { 'Content-Type' => 'application/json' }
-    )
-
-    response_body = JSON.parse(response.body)
-
-    if response_body['errors']
-      puts "Error: #{response_body['errors']}"
-    else
-      puts "Expense draft created successfully:"
-      puts JSON.pretty_generate(response_body['data']['draftExpenseAndInviteUser'])
-      Invitation.create!(project_allocation: self, email: project.contact_email, status: 'DRAFT', member_invitation_id: response_body['data']['draftExpenseAndInviteUser']['legacyId'], data: response_body['data']['draftExpenseAndInviteUser'])
-    end
+    data = response_body['data']['draftExpenseAndInviteUser']
+    puts "Expense draft created successfully:"
+    puts JSON.pretty_generate(data)
+    inv = Invitation.create!(project_allocation: self, email: project.contact_email, status: 'DRAFT', member_invitation_id: data['legacyId'], data: data)
+    log_event('expense_created', invitation_record: inv, metadata: { legacy_id: data['legacyId'] })
+    inv
   end
 
   def send_to_osc_collective(collective_slug, amount_cents)
     return if funding_rejected?
+
     query = <<-GQL
       mutation(
         $fromAccount: AccountReferenceInput!,
@@ -272,28 +290,18 @@ class ProjectAllocation < ApplicationRecord
     variables = {
       fromAccount: { slug: fund.oc_project_slug },
       toAccount: { slug: collective_slug },
-      amount: { currency: "USD", valueInCents: amount_cents }, 
+      amount: { currency: "USD", valueInCents: amount_cents },
       frequency: "ONETIME",
       isBalanceTransfer: true,
       paymentMethodId: fund.osc_payment_method['id']
     }
-    payload = { query: query, variables: variables }.to_json
 
-    response = Faraday.post(
-      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
-      payload,
-      { 'Content-Type' => 'application/json' }
-    )
+    response_body = oc_api_request(query: query, variables: variables, event_type: 'payout_osc_collective')
+    return nil unless response_body
 
-    response_body = JSON.parse(response.body)
-
-    if response_body['errors']
-      puts "Error: #{response_body['errors']}"
-    else
-      puts "Order created successfully:"
-      puts JSON.pretty_generate(response_body['data']['createOrder'])
-      response_body['data']['createOrder']
-    end
+    puts "Order created successfully:"
+    puts JSON.pretty_generate(response_body['data']['createOrder'])
+    response_body['data']['createOrder']
   end
 
   def expense_invite_title
@@ -330,7 +338,7 @@ class ProjectAllocation < ApplicationRecord
         }
       }
     GQL
-  
+
     variables = {
       account: { slug: fund.oc_project_slug },
       expense: {
@@ -343,39 +351,29 @@ class ProjectAllocation < ApplicationRecord
           slug: collective_slug,
           isInvite: true
         },
-        payoutMethod: { 
+        payoutMethod: {
           data: {},
           isSaved: false
-         }
+        }
       }
     }
-    payload = { query: query, variables: variables }.to_json
-  
-    response = Faraday.post(
-      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
-      payload,
-      { 'Content-Type' => 'application/json' }
-    )
-  
-    response_body = JSON.parse(response.body)
 
-    if response_body['errors']
-      puts "Error: #{response_body['errors']}"
-    else
-      puts "Draft expense created successfully and invitation sent:"
-      puts JSON.pretty_generate(response_body['data']['draftExpenseAndInviteUser'])
-      response_body['data']['draftExpenseAndInviteUser']
-      pp response_body
-      # TODO this doesn't record the invitation id
-      Invitation.create!(project_allocation: self, email: project.contact_email, status: 'DRAFT', member_invitation_id: response_body['data']['draftExpenseAndInviteUser']['legacyId'], data: response_body['data']['draftExpenseAndInviteUser']) 
-    end
+    response_body = oc_api_request(query: query, variables: variables, event_type: 'payout_non_osc_collective')
+    return nil unless response_body
+
+    data = response_body['data']['draftExpenseAndInviteUser']
+    puts "Draft expense created successfully and invitation sent:"
+    puts JSON.pretty_generate(data)
+    inv = Invitation.create!(project_allocation: self, email: project.contact_email, status: 'DRAFT', member_invitation_id: data['legacyId'], data: data)
+    log_event('expense_created', invitation_record: inv, metadata: { legacy_id: data['legacyId'] })
+    data
   end
 
   def send_expense_to_vendor(vendor, amount_cents)
     return if funding_rejected?
     return if paid?
 
-    description =  proxy_collective_expense_invite_description(vendor)
+    description = proxy_collective_expense_invite_description(vendor)
 
     query = <<-GQL
       mutation(
@@ -401,7 +399,7 @@ class ProjectAllocation < ApplicationRecord
         }
       }
     GQL
-  
+
     variables = {
       account: { slug: fund.oc_project_slug },
       expense: {
@@ -415,28 +413,19 @@ class ProjectAllocation < ApplicationRecord
         },
         payoutMethod: { type: "ACCOUNT_BALANCE" },
         tags: [vendor.platform, "ecosystem-fund"],
-        accountingCategory: "3vjrkx5l-mnv904qj-jmq8bwa7-zdygoe3d" # 7032 - "Expenses - Donations & Sponsorships"
+        accountingCategory: "3vjrkx5l-mnv904qj-jmq8bwa7-zdygoe3d"
       }
     }
-    payload = { query: query, variables: variables }.to_json
-  
-    response = Faraday.post(
-      "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/api/graphql/v2?personalToken=#{ENV['OPENCOLLECTIVE_TOKEN']}",
-      payload,
-      { 'Content-Type' => 'application/json' }
-    )
-  
-    response_body = JSON.parse(response.body)
 
-    if response_body['errors']
-      puts "Error: #{response_body['errors']}"
-      nil
-    else
-      puts "Draft expense created successfully and invitation sent:"
-      puts JSON.pretty_generate(response_body['data']['createExpense'])
-      pp response_body
-      Invitation.create!(project_allocation: self, email: project.contact_email, status: 'DRAFT', member_invitation_id: response_body['data']['createExpense']['legacyId'], data: response_body['data']['createExpense']) 
-    end
+    response_body = oc_api_request(query: query, variables: variables, event_type: 'payout_proxy_collective')
+    return nil unless response_body
+
+    data = response_body['data']['createExpense']
+    puts "Draft expense created successfully and invitation sent:"
+    puts JSON.pretty_generate(data)
+    inv = Invitation.create!(project_allocation: self, email: project.contact_email, status: 'DRAFT', member_invitation_id: data['legacyId'], data: data)
+    log_event('expense_created', invitation_record: inv, metadata: { legacy_id: data['legacyId'], vendor_slug: vendor.slug })
+    inv
   end
 
   def check_collective_existence(slug)
@@ -545,10 +534,13 @@ class ProjectAllocation < ApplicationRecord
     return if funding_source.present?
     return if invitation.present?
     return if funding_rejected?
-    
-    invitation = create_invite
-    
-    invitation.try(:send_email)
+
+    inv = create_invite
+    return unless inv
+
+    log_event('invitation_created', invitation_record: inv, metadata: { email: inv.email })
+    inv.send_email
+    inv
   end
 
   def send_expense_invite_email
@@ -557,20 +549,22 @@ class ProjectAllocation < ApplicationRecord
   end
 
   def reject_funding!
-    project.update!(funding_rejected: true) 
-    # reject all other invitations for the same project
+    project.update!(funding_rejected: true)
+    log_event('funding_rejected', message: "Funding rejected for project: #{project.to_s}")
     project.project_allocations.each do |pa|
       next unless pa.invitation.present?
       pa.invitation.update!(rejected_at: Time.now)
+      pa.log_event('invitation_rejected', invitation_record: pa.invitation)
     end
   end
 
   def accept_funding!
     project.update!(funding_rejected: false)
-    # accept all other invitations for the same project
+    log_event('funding_accepted', message: "Funding accepted for project: #{project.to_s}")
     project.project_allocations.each do |pa|
       next unless pa.invitation.present?
       pa.invitation.update!(accepted_at: Time.now)
+      pa.log_event('invitation_accepted', invitation_record: pa.invitation)
     end
   end
 
@@ -603,5 +597,17 @@ class ProjectAllocation < ApplicationRecord
 
   def success?
     ['APPROVED', 'PAID'].include?(status)
+  end
+
+  def log_event(event_type, status: 'success', message: nil, metadata: {}, invitation_record: nil)
+    events.create!(
+      event_type: event_type,
+      status: status,
+      message: message,
+      metadata: metadata,
+      fund_id: fund_id,
+      allocation_id: allocation_id,
+      invitation: invitation_record
+    )
   end
 end
