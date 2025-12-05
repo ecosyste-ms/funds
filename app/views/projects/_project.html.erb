@@ -6,7 +6,7 @@
     </div> 
   </td>
 	<td>
-    <%= number_to_currency(project.total_allocated / 100.0) %>
+    <%= link_to number_to_currency(project.total_allocated / 100.0), project_path(project) %>
 	</td>
   <td>
     <%= number_to_human(project.total_downloads, format: '%n%u', units: { thousand: 'K', million: 'M', billion: 'B' }) %>
