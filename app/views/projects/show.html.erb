@@ -1,38 +1,140 @@
 <% @meta_title = "#{@project.url}" %>
-<% @meta_description = "Details of the open source software project at #{@project.url}" %>
+<% @meta_description = "Funding details for the open source project at #{@project.url}" %>
 
 <div class="container-md">
   <h1>
-    <%= @project.url %>
+    <% if @project.avatar_url.present? %>
+      <img src="<%= @project.avatar_url %>" height="48" width="48" onerror="this.style.display='none'" class="me-2" loading="lazy" alt="<%= @project.name %> logo">
+    <% end %>
+    <%= link_to @project.to_s, @project.url, target: :_blank %>
   </h1>
 
-  <% if @project.last_synced_at %>
-  
-    <% if @project.keywords.any? %>
-      <p>
-        <% @project.keywords.each do |keyword| %>
-          <span class="badge bg-light text-dark">
-            <%= keyword %>
-          </span>
-        <% end %>
-      </p>
-    <% end %>
-
-    <p class="card-subtitle mb-2 text-muted"><i><small>
-        Last synced: <%= distance_of_time_in_words_to_now @project.last_synced_at %> ago <br>
-    </small></i></p>
-
-    <%= render 'repository' %>
-    <%= render 'owner' %>
-    <%= render 'committers' %>
-    <%= render 'issues' %>
-    <%= render 'packages' %>
-    <%= render 'dependencies' %>
-
-  <% else %>
-    <p>
-      This project has not been synced yet. Check back in a few minutes.
-    </p>
+  <% if @project.description.present? %>
+    <p class="text-muted"><%= @project.description %></p>
   <% end %>
 
+  <% if @project_allocations.any? %>
+    <h2 class="mt-4">Funding Allocations</h2>
+
+    <% @project_allocations.group_by(&:fund).each do |fund, allocations| %>
+      <div class="card mb-4">
+        <div class="card-header">
+          <h3 class="h5 mb-0">
+            <% if fund.logo_url.present? %>
+              <img src="<%= fund.logo_url %>" height="24" width="24" onerror="this.style.display='none'" class="me-2" loading="lazy" alt="<%= fund.name %> logo">
+            <% end %>
+            <%= link_to fund.name, fund_path(fund) %>
+          </h3>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-sm mb-0">
+              <thead>
+                <tr>
+                  <th>Allocation</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Funding Source</th>
+                  <th>Invitation</th>
+                  <th>Accepted</th>
+                  <th>Rejected</th>
+                  <th>Deleted</th>
+                  <th>Expense</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% allocations.each do |pa| %>
+                  <tr>
+                    <td>
+                      <%= link_to pa.allocation.name, fund_allocation_path(fund, pa.allocation) %>
+                    </td>
+                    <td>
+                      <%= number_to_currency(pa.amount_cents / 100.0) %>
+                    </td>
+                    <td>
+                      <% if pa.funding_rejected? %>
+                        <span class="badge bg-danger">Rejected</span>
+                      <% elsif pa.invitation&.deleted_at.present? %>
+                        <span class="badge bg-danger">Deleted</span>
+                      <% elsif pa.invitation&.status == 'PAID' %>
+                        <span class="badge bg-success">Paid</span>
+                      <% elsif pa.paid? && pa.invitation.blank? %>
+                        <span class="badge bg-success">Paid</span>
+                      <% elsif pa.invitation.present? %>
+                        <% if pa.invitation.accepted? %>
+                          <span class="badge bg-info">Awaiting Payment</span>
+                        <% elsif pa.invitation.rejected? %>
+                          <span class="badge bg-danger">Invitation Rejected</span>
+                        <% else %>
+                          <span class="badge bg-warning text-dark">Invitation Pending</span>
+                        <% end %>
+                      <% elsif pa.funding_source && pa.funding_source.approved? %>
+                        <span class="badge bg-info">Awaiting Payment</span>
+                      <% else %>
+                        <span class="badge bg-secondary">Pending</span>
+                      <% end %>
+                    </td>
+                    <td>
+                      <% if pa.funding_source.present? %>
+                        <%= link_to pa.funding_source.platform, pa.funding_source.url, target: :_blank %>
+                      <% end %>
+                    </td>
+                    <td>
+                      <% if pa.invitation.present? %>
+                        <%= pa.invitation.email.gsub(/(.{2})(.*)(@.*)/) { $1 + '*' * $2.length + $3 } %>
+                        <br>
+                        <small class="text-muted">
+                          Deadline: <%= pa.invitation.decline_deadline.strftime('%b %d, %Y') %>
+                        </small>
+                      <% end %>
+                    </td>
+                    <td>
+                      <% if pa.invitation&.accepted_at.present? %>
+                        <%= pa.invitation.accepted_at.strftime('%b %d, %Y') %>
+                      <% end %>
+                    </td>
+                    <td>
+                      <% if pa.invitation&.rejected_at.present? %>
+                        <%= pa.invitation.rejected_at.strftime('%b %d, %Y') %>
+                      <% end %>
+                    </td>
+                    <td>
+                      <% if pa.invitation&.deleted_at.present? %>
+                        <%= pa.invitation.deleted_at.strftime('%b %d, %Y') %>
+                      <% end %>
+                    </td>
+                    <td>
+                      <% if pa.invitation.present? && pa.invitation.member_invitation_id.present? %>
+                        <%= link_to "##{pa.invitation.member_invitation_id}", pa.invitation.html_url, target: :_blank %>
+                        <% if pa.invitation.status.present? %>
+                          <br><small class="text-muted"><%= pa.invitation.status %></small>
+                        <% end %>
+                      <% end %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+              <tfoot>
+                <tr class="table-light">
+                  <th>Total from <%= fund.name %></th>
+                  <th><%= number_to_currency(allocations.sum(&:amount_cents) / 100.0) %></th>
+                  <th colspan="7"></th>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="card bg-light">
+      <div class="card-body">
+        <strong>Total Allocated:</strong> <%= number_to_currency(@project.total_allocated / 100.0) %>
+      </div>
+    </div>
+  <% else %>
+    <div class="alert alert-info mt-4">
+      This project has not received any funding allocations yet.
+    </div>
+  <% end %>
 </div>

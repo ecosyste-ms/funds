@@ -14,5 +14,8 @@ class ProjectsController < ApplicationController
 
   def show
     @project = Project.find(params[:id])
+    @project_allocations = @project.project_allocations
+      .includes(:fund, :allocation, :invitation, :funding_source)
+      .order('allocations.created_at DESC')
   end
 end
