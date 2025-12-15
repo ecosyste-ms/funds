@@ -413,7 +413,7 @@ class ProjectAllocation < ApplicationRecord
         },
         payoutMethod: { type: "ACCOUNT_BALANCE" },
         tags: [vendor.platform, "ecosystem-fund"],
-        accountingCategory: "3vjrkx5l-mnv904qj-jmq8bwa7-zdygoe3d"
+        accountingCategory: { id: "3vjrkx5l-mnv904qj-jmq8bwa7-zdygoe3d" }
       }
     }
 
