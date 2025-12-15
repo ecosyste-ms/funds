@@ -127,10 +127,19 @@ class ProjectAllocation < ApplicationRecord
       else
         log_event('payout_failed', status: 'error', message: "Failed to create proxy collective for: #{funding_source.url}")
       end
+    elsif approved_funding_source? && !minimum_funding_source_amount_met?
+      puts "  Skipping: amount below funding source minimum for #{funding_source.url}"
+      log_event('payout_skipped', status: 'success', message: "Amount below funding source minimum", metadata: {
+        funding_source_url: funding_source.url,
+        amount_cents: amount_cents,
+        minimum_cents: funding_source.minimum_donation_ammount_cents
+      })
     elsif project && project.contact_email.present?
       puts "  Sending expense invite: #{project.contact_email}"
       result = send_expense_invite
-      if result
+      if result.is_a?(Hash) && result[:skipped]
+        log_event('payout_skipped', status: 'success', message: "Skipped expense invite: #{result[:skipped]}", metadata: result)
+      elsif result
         update!(paid_at: Time.now)
         log_event('payout_completed', message: "Sent expense invite to: #{project.contact_email}")
       else
@@ -189,11 +198,11 @@ class ProjectAllocation < ApplicationRecord
   end
 
   def send_expense_invite
-    return if funding_rejected?
-    return if approved_funding_source?
-    return unless project.contact_email.present?
-    return if invitation.present? && invitation.member_invitation_id.present?
-    return if paid?
+    return { skipped: 'funding_rejected' } if funding_rejected?
+    return { skipped: 'has_approved_funding_source' } if approved_funding_source?
+    return { skipped: 'no_contact_email' } unless project.contact_email.present?
+    return { skipped: 'invitation_already_sent', invitation_id: invitation.member_invitation_id } if invitation.present? && invitation.member_invitation_id.present?
+    return { skipped: 'already_paid' } if paid?
 
     query = <<~GRAPHQL
       mutation($expense: ExpenseInviteDraftInput!, $account: AccountReferenceInput!) {
