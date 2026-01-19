@@ -106,4 +106,128 @@ class AllocationTest < ActiveSupport::TestCase
     assert_equal 3, ProjectAllocation.count
     assert_equal 40_000, ProjectAllocation.find_by(project_id: @project1.id).amount_cents
   end
+
+  test 'payout_proxy_collectives_aggregated groups allocations by funding source' do
+    funding_source = FundingSource.create!(
+      url: 'https://github.com/sponsors/testuser',
+      platform: 'github.com',
+      github_sponsors: { 'minimum_sponsorship_amount' => 100 }
+    )
+
+    project1 = Project.create!(
+      url: 'https://github.com/test/project1',
+      licenses: ['mit'],
+      registry_names: ['npm'],
+      repository: { 'archived' => false },
+      funding_source: funding_source,
+      owner: { 'email' => 'test@example.com' }
+    )
+
+    project2 = Project.create!(
+      url: 'https://github.com/test/project2',
+      licenses: ['mit'],
+      registry_names: ['npm'],
+      repository: { 'archived' => false },
+      funding_source: funding_source,
+      owner: { 'email' => 'test@example.com' }
+    )
+
+    # Each allocation is $50 (below $100 minimum), but together they're $100
+    pa1 = ProjectAllocation.create!(
+      allocation: @allocation,
+      project: project1,
+      fund: @fund,
+      funding_source: funding_source,
+      amount_cents: 5000,
+      score: 0.5
+    )
+
+    pa2 = ProjectAllocation.create!(
+      allocation: @allocation,
+      project: project2,
+      fund: @fund,
+      funding_source: funding_source,
+      amount_cents: 5000,
+      score: 0.5
+    )
+
+    # Verify they're grouped together
+    proxy_allocations = @allocation.project_allocations.includes(:funding_source, :project)
+      .select(&:is_proxy_collective?)
+      .reject(&:paid?)
+      .reject(&:funding_rejected?)
+
+    grouped = proxy_allocations.group_by(&:funding_source_id)
+
+    assert_equal 1, grouped.keys.length
+    assert_equal 2, grouped[funding_source.id].length
+    assert_equal 10000, grouped[funding_source.id].sum(&:amount_cents)
+  end
+
+  test 'payout_proxy_collectives_aggregated falls back to email when aggregated total still below minimum' do
+    funding_source = FundingSource.create!(
+      url: 'https://github.com/sponsors/testuser',
+      platform: 'github.com',
+      github_sponsors: { 'minimum_sponsorship_amount' => 200 }
+    )
+
+    project1 = Project.create!(
+      url: 'https://github.com/test/project1',
+      licenses: ['mit'],
+      registry_names: ['npm'],
+      repository: { 'archived' => false },
+      funding_source: funding_source,
+      owner: { 'email' => 'test@example.com' }
+    )
+
+    project2 = Project.create!(
+      url: 'https://github.com/test/project2',
+      licenses: ['mit'],
+      registry_names: ['npm'],
+      repository: { 'archived' => false },
+      funding_source: funding_source,
+      owner: { 'email' => 'test@example.com' }
+    )
+
+    # Each allocation is $50, total is $100, but minimum is $200
+    pa1 = ProjectAllocation.create!(
+      allocation: @allocation,
+      project: project1,
+      fund: @fund,
+      funding_source: funding_source,
+      amount_cents: 5000,
+      score: 0.5
+    )
+
+    pa2 = ProjectAllocation.create!(
+      allocation: @allocation,
+      project: project2,
+      fund: @fund,
+      funding_source: funding_source,
+      amount_cents: 5000,
+      score: 0.5
+    )
+
+    # Stub the OC API call for email fallback
+    stub_request(:post, /opencollective/).to_return(
+      status: 200,
+      body: { data: { draftExpenseAndInviteUser: { id: '123', legacyId: 456, status: 'DRAFT', draftKey: 'abc' } } }.to_json,
+      headers: { 'Content-Type' => 'application/json' }
+    )
+
+    @allocation.payout_proxy_collectives_aggregated
+
+    # Should have logged payout_skipped events with fallback message for each allocation
+    pa1.reload
+    pa2.reload
+
+    event1 = pa1.events.find_by(event_type: 'payout_skipped')
+    event2 = pa2.events.find_by(event_type: 'payout_skipped')
+
+    assert_not_nil event1
+    assert_not_nil event2
+    assert_match(/Aggregated total below minimum/, event1.message)
+    assert_equal 10000, event1.metadata['aggregated_total_cents']
+    assert_equal 20000, event1.metadata['minimum_cents']
+  end
 end
