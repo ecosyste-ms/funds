@@ -40,3 +40,4 @@ app/assets/.DS_Store
 *.dump
 *.sql
 *.csv
+*.tsv

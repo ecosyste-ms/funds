@@ -128,12 +128,14 @@ class ProjectAllocation < ApplicationRecord
         log_event('payout_failed', status: 'error', message: "Failed to create proxy collective for: #{funding_source.url}")
       end
     elsif approved_funding_source? && !minimum_funding_source_amount_met?
-      puts "  Skipping: amount below funding source minimum for #{funding_source.url}"
-      log_event('payout_skipped', status: 'success', message: "Amount below funding source minimum", metadata: {
+      # Amount below funding source minimum - fall back to email invite
+      puts "  Amount below funding source minimum for #{funding_source.url}, falling back to email invite"
+      log_event('payout_below_minimum', status: 'success', message: "Amount below funding source minimum, attempting email fallback", metadata: {
         funding_source_url: funding_source.url,
         amount_cents: amount_cents,
         minimum_cents: funding_source.minimum_donation_ammount_cents
       })
+      payout_via_email_invite
     elsif project && project.contact_email.present?
       puts "  Sending expense invite: #{project.contact_email}"
       result = send_expense_invite
@@ -149,6 +151,177 @@ class ProjectAllocation < ApplicationRecord
       puts "  No valid payout method found for #{project.to_s}"
       log_event('payout_skipped', status: 'error', message: "No valid payout method found")
     end
+  end
+
+  def payout_via_email_invite
+    return if funding_rejected?
+    return if paid?
+
+    unless project&.contact_email.present?
+      puts "  No contact email for #{project.to_s}, cannot fall back to email invite"
+      log_event('payout_skipped', status: 'error', message: "No contact email for email fallback")
+      return
+    end
+
+    puts "  Sending expense invite (fallback): #{project.contact_email}"
+    result = send_expense_invite_fallback
+    if result.is_a?(Hash) && result[:skipped]
+      log_event('payout_skipped', status: 'success', message: "Skipped expense invite fallback: #{result[:skipped]}", metadata: result)
+    elsif result
+      update!(paid_at: Time.now)
+      log_event('payout_completed', message: "Sent expense invite (fallback) to: #{project.contact_email}")
+    else
+      log_event('payout_failed', status: 'error', message: "Failed to send expense invite fallback to: #{project.contact_email}")
+    end
+  end
+
+  def send_expense_invite_fallback
+    # Like send_expense_invite but allows fallback when funding source is approved but below minimum
+    return { skipped: 'funding_rejected' } if funding_rejected?
+    return { skipped: 'no_contact_email' } unless project.contact_email.present?
+    return { skipped: 'invitation_already_sent', invitation_id: invitation.member_invitation_id } if invitation.present? && invitation.member_invitation_id.present?
+    return { skipped: 'already_paid' } if paid?
+
+    query = <<~GRAPHQL
+      mutation($expense: ExpenseInviteDraftInput!, $account: AccountReferenceInput!) {
+        draftExpenseAndInviteUser(expense: $expense, account: $account, skipInvite: true, lockedFields: [AMOUNT, DESCRIPTION, TYPE, PAYEE]) {
+          id
+          legacyId
+          draft
+          lockedFields
+          account {
+            id
+            slug
+          }
+          payee {
+            ... on Individual {
+              id
+              email
+            }
+            ... on Organization {
+              id
+            }
+          }
+          status
+          draftKey
+        }
+      }
+    GRAPHQL
+
+    variables = {
+      expense: {
+        description: "#{fund.name} Ecosystem allocation for #{project.to_s}",
+        currency: "USD",
+        type: "INVOICE",
+        payee: {
+          name: "#{project.to_s} maintainer",
+          email: project.contact_email
+        },
+        items: [
+          {
+            description: expense_invite_title,
+            longDescription: expense_invite_description,
+            amount: amount_cents,
+            currency: "USD"
+          }
+        ]
+      },
+      account: {
+        slug: fund.oc_project_slug
+      }
+    }
+
+    response_body = oc_api_request(query: query, variables: variables, event_type: 'payout_expense_invite_fallback')
+    return nil unless response_body
+
+    data = response_body['data']['draftExpenseAndInviteUser']
+    puts "Expense draft created successfully (fallback):"
+    puts JSON.pretty_generate(data)
+    inv = Invitation.create!(project_allocation: self, email: project.contact_email, status: 'DRAFT', member_invitation_id: data['legacyId'], data: data)
+    log_event('expense_created', invitation_record: inv, metadata: { legacy_id: data['legacyId'], fallback: true })
+    inv
+  end
+
+  def send_aggregated_proxy_payout(allocations, total_cents)
+    return if funding_rejected?
+
+    proxy_collective = find_or_create_proxy_collective(funding_source.url)
+    return nil unless proxy_collective
+
+    proxy_collective.set_payout_method
+
+    project_names = allocations.map { |pa| pa.project.name }.join(', ')
+    description = "Aggregated ecosystem allocation for #{project_names} on #{proxy_collective.website} from #{fund.name}"
+
+    puts "  Adding aggregated funds to proxy collective: #{proxy_collective.slug}"
+    expense = send_aggregated_expense_to_vendor(proxy_collective, total_cents, description, allocations)
+    if expense
+      expense.approve_expense
+      expense
+    else
+      nil
+    end
+  end
+
+  def send_aggregated_expense_to_vendor(vendor, amount_cents, description, allocations)
+    return if funding_rejected?
+    return if paid?
+
+    project_names = allocations.map { |pa| pa.project.name }.join(', ')
+
+    query = <<-GQL
+      mutation(
+        $account: AccountReferenceInput!,
+        $expense: ExpenseCreateInput!,
+      ) {
+        createExpense(
+          account: $account,
+          expense: $expense,
+        ) {
+          id
+          status
+          draftKey
+          amount
+          currency
+          description
+          legacyId
+          payee {
+            ... on Collective {
+              slug
+            }
+          }
+        }
+      }
+    GQL
+
+    variables = {
+      account: { slug: fund.oc_project_slug },
+      expense: {
+        description: "#{fund.name} Ecosystem Funds Sponsorship for #{project_names}",
+        longDescription: description,
+        currency: "USD",
+        type: "INVOICE",
+        items: [{ amount: amount_cents, description: description }],
+        payee: {
+          slug: vendor.slug
+        },
+        payoutMethod: { type: "ACCOUNT_BALANCE" },
+        tags: [vendor.platform, "ecosystem-fund", "aggregated"],
+        accountingCategory: { id: "3vjrkx5l-mnv904qj-jmq8bwa7-zdygoe3d" }
+      }
+    }
+
+    response_body = oc_api_request(query: query, variables: variables, event_type: 'payout_aggregated_proxy_collective')
+    return nil unless response_body
+
+    data = response_body['data']['createExpense']
+    puts "Aggregated expense created successfully:"
+    puts JSON.pretty_generate(data)
+
+    # Create invitation record for tracking on the first allocation
+    inv = Invitation.create!(project_allocation: self, email: project.contact_email, status: 'DRAFT', member_invitation_id: data['legacyId'], data: data.merge('aggregated_allocation_ids' => allocations.map(&:id)))
+    log_event('expense_created', invitation_record: inv, metadata: { legacy_id: data['legacyId'], vendor_slug: vendor.slug, aggregated: true, allocation_ids: allocations.map(&:id) })
+    inv
   end
 
   def proxy_collective_expense_invite_description(proxy_collective)

@@ -284,6 +284,47 @@ class Allocation < ApplicationRecord
     project_allocations.select(&:is_proxy_collective?).each(&:payout)
   end
 
+  def payout_proxy_collectives_aggregated
+    # Group proxy collective allocations by funding source
+    proxy_allocations = project_allocations.includes(:funding_source, :project)
+      .select(&:is_proxy_collective?)
+      .reject(&:paid?)
+      .reject(&:funding_rejected?)
+
+    grouped = proxy_allocations.group_by(&:funding_source_id)
+
+    grouped.each do |funding_source_id, allocations|
+      funding_source = allocations.first.funding_source
+      total_cents = allocations.sum(&:amount_cents)
+      minimum_cents = funding_source.minimum_donation_ammount_cents
+
+      if total_cents >= minimum_cents
+        # Aggregated amount meets minimum - send via proxy collective
+        puts "  Sending aggregated #{allocations.length} projects (#{total_cents} cents) to #{funding_source.url}"
+        result = allocations.first.send_aggregated_proxy_payout(allocations, total_cents)
+        if result
+          allocations.each { |pa| pa.update!(paid_at: Time.now) }
+          allocations.each { |pa| pa.log_event('payout_completed', message: "Sent via aggregated proxy collective: #{funding_source.name}") }
+        else
+          allocations.each { |pa| pa.log_event('payout_failed', status: 'error', message: "Failed aggregated proxy payout") }
+        end
+      else
+        # Still below minimum even after aggregating - fall back to email invites
+        puts "  Aggregated total (#{total_cents} cents) still below minimum (#{minimum_cents} cents) for #{funding_source.url}"
+        puts "  Falling back to email invites for #{allocations.length} projects"
+        allocations.each do |pa|
+          pa.log_event('payout_skipped', status: 'success', message: "Aggregated total below minimum, falling back to email", metadata: {
+            funding_source_url: funding_source.url,
+            individual_amount_cents: pa.amount_cents,
+            aggregated_total_cents: total_cents,
+            minimum_cents: minimum_cents
+          })
+          pa.payout_via_email_invite
+        end
+      end
+    end
+  end
+
   def payout_invited
     project_allocations.select(&:is_invited?).each(&:payout)
   end
