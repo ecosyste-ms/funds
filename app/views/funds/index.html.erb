@@ -25,11 +25,9 @@
     </div>
     
     <div class="row mb-5">
-      
-      
-      <% @featured_funds.each do |fund| %>
-        <div class="col-lg-6 col-xl-3">
-          <a href="<%= fund_path(fund) %>" class="card fund-card p-4 mb-3 mb-xl-0 block-link block-link--spesh">
+      <% @funded_funds.each do |fund| %>
+        <div class="col-lg-6 col-xl-3 mb-3">
+          <a href="<%= fund_path(fund) %>" class="card fund-card p-4 h-100 block-link block-link--spesh">
             <div class="row align-items-center align-items-stretch">
               <div class="col-8">
                 <h3 class="mb-3 block-link__title spesh-link"><%= fund.name %></h3>
@@ -44,7 +42,6 @@
           </a>
         </div>
       <% end %>
-
     </div>
 
     <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-5">

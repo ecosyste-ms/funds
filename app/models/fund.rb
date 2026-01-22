@@ -15,6 +15,7 @@ class Fund < ApplicationRecord
   scope :featured, -> { where(featured: true) }
   scope :not_featured, -> { where(featured: false) }
   scope :short_names, -> { where("LENGTH(name) < ?", 20) }
+  scope :with_donations, -> { where(id: Transaction.where(transaction_type: 'CREDIT').select(:fund_id)) }
 
   def self.search(query)
     where("name ILIKE :query OR description ILIKE :query", query: "%#{query}%")
