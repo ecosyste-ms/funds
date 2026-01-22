@@ -28,14 +28,23 @@
                 <span class="stat-card-title">
                   <%= number_to_currency @fund.total_donation_amount %>
                 </span>
-                <span class="stat-card-text small">Total funded</span>
+                <span class="stat-card-text small">Donated</span>
               </div>
             </div>
 
             <div class="stat-card mb-2">
               <div class="stat-card-body">
                 <span class="stat-card-title">
-                  <%= @fund.funders.length %>
+                  <%= number_to_currency @fund.completed_allocations_total %>
+                </span>
+                <span class="stat-card-text small">Distributed</span>
+              </div>
+            </div>
+
+            <div class="stat-card mb-2">
+              <div class="stat-card-body">
+                <span class="stat-card-title">
+                  <%= number_with_delimiter @fund.funders.length %>
                 </span>
                 <span class="stat-card-text small">Funders</span>
               </div>

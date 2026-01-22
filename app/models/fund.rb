@@ -515,7 +515,7 @@ class Fund < ApplicationRecord
   end
 
   def total_distributed_cents
-    allocations.sum(&:total_allocated_cents)
+    (transactions.where(transaction_kind: 'EXPENSE').sum(:amount).abs * 100).to_i
   end
 
   def total_funded_projects

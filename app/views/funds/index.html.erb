@@ -31,8 +31,8 @@
             <div class="row align-items-center align-items-stretch">
               <div class="col-8">
                 <h3 class="mb-3 block-link__title spesh-link"><%= fund.name %></h3>
-                <p><span class="label">Donated</span><strong class="value"><%= number_to_currency fund.total_donations %></strong></p>
-                <p><span class="label">Distributed</span><strong class="value"><%= number_to_currency fund.total_distributed_cents/100 %></strong></p>
+                <p><span class="label">Donated</span><strong class="value"><%= number_to_currency fund.total_donation_amount %></strong></p>
+                <p><span class="label">Distributed</span><strong class="value"><%= number_to_currency fund.completed_allocations_total %></strong></p>
                 <p><span class="label">From</span><strong class="value"><%= number_with_delimiter(fund.total_donors) %> <%= 'Funder'.pluralize(fund.total_donors) %></strong></p>
                 <p><span class="label">To</span><strong class="value"><%= number_with_delimiter(fund.possible_projects_count) %> <%= 'Project'.pluralize(fund.possible_projects_count) %></strong></p>
               </div>
