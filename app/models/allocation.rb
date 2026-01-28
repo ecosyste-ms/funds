@@ -391,7 +391,7 @@ class Allocation < ApplicationRecord
   end
 
   def transaction_end_date
-    created_at
+    created_at.end_of_month
   end
 
   def funder_names
