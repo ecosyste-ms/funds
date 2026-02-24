@@ -76,13 +76,13 @@ GEM
       bigdecimal
       rexml
     crass (1.0.6)
-    css_parser (1.21.1)
+    css_parser (2.0.0)
       addressable
     csv (3.3.5)
     date (3.5.1)
     dotenv (3.2.0)
     drb (2.2.3)
-    erb (6.0.1)
+    erb (6.0.2)
     erubi (1.13.1)
     factory_bot (6.5.6)
       activesupport (>= 6.1.0)
@@ -310,11 +310,10 @@ GEM
       concurrent-ruby (~> 1.0)
     uri (1.1.1)
     useragent (0.16.11)
-    web-console (4.2.1)
-      actionview (>= 6.0.0)
-      activemodel (>= 6.0.0)
+    web-console (4.3.0)
+      actionview (>= 8.0.0)
       bindex (>= 0.4.0)
-      railties (>= 6.0.0)
+      railties (>= 8.0.0)
     webmock (3.26.1)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
@@ -411,12 +410,12 @@ CHECKSUMS
   counter_culture (3.12.1) sha256=8a880092321941732bfa639c449a133ff08c5197c29e853371cc03c486e43980
   crack (1.0.1) sha256=ff4a10390cd31d66440b7524eb1841874db86201d5b70032028553130b6d4c7e
   crass (1.0.6) sha256=dc516022a56e7b3b156099abc81b6d2b08ea1ed12676ac7a5657617f012bd45d
-  css_parser (1.21.1) sha256=6cfd3ffc0a97333b39d2b1b49c95397b05e0e3b684d68f77ec471ba4ec2ef7c7
+  css_parser (2.0.0) sha256=af5c759a127b125b635006a6c6c2e05b96a1ebdeec21b3c415fd5f09ec714a0a
   csv (3.3.5) sha256=6e5134ac3383ef728b7f02725d9872934f523cb40b961479f69cf3afa6c8e73f
   date (3.5.1) sha256=750d06384d7b9c15d562c76291407d89e368dda4d4fff957eb94962d325a0dc0
   dotenv (3.2.0) sha256=e375b83121ea7ca4ce20f214740076129ab8514cd81378161f11c03853fe619d
   drb (2.2.3) sha256=0b00d6fdb50995fe4a45dea13663493c841112e4068656854646f418fda13373
-  erb (6.0.1) sha256=28ecdd99c5472aebd5674d6061e3c6b0a45c049578b071e5a52c2a7f13c197e5
+  erb (6.0.2) sha256=9fe6264d44f79422c87490a1558479bd0e7dad4dd0e317656e67ea3077b5242b
   erubi (1.13.1) sha256=a082103b0885dbc5ecf1172fede897f9ebdb745a4b97a5e8dc63953db1ee4ad9
   factory_bot (6.5.6) sha256=12beb373214dccc086a7a63763d6718c49769d5606f0501e0a4442676917e077
   factory_bot_rails (6.5.1) sha256=d3cc4851eae4dea8a665ec4a4516895045e710554d2b5ac9e68b94d351bc6d68
@@ -528,7 +527,7 @@ CHECKSUMS
   tzinfo (2.0.6) sha256=8daf828cc77bcf7d63b0e3bdb6caa47e2272dcfaf4fbfe46f8c3a9df087a829b
   uri (1.1.1) sha256=379fa58d27ffb1387eaada68c749d1426738bd0f654d812fcc07e7568f5c57c6
   useragent (0.16.11) sha256=700e6413ad4bb954bb63547fa098dddf7b0ebe75b40cc6f93b8d54255b173844
-  web-console (4.2.1) sha256=e7bcf37a10ea2b4ec4281649d1cee461b32232d0a447e82c786e6841fd22fe20
+  web-console (4.3.0) sha256=e13b71301cdfc2093f155b5aa3a622db80b4672d1f2f713119cc7ec7ac6a6da4
   webmock (3.26.1) sha256=4f696fb57c90a827c20aadb2d4f9058bbff10f7f043bd0d4c3f58791143b1cd7
   zeitwerk (2.7.5) sha256=d8da92128c09ea6ec62c949011b00ed4a20242b255293dd66bf41545398f73dd
 
