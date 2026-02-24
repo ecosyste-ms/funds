@@ -55,6 +55,6 @@ group :test do
   gem "rails-controller-testing"
   gem "factory_bot_rails"
   gem 'faker'
-  gem "minitest", "~> 5"
+  gem "minitest", "~> 6"
 end
 
