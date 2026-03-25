@@ -3,7 +3,7 @@ source "https://rubygems.org"
 ruby file: ".ruby-version"
 
 # Rails components
-gem "railties", "~> 8.1.1"
+gem "railties", "~> 8.1.3"
 gem "activemodel", "~> 8.1.1"
 gem "activerecord", "~> 8.1.1"
 gem "actionpack", "~> 8.1.1"
