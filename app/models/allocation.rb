@@ -269,7 +269,8 @@ class Allocation < ApplicationRecord
   end
 
   def payout
-    project_allocations.each(&:payout)
+    project_allocations.reject(&:is_proxy_collective?).each(&:payout)
+    payout_proxy_collectives
   end
 
   def payout_open_source_collectives
@@ -281,10 +282,6 @@ class Allocation < ApplicationRecord
   end
 
   def payout_proxy_collectives
-    project_allocations.select(&:is_proxy_collective?).each(&:payout)
-  end
-
-  def payout_proxy_collectives_aggregated
     # Group proxy collective allocations by funding source
     proxy_allocations = project_allocations.includes(:funding_source, :project)
       .select(&:is_proxy_collective?)
