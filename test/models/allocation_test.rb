@@ -107,7 +107,84 @@ class AllocationTest < ActiveSupport::TestCase
     assert_equal 40_000, ProjectAllocation.find_by(project_id: @project1.id).amount_cents
   end
 
-  test 'payout_proxy_collectives_aggregated groups allocations by funding source' do
+  test 'payout creates one expense per funding source for proxy collectives, not one per project' do
+    funding_source = FundingSource.create!(
+      url: 'https://github.com/sponsors/dtolnay',
+      platform: 'github.com'
+    )
+
+    project1 = Project.create!(
+      url: 'https://github.com/dtolnay/syn',
+      name: 'syn',
+      licenses: ['mit'],
+      registry_names: ['crates.io'],
+      repository: { 'archived' => false },
+      funding_source: funding_source,
+      owner: { 'email' => 'dtolnay@example.com' }
+    )
+
+    project2 = Project.create!(
+      url: 'https://github.com/dtolnay/serde',
+      name: 'serde',
+      licenses: ['mit'],
+      registry_names: ['crates.io'],
+      repository: { 'archived' => false },
+      funding_source: funding_source,
+      owner: { 'email' => 'dtolnay@example.com' }
+    )
+
+    project3 = Project.create!(
+      url: 'https://github.com/dtolnay/anyhow',
+      name: 'anyhow',
+      licenses: ['mit'],
+      registry_names: ['crates.io'],
+      repository: { 'archived' => false },
+      funding_source: funding_source,
+      owner: { 'email' => 'dtolnay@example.com' }
+    )
+
+    pa1 = ProjectAllocation.create!(allocation: @allocation, project: project1, fund: @fund, funding_source: funding_source, amount_cents: 20000, score: 0.3)
+    pa2 = ProjectAllocation.create!(allocation: @allocation, project: project2, fund: @fund, funding_source: funding_source, amount_cents: 20000, score: 0.3)
+    pa3 = ProjectAllocation.create!(allocation: @allocation, project: project3, fund: @fund, funding_source: funding_source, amount_cents: 19900, score: 0.3)
+
+    proxy_collective = ProxyCollective.create!(
+      slug: 'esf-github-sponsors-dtolnay',
+      name: 'https://github.com/sponsors/dtolnay',
+      website: 'https://github.com/sponsors/dtolnay'
+    )
+
+    ProxyCollective.stubs(:find_or_create_by_website).returns(proxy_collective)
+    proxy_collective.stubs(:set_payout_method).returns(true)
+
+    expense_requests = []
+    stub_request(:post, /opencollective/).to_return do |request|
+      body = JSON.parse(request.body)
+      expense_requests << body
+      if body['query'].include?('createExpense')
+        {
+          status: 200,
+          body: { data: { createExpense: { id: '1', legacyId: 789, status: 'APPROVED', amount: 59900, currency: 'USD', description: 'test', draftKey: 'abc', payee: { slug: proxy_collective.slug } } } }.to_json,
+          headers: { 'Content-Type' => 'application/json' }
+        }
+      else
+        {
+          status: 200,
+          body: { data: { processExpense: { id: '1', status: 'APPROVED' } } }.to_json,
+          headers: { 'Content-Type' => 'application/json' }
+        }
+      end
+    end
+
+    @allocation.payout
+
+    create_expense_calls = expense_requests.select { |r| r['query'].include?('createExpense') }
+    assert_equal 1, create_expense_calls.length, "Expected 1 aggregated expense but got #{create_expense_calls.length} individual ones"
+
+    total_amount = create_expense_calls.first['variables']['expense']['items'].sum { |i| i['amount'] }
+    assert_equal 59900, total_amount, "Expected aggregated amount of 59900 cents"
+  end
+
+  test 'payout_proxy_collectives groups allocations by funding source' do
     funding_source = FundingSource.create!(
       url: 'https://github.com/sponsors/testuser',
       platform: 'github.com',
@@ -164,7 +241,7 @@ class AllocationTest < ActiveSupport::TestCase
     assert_equal 10000, grouped[funding_source.id].sum(&:amount_cents)
   end
 
-  test 'payout_proxy_collectives_aggregated falls back to email when aggregated total still below minimum' do
+  test 'payout_proxy_collectives falls back to email when aggregated total still below minimum' do
     funding_source = FundingSource.create!(
       url: 'https://github.com/sponsors/testuser',
       platform: 'github.com',
@@ -215,7 +292,7 @@ class AllocationTest < ActiveSupport::TestCase
       headers: { 'Content-Type' => 'application/json' }
     )
 
-    @allocation.payout_proxy_collectives_aggregated
+    @allocation.payout_proxy_collectives
 
     # Should have logged payout_skipped events with fallback message for each allocation
     pa1.reload
