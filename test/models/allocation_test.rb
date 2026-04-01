@@ -184,6 +184,37 @@ class AllocationTest < ActiveSupport::TestCase
     assert_equal 59900, total_amount, "Expected aggregated amount of 59900 cents"
   end
 
+  test 'github_sponsors_csv_export excludes maintainers below funding source minimum' do
+    above_minimum_fs = FundingSource.create!(
+      url: 'https://github.com/sponsors/dtolnay',
+      platform: 'github.com',
+      github_sponsors: { 'minimum_sponsorship_amount' => 100 }
+    )
+
+    below_minimum_fs = FundingSource.create!(
+      url: 'https://github.com/sponsors/cowtowncoder',
+      platform: 'github.com',
+      github_sponsors: { 'minimum_sponsorship_amount' => 100 }
+    )
+
+    project1 = Project.create!(url: 'https://github.com/dtolnay/serde', name: 'serde', licenses: ['mit'], registry_names: ['crates.io'], repository: { 'archived' => false }, funding_source: above_minimum_fs)
+    project2 = Project.create!(url: 'https://github.com/dtolnay/syn', name: 'syn', licenses: ['mit'], registry_names: ['crates.io'], repository: { 'archived' => false }, funding_source: above_minimum_fs)
+    project3 = Project.create!(url: 'https://github.com/cowtowncoder/jackson', name: 'jackson', licenses: ['apache'], registry_names: ['maven'], repository: { 'archived' => false }, funding_source: below_minimum_fs)
+
+    # dtolnay: two projects totaling $120 (above $100 minimum)
+    ProjectAllocation.create!(allocation: @allocation, project: project1, fund: @fund, funding_source: above_minimum_fs, amount_cents: 7000, score: 0.3)
+    ProjectAllocation.create!(allocation: @allocation, project: project2, fund: @fund, funding_source: above_minimum_fs, amount_cents: 5000, score: 0.3)
+
+    # cowtowncoder: one project at $50 (below $100 minimum)
+    ProjectAllocation.create!(allocation: @allocation, project: project3, fund: @fund, funding_source: below_minimum_fs, amount_cents: 5000, score: 0.3)
+
+    csv = @allocation.github_sponsors_csv_export
+    lines = csv.lines.map(&:strip)
+
+    assert lines.any? { |l| l.include?('dtolnay') }, "Expected dtolnay in CSV"
+    refute lines.any? { |l| l.include?('cowtowncoder') }, "Expected cowtowncoder excluded from CSV (below minimum)"
+  end
+
   test 'payout_proxy_collectives groups allocations by funding source' do
     funding_source = FundingSource.create!(
       url: 'https://github.com/sponsors/testuser',
