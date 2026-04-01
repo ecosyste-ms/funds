@@ -1,0 +1,25 @@
+app/models/allocation.rb
+  ffdc0f87bc8f798d 272-273
+test/models/allocation_test.rb
+  ffdc0f87bc8f798d 110-187,244,295
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.22",
+  "base_commit_sha": "9adf001c5e3eab11bc33de4781f4002df6b9c3ea",
+  "prompts": {
+    "ffdc0f87bc8f798d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "83610269-7a7e-4381-bbb3-01cdd39f595a",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Andrew Nesbitt <andrewnez@gmail.com>",
+      "messages": [],
+      "total_additions": 82,
+      "total_deletions": 8,
+      "accepted_lines": 82,
+      "overriden_lines": 0
+    }
+  }
+}
