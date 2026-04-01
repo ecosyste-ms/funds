@@ -345,14 +345,15 @@ class Allocation < ApplicationRecord
   def github_sponsors_csv_export
     CSV.generate do |csv|
       csv << ['Maintainer username', 'Sponsorship amount in USD']
-      
+
       grouped_allocations = project_allocations
         .select { |pa| pa.funding_source && pa.funding_source.platform == 'github.com' }
-        .group_by { |pa| pa.funding_source.name }
+        .group_by { |pa| [pa.funding_source.name, pa.funding_source] }
         .transform_values { |pas| pas.sum { |pa| pa.amount_cents } }
-        .sort_by { |_, amount_cents| -amount_cents } # Sort by amount descending
-    
-      grouped_allocations.each do |maintainer, amount_cents|
+        .select { |(_, fs), amount_cents| amount_cents >= fs.minimum_donation_ammount_cents }
+        .sort_by { |_, amount_cents| -amount_cents }
+
+      grouped_allocations.each do |(maintainer, _), amount_cents|
         csv << [maintainer, amount_cents / 100.0]
       end
     end
@@ -369,14 +370,15 @@ class Allocation < ApplicationRecord
   def self.github_sponsors_csv_export(allocations)
     CSV.generate do |csv|
       csv << ['Maintainer username', 'Sponsorship amount in USD']
-  
+
       grouped_allocations = allocations.flat_map(&:project_allocations)
         .select { |pa| pa.funding_source&.platform == 'github.com' }
-        .group_by { |pa| pa.funding_source.name }
+        .group_by { |pa| [pa.funding_source.name, pa.funding_source] }
         .transform_values { |pas| pas.sum(&:amount_cents) }
-        .sort_by { |_, amount_cents| -amount_cents } # Sort by amount descending
-  
-      grouped_allocations.each do |maintainer, amount_cents|
+        .select { |(_, fs), amount_cents| amount_cents >= fs.minimum_donation_ammount_cents }
+        .sort_by { |_, amount_cents| -amount_cents }
+
+      grouped_allocations.each do |(maintainer, _), amount_cents|
         csv << [maintainer, amount_cents / 100]
       end
     end
