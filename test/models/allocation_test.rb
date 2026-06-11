@@ -215,6 +215,47 @@ class AllocationTest < ActiveSupport::TestCase
     refute lines.any? { |l| l.include?('cowtowncoder') }, "Expected cowtowncoder excluded from CSV (below minimum)"
   end
 
+  test 'not_completed_as_of returns allocations pending at the given time' do
+    may = Allocation.create!(fund_id: @fund.id, year: 2025, month: 5, total_cents: 1000, created_at: Time.utc(2025, 5, 1), completed_at: Time.utc(2025, 5, 28))
+    june = Allocation.create!(fund_id: @fund.id, year: 2025, month: 6, total_cents: 1000, created_at: Time.utc(2025, 6, 1), completed_at: Time.utc(2025, 6, 28))
+    lingering = Allocation.create!(fund_id: @fund.id, year: 2025, month: 4, total_cents: 1000, created_at: Time.utc(2025, 4, 1))
+
+    may_snapshot = Allocation.not_completed_as_of(Time.utc(2025, 5, 15, 12))
+    assert_includes may_snapshot, may
+    assert_includes may_snapshot, lingering
+    refute_includes may_snapshot, june
+
+    june_snapshot = Allocation.not_completed_as_of(Time.utc(2025, 6, 15, 12))
+    refute_includes june_snapshot, may
+    assert_includes june_snapshot, june
+    assert_includes june_snapshot, lingering
+  end
+
+  test 'github_sponsors_csv_export_history includes rows per export date with fractional dollars' do
+    fs = FundingSource.create!(url: 'https://github.com/sponsors/dtolnay', platform: 'github.com', github_sponsors: {})
+    project = Project.create!(url: 'https://github.com/dtolnay/serde', licenses: ['mit'], registry_names: ['npm'], repository: { 'archived' => false }, funding_source: fs)
+
+    may = Allocation.create!(fund_id: @fund.id, year: 2025, month: 5, total_cents: 1000, created_at: Time.utc(2025, 5, 1), completed_at: Time.utc(2025, 5, 28))
+    ProjectAllocation.create!(allocation: may, project: project, fund: @fund, funding_source: fs, amount_cents: 7050, score: 0.5)
+
+    csv = Allocation.github_sponsors_csv_export_history
+    lines = csv.lines.map(&:strip)
+
+    assert_equal 'Export date,Maintainer username,Sponsorship amount in USD', lines.first
+    assert_includes lines, '2025-05-15,dtolnay,70'
+    refute lines.any? { |l| l.start_with?('2025-06-15') }, "Expected no rows after allocation completed"
+  end
+
+  test 'github_sponsors_csv_export rounds down to whole dollars for github bulk upload' do
+    fs = FundingSource.create!(url: 'https://github.com/sponsors/dtolnay', platform: 'github.com', github_sponsors: {})
+    project = Project.create!(url: 'https://github.com/dtolnay/serde', licenses: ['mit'], registry_names: ['npm'], repository: { 'archived' => false }, funding_source: fs)
+    ProjectAllocation.create!(allocation: @allocation, project: project, fund: @fund, funding_source: fs, amount_cents: 7050, score: 0.5)
+
+    csv = Allocation.github_sponsors_csv_export([@allocation])
+
+    assert_includes csv, "dtolnay,70\n"
+  end
+
   test 'payout_proxy_collectives groups allocations by funding source' do
     funding_source = FundingSource.create!(
       url: 'https://github.com/sponsors/testuser',

@@ -7,6 +7,7 @@ class Allocation < ApplicationRecord
   scope :displayable, -> { where('funded_projects_count > 0') }
   scope :completed, -> { where.not(completed_at: nil) }
   scope :not_completed, -> { where(completed_at: nil) }
+  scope :not_completed_as_of, ->(time) { where(created_at: ..time).where('completed_at IS NULL OR completed_at > ?', time) }
 
   validates_uniqueness_of :slug, scope: :fund_id
 
@@ -342,6 +343,7 @@ class Allocation < ApplicationRecord
     project_allocations.includes(:funding_source).select{|pa| pa.funding_source.blank?}.length
   end
 
+  # GitHub Sponsors bulk uploads only accept whole dollar amounts
   def github_sponsors_csv_export
     CSV.generate do |csv|
       csv << ['Maintainer username', 'Sponsorship amount in USD']
@@ -354,7 +356,7 @@ class Allocation < ApplicationRecord
         .sort_by { |_, amount_cents| -amount_cents }
 
       grouped_allocations.each do |(maintainer, _), amount_cents|
-        csv << [maintainer, amount_cents / 100.0]
+        csv << [maintainer, amount_cents / 100]
       end
     end
   end
@@ -367,19 +369,46 @@ class Allocation < ApplicationRecord
     allocations.flat_map(&:project_allocations).select { |pa| pa.funding_source&.platform == 'github.com' }.sum(&:amount_cents)
   end
 
+  def self.github_sponsors_grouped_allocations(allocations)
+    allocations.flat_map(&:project_allocations)
+      .select { |pa| pa.funding_source&.platform == 'github.com' }
+      .group_by { |pa| [pa.funding_source.name, pa.funding_source] }
+      .transform_values { |pas| pas.sum(&:amount_cents) }
+      .select { |(_, fs), amount_cents| amount_cents >= fs.minimum_donation_ammount_cents }
+      .sort_by { |_, amount_cents| -amount_cents }
+  end
+
+  # GitHub Sponsors bulk uploads only accept whole dollar amounts
   def self.github_sponsors_csv_export(allocations)
     CSV.generate do |csv|
       csv << ['Maintainer username', 'Sponsorship amount in USD']
 
-      grouped_allocations = allocations.flat_map(&:project_allocations)
-        .select { |pa| pa.funding_source&.platform == 'github.com' }
-        .group_by { |pa| [pa.funding_source.name, pa.funding_source] }
-        .transform_values { |pas| pas.sum(&:amount_cents) }
-        .select { |(_, fs), amount_cents| amount_cents >= fs.minimum_donation_ammount_cents }
-        .sort_by { |_, amount_cents| -amount_cents }
-
-      grouped_allocations.each do |(maintainer, _), amount_cents|
+      github_sponsors_grouped_allocations(allocations).each do |(maintainer, _), amount_cents|
         csv << [maintainer, amount_cents / 100]
+      end
+    end
+  end
+
+  GITHUB_SPONSORS_EXPORT_START = Date.new(2025, 5, 15)
+
+  def self.github_sponsors_export_dates
+    dates = []
+    date = GITHUB_SPONSORS_EXPORT_START
+    while date <= Date.today
+      dates << date
+      date = date >> 1
+    end
+    dates
+  end
+
+  def self.github_sponsors_csv_export_history
+    CSV.generate do |csv|
+      csv << ['Export date', 'Maintainer username', 'Sponsorship amount in USD']
+
+      github_sponsors_export_dates.each do |date|
+        github_sponsors_grouped_allocations(not_completed_as_of(date.end_of_day)).each do |(maintainer, _), amount_cents|
+          csv << [date.iso8601, maintainer, amount_cents / 100]
+        end
       end
     end
   end
