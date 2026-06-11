@@ -2,7 +2,18 @@ class Admin::AllocationsController < Admin::ApplicationController
   skip_before_action :require_basic_auth, only: [:github_sponsors]
   
   def github_sponsors
-    csv_string = Allocation.github_sponsors_csv_export(Allocation.not_completed.all) 
-    send_data csv_string, filename: "github_sponsors.csv", type: "text/csv"
+    if params[:date].blank?
+      redirect_to github_sponsors_dated_admin_allocations_path(date: Date.today.iso8601, format: :csv)
+      return
+    end
+
+    date = begin
+      Date.iso8601(params[:date])
+    rescue Date::Error
+      raise ActiveRecord::RecordNotFound
+    end
+
+    csv_string = Allocation.github_sponsors_csv_export(Allocation.not_completed_as_of(date.end_of_day))
+    send_data csv_string, filename: "github_sponsors-#{date.iso8601}.csv", type: "text/csv"
   end
 end

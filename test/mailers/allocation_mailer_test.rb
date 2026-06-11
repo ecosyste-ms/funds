@@ -10,6 +10,6 @@ class AllocationMailerTest < ActionMailer::TestCase
 
     assert_equal ["test@example.com"], email.to
     assert_equal "Ecosyste.ms Funds GitHub Sponsors Bulk CSV Export", email.subject
-    assert_match "https://funds.ecosyste.ms/admin/allocations/github_sponsors.csv", email.body.to_s
+    assert_match "https://funds.ecosyste.ms/admin/allocations/github_sponsors/#{Date.today.iso8601}.csv", email.body.to_s
   end
 end

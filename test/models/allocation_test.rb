@@ -215,6 +215,22 @@ class AllocationTest < ActiveSupport::TestCase
     refute lines.any? { |l| l.include?('cowtowncoder') }, "Expected cowtowncoder excluded from CSV (below minimum)"
   end
 
+  test 'not_completed_as_of returns allocations pending at the given time' do
+    may = Allocation.create!(fund_id: @fund.id, year: 2025, month: 5, total_cents: 1000, created_at: Time.utc(2025, 5, 1), completed_at: Time.utc(2025, 5, 28))
+    june = Allocation.create!(fund_id: @fund.id, year: 2025, month: 6, total_cents: 1000, created_at: Time.utc(2025, 6, 1), completed_at: Time.utc(2025, 6, 28))
+    lingering = Allocation.create!(fund_id: @fund.id, year: 2025, month: 4, total_cents: 1000, created_at: Time.utc(2025, 4, 1))
+
+    may_snapshot = Allocation.not_completed_as_of(Time.utc(2025, 5, 15, 12))
+    assert_includes may_snapshot, may
+    assert_includes may_snapshot, lingering
+    refute_includes may_snapshot, june
+
+    june_snapshot = Allocation.not_completed_as_of(Time.utc(2025, 6, 15, 12))
+    refute_includes june_snapshot, may
+    assert_includes june_snapshot, june
+    assert_includes june_snapshot, lingering
+  end
+
   test 'payout_proxy_collectives groups allocations by funding source' do
     funding_source = FundingSource.create!(
       url: 'https://github.com/sponsors/testuser',

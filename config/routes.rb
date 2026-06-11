@@ -15,6 +15,7 @@ Rails.application.routes.draw do
     resources :allocations, only: [:index] do
       collection do
         get :github_sponsors
+        get 'github_sponsors/:date', action: :github_sponsors, as: :github_sponsors_dated, constraints: { date: /\d{4}-\d{2}-\d{2}/ }
       end
     end
     resources :events, only: [:index]
