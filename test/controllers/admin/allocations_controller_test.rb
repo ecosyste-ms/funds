@@ -34,6 +34,17 @@ class Admin::AllocationsControllerTest < ActionDispatch::IntegrationTest
     refute_match 'dtolnay', response.body
   end
 
+  test "github_sponsors_history returns combined csv with a date column" do
+    @allocation.update!(completed_at: Time.utc(2025, 5, 28))
+
+    get github_sponsors_history_admin_allocations_url(format: :csv)
+    assert_response :success
+    assert_match 'Export date,Maintainer username,Sponsorship amount in USD', response.body
+    assert_match '2025-05-15,dtolnay,50', response.body
+    refute_match '2025-06-15', response.body
+    assert_match 'github_sponsors_history.csv', response.headers['Content-Disposition']
+  end
+
   test "dated github_sponsors returns 404 for invalid date" do
     get github_sponsors_dated_admin_allocations_url(date: '2025-99-99', format: :csv)
     assert_response :not_found
