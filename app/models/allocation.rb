@@ -35,6 +35,7 @@ class Allocation < ApplicationRecord
 
   def complete!
     update!(completed_at: Time.now)
+    fund.update_stats
   end
 
   def complete_payout_total_cents

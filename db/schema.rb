@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_05_141848) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_15_151402) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -45,6 +45,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_05_141848) do
 
   create_table "funds", force: :cascade do |t|
     t.float "balance", default: 0.0
+    t.bigint "completed_allocations_total_cents", default: 0
     t.datetime "created_at", null: false
     t.string "description"
     t.string "excluded_topics", default: [], array: true
@@ -63,6 +64,8 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_05_141848) do
     t.string "secondary_topics", default: [], array: true
     t.string "slug"
     t.string "topic_logo_url"
+    t.bigint "total_donation_amount_cents", default: 0
+    t.integer "total_donors_count", default: 0
     t.integer "transactions_count", default: 0
     t.datetime "updated_at", null: false
     t.string "wikipedia_url"

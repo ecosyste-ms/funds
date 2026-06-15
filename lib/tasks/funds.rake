@@ -21,4 +21,8 @@ namespace :funds do
     Invitation.delete_expired
     Allocation.not_completed.each(&:complete!)
   end
+
+  task update_stats: :environment do
+    Fund.find_each(&:update_stats)
+  end
 end

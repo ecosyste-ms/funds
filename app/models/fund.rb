@@ -511,7 +511,7 @@ class Fund < ApplicationRecord
   end
 
   def total_donors
-    transactions.donations.distinct.count(:account)
+    total_donors_count
   end
 
   def total_distributed_cents
@@ -552,7 +552,7 @@ class Fund < ApplicationRecord
       Transaction.upsert_all(transactions, unique_by: :uuid)
       offset += 1000
     end
-    update(balance: current_balance)
+    update_stats
   end
 
   def fetch_transactions_from_graphql(offset: 0)
@@ -689,7 +689,7 @@ class Fund < ApplicationRecord
   end
 
   def total_donation_amount
-    transactions.donations.sum(:amount)
+    total_donation_amount_cents / 100.0
   end
 
   def funders
@@ -752,7 +752,16 @@ class Fund < ApplicationRecord
   end
 
   def completed_allocations_total
-    (allocations.completed.sum(&:complete_payout_total_cents) / 100.0).round(2)
+    completed_allocations_total_cents / 100.0
+  end
+
+  def update_stats
+    update(
+      balance: current_balance,
+      total_donation_amount_cents: (transactions.donations.sum(:amount) * 100).to_i,
+      total_donors_count: transactions.donations.distinct.count(:account),
+      completed_allocations_total_cents: allocations.completed.sum(&:complete_payout_total_cents)
+    )
   end
 
   def in_progress_allocations_total
