@@ -1,8 +1,8 @@
-# [Ecosyste.ms: Funds](https://funds.ecosyste.ms)
+# [Ecosyste.ms: Funds](http://web.archive.org/web/20260719090530/https://funds.ecosyste.ms/)
 
 An open source funding solution from ecosyste.ms & Open Source Collective.
 
-This project is part of [Ecosyste.ms](https://ecosyste.ms): Tools and open datasets to support, sustain, and secure critical digital infrastructure.
+This project is part of [Ecosyste.ms](http://web.archive.org/web/20260719083207/https://ecosyste.ms/): Tools and open datasets to support, sustain, and secure critical digital infrastructure.
 
 ## Documentation
 
