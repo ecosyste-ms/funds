@@ -2,13 +2,13 @@
 
 ## Overview
 
-Funds are based on either a package manager for a software ecosystem (i.e. rubygems, npm or cargo), or from a [featured topic on GitHub](https://awesome.ecosyste.ms/topics). The funds are used to support the development of the ecosystem, and are distributed to maintainers, contributors, and projects in the ecosystem.
+Funds are based on either a package manager for a software ecosystem (i.e. rubygems, npm or cargo), or from a [featured topic on GitHub](http://web.archive.org/web/20260124030533/https://awesome.ecosyste.ms/topics). The funds are used to support the development of the ecosystem, and are distributed to maintainers, contributors, and projects in the ecosystem.
 
 ## Funding
 
 Each fund has an associated Project on Open Source Collective, which is used to collect and distribute funds. Donations can be made to the fund, and the funds are automatically distributed to maintainers, contributors, and projects in the ecosystem based on their usage and criticality within their ecosystem.
 
-Data is synced into the funds from Open Source Collective, triggered by webhooks. Project data is synced from [Ecosyste.ms](https://ecosyste.ms/) on a daily bases, and transaction data is synced in real-time.
+Data is synced into the funds from Open Source Collective, triggered by webhooks. Project data is synced from [Ecosyste.ms](http://web.archive.org/web/20260719083207/https://ecosyste.ms/) on a daily bases, and transaction data is synced in real-time.
 
 Funding is allocated on a monthly basis once a minimum threshold is reached, funding sources are discovered and then payouts made to maintainers, contributors, and projects in the ecosystem.
 
