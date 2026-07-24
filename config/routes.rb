@@ -29,6 +29,16 @@ Rails.application.routes.draw do
     resources :events, only: [:index]
   end
 
+  namespace :api do
+    namespace :v1 do
+      resources :funds, only: [:show] do
+        collection do
+          get :search
+        end
+      end
+    end
+  end
+
   resources :funds, only: [:index, :show] do
     collection do
       get :search
