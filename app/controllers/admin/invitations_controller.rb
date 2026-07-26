@@ -20,10 +20,11 @@ class Admin::InvitationsController < Admin::ApplicationController
       .joins(project_allocation: [:project, :fund])
       .includes(project_allocation: [:project, :fund])
 
+    direction = params[:order] == 'desc' ? 'desc' : 'asc'
     if params[:sort] == "amount"
-      @invitations = @invitations.order("project_allocation.amount_cents #{params[:order] || 'asc'}")
+      @invitations = @invitations.order("project_allocation.amount_cents #{direction}")
     elsif params[:sort] == "fund"
-      @invitations = @invitations.order("funds.name #{params[:order] || 'asc'}")
+      @invitations = @invitations.order("funds.name #{direction}")
     elsif params[:sort] == "status"
       @invitations = @invitations.sort_by do |i|
         [

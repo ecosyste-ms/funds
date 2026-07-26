@@ -30,4 +30,10 @@ class FundsControllerTest < ActionDispatch::IntegrationTest
     assert_includes assigns(:funds), fund1, "Expected fund1 to be in @funds"
     assert_not_includes assigns(:funds), fund2, "Expected fund2 to NOT be in @funds"
   end
+
+  test "search handles hostile query strings" do
+    get search_funds_url, params: { query: "') THEN 0 ELSE (SELECT 1) END --" }
+    assert_response :success
+    assert_empty assigns(:funds)
+  end
 end

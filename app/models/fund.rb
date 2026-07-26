@@ -18,16 +18,10 @@ class Fund < ApplicationRecord
   scope :with_donations, -> { where(id: Transaction.where(transaction_type: 'CREDIT').select(:fund_id)) }
 
   def self.search(query)
-    where("name ILIKE :query OR description ILIKE :query", query: "%#{query}%")
+    where("name ILIKE :query OR description ILIKE :query", query: "%#{sanitize_sql_like(query.to_s)}%")
       .left_joins(:allocations)
       .group("funds.id")
-      .order(Arel.sql(<<~SQL.squish))
-        CASE
-          WHEN LOWER(name) = LOWER('#{query}') THEN 0
-          ELSE 1
-        END,
-        COUNT(allocations.id) DESC
-      SQL
+      .order(Arel.sql("CASE WHEN LOWER(name) = LOWER(?) THEN 0 ELSE 1 END, COUNT(allocations.id) DESC", query.to_s))
   end
 
   def self.sync_least_recently_synced    

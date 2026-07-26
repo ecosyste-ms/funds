@@ -48,6 +48,24 @@ class FundTest < ActiveSupport::TestCase
     assert_equal 40.0, fund.completed_allocations_total
   end
 
+  test 'search treats query as a literal in the order clause' do
+    create(:fund, name: "d'Artagnan tools")
+    exact = create(:fund, name: "d'Artagnan")
+
+    results = Fund.search("d'Artagnan")
+
+    assert_equal exact, results.first
+    assert_equal 2, results.length
+  end
+
+  test 'search escapes LIKE wildcards in query' do
+    create(:fund, name: 'Underscore')
+    match = create(:fund, name: '100% Open')
+
+    assert_equal [match], Fund.search('100%').to_a
+    assert_empty Fund.search('Under_core')
+  end
+
   test 'stat readers use stored columns without querying' do
     fund = create(:fund, total_donation_amount_cents: 12345, total_donors_count: 7, completed_allocations_total_cents: 6789)
 

@@ -6,7 +6,7 @@
     <% if @project.avatar_url.present? %>
       <img src="<%= @project.avatar_url %>" height="48" width="48" onerror="this.style.display='none'" class="me-2" loading="lazy" alt="<%= @project.name %> logo">
     <% end %>
-    <%= link_to @project.to_s, @project.url, target: :_blank %>
+    <%= link_to @project.to_s, safe_url(@project.url), target: :_blank %>
   </h1>
 
   <% if @project.description.present? %>

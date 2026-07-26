@@ -36,6 +36,15 @@ module ApplicationHelper
     "#{obfuscated_local}@#{domain}"
   end
 
+  def safe_url(url)
+    return nil if url.blank?
+    uri = Addressable::URI.parse(url)
+    return nil unless uri&.scheme&.in?(%w[http https])
+    url
+  rescue Addressable::URI::InvalidURIError
+    nil
+  end
+
   def bootstrap_icon(symbol, options = {})
     return "" if symbol.nil?
     icon = BootstrapIcons::BootstrapIcon.new(symbol, options)
