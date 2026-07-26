@@ -31,6 +31,14 @@ class FundsControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes assigns(:funds), fund2, "Expected fund2 to NOT be in @funds"
   end
 
+  test "search redirects to all funds when query is blank" do
+    get search_funds_url, params: { query: '' }
+    assert_redirected_to all_funds_path
+
+    get search_funds_url
+    assert_redirected_to all_funds_path
+  end
+
   test "search handles hostile query strings" do
     get search_funds_url, params: { query: "') THEN 0 ELSE (SELECT 1) END --" }
     assert_response :success

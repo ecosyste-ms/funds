@@ -10,6 +10,7 @@ class FundsController < ApplicationController
   end
   
   def search
+    return redirect_to all_funds_path if params[:query].blank?
     @funds = Fund.search(params[:query])
     @pagy, @funds = pagy(@funds)
   end
