@@ -1,6 +1,6 @@
 module Api
   module V1
-    class FundsController < ApplicationController
+    class FundsController < Api::V1::ApplicationController
       def search
           return head :bad_request if params[:query].blank?
 
