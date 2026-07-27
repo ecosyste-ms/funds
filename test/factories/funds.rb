@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :fund do
-    name { Faker::Company.name }
-    slug { Faker::Internet.slug }
+    sequence(:name) { |n| "#{Faker::Company.name} #{n}" }
+    sequence(:slug) { |n| "#{Faker::Internet.slug}-#{n}" }
     primary_topic { Faker::Lorem.word }
     secondary_topics { [] }
     description { Faker::Lorem.sentence }

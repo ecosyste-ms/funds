@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :project do
     name { Faker::App.name }
-    url { Faker::Internet.url }
+    sequence(:url) { |n| "https://github.com/#{Faker::Internet.slug}/#{Faker::Internet.slug}-#{n}" }
     description { Faker::Lorem.sentence }
     repository { {} }
     packages { [] }
