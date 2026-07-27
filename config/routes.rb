@@ -7,8 +7,15 @@ Sidekiq::Web.use Rack::Auth::Basic do |username, password|
 end if Rails.env.production?
 
 Rails.application.routes.draw do
+  mount Rswag::Ui::Engine => '/docs'
+  mount Rswag::Api::Engine => '/docs'
   mount Sidekiq::Web => "/sidekiq"
   mount PgHero::Engine, at: "pghero"
+
+  namespace :api do
+    namespace :v1 do
+    end
+  end
 
   namespace :admin do
     resources :invitations, only: [:index]
