@@ -18,70 +18,71 @@ servers:
 paths:
   /funds/search:
     get:
-      summary: Search for packages with funding information
+      summary: Search for funds by name
       description: >
-        Search for packages by name and determine whether funding information
-        is available. Returns a list of matching funded packages.
+        Search for funds by name and determine whether funding information
+        is available. Returns a list of matching funds with pagination details.
       operationId: searchFunds
       tags:
         - funds
       parameters:
-        - name: q
+        - name: query
           in: query
-          description: Package name to search for
+          description: Fund name to search for
           required: true
           schema:
             type: string
+            minLength: 1
+            maxLength: 100
+        - name: page
+          in: query
+          description: The page number to retrieve
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100000
+            default: 1
+            example: 1
       responses:
         "200":
-          description: Matching funded packages found
+          description: Matching funds found
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - funds
-                properties:
-                  funds:
-                    type: array
-                    description: List of matching funded packages
-                    items:
-                      $ref: "#/components/schemas/FundSearchResult"
+                $ref: "#/components/schemas/FundSearchResult"
               example:
+                current_page: 1
+                total_pages: 5
                 funds:
                   - name: Django
                     url: https://funds.ecosyste.ms/funds/django
                     description: Django is a web application framework for Python.
-                    total_funded_projects: 361
                     total_donors: 7
                   - name: Wagtail
                     url: https://funds.ecosyste.ms/funds/wagtail
                     description: Wagtail is an open source CMS written in Python and built on the Django web framework.
-                    total_funded_projects: 146
                     total_donors: 0
-
         "400":
-          description: Bad request when the search query is missing or empty
+          description: Bad request when the search query or page number is invalid
 
-        "404":
-          description: No matching funded packages found
-
-  /funds/{name}:
+  /funds/{slug}:
     get:
-      summary: Get funding information for a package
-      description: >
-        Retrieve funding statistics and allocation information for a funded
-        package by its name.
+      summary: Get funding information for a fund name
+      description: Retrieve funding statistics and allocation information for a fund by its name.
       operationId: getFund
       tags:
         - funds
       parameters:
-        - name: name
+        - name: slug
           in: path
-          description: Name (slug) of the funded package
+          description: Slug of the fund
+          example: django
           required: true
           schema:
             type: string
+            minLength: 1
+            maxLength: 100
       responses:
         "200":
           description: Fund information retrieved successfully
@@ -119,11 +120,12 @@ paths:
                       value: 51.0
                       currency: USD
                     funder_link: https://opencollective.com/chris-adams
-
+        "400":
+          description: Bad request when the slug is empty or invalid
         "404":
           description: Fund not found
 
-  /funds/{name}/projects:
+  /funds/{slug}/projects:
     get:
       summary: List projects for a fund
       description: >
@@ -133,33 +135,28 @@ paths:
       tags:
         - funds
       parameters:
-        - name: name
+        - name: slug
           in: path
-          description: Name (slug) of the fund
+          description: Slug of the fund
+          example: django
           required: true
           schema:
             type: string
-        - name: limit
+            minLength: 1
+            maxLength: 100
+        - name: page
           in: query
-          description: Maximum number of projects to return
+          description: The page number to retrieve
           required: false
           schema:
             type: integer
-            default: 50
             minimum: 1
-          example: 50
-        - name: offset
-          in: query
-          description: Number of projects to skip before returning results
-          required: false
-          schema:
-            type: integer
-            default: 0
-            minimum: 0
-          example: 0
+            maximum: 100000
+            default: 1
+            example: 1
       responses:
         "200":
-          description: Paginated list of projects
+          description: List of projects
           content:
             application/json:
               schema:
@@ -180,47 +177,42 @@ paths:
                     downloads: 52500000
                     dependent_repos: 115000
                     dependent_packages: 2660
-
         "404":
           description: Fund not found
+        "400":
+          description: Bad request when slug or page number is invalid
 
-  /funds/{name}/funders:
+  /funds/{slug}/funders:
     get:
       summary: List funders for a fund
       description: >
-        Retrieve a paginated list of funders supporting a fund,
-        including contribution totals and donation counts.
+        Retrieve a list of funders supporting a fund, including contribution totals and donation counts.
       operationId: getFundFunders
       tags:
         - funds
       parameters:
-        - name: name
+        - name: slug
           in: path
-          description: Name (slug) of the fund
+          description: Slug of the fund
+          example: django
           required: true
           schema:
             type: string
-        - name: limit
+            minLength: 1
+            maxLength: 100
+        - name: page
           in: query
-          description: Maximum number of funders to return
+          description: The page number to retrieve
           required: false
           schema:
             type: integer
-            default: 50
             minimum: 1
-          example: 50
-        - name: offset
-          in: query
-          description: Number of funders to skip before returning results
-          required: false
-          schema:
-            type: integer
-            default: 0
-            minimum: 0
-          example: 0
+            maximum: 100000
+            default: 1
+            example: 1
       responses:
         "200":
-          description: Paginated list of funders
+          description: List of funders
           content:
             application/json:
               schema:
@@ -230,6 +222,8 @@ paths:
                 total_funders_count: 7
                 repeat_funders_count: 1
                 one_time_funders_count: 6
+                current_page: 1
+                total_pages: 5
                 funders:
                   - name: Sentry
                     total_funded:
@@ -243,11 +237,12 @@ paths:
                       currency: USD
                     donations_count: 13
                     profile: https://opencollective.com/thibaudcolas
-
+        "400":
+          description: Bad request when slug or page number is invalid
         "404":
           description: Fund not found
 
-  /funds/{name}/allocations/{allocationMonthYear}:
+  /funds/{slug}/allocations/{allocation_month_year}:
     get:
       summary: Get funding allocations for a fund
       description: >
@@ -258,13 +253,16 @@ paths:
       tags:
         - funds
       parameters:
-        - name: name
+        - name: slug
           in: path
-          description: Name (slug) of the fund
+          description: Slug of the fund
+          example: django
           required: true
           schema:
             type: string
-        - name: allocationMonthYear
+            minLength: 1
+            maxLength: 100
+        - name: allocation_month_year
           in: path
           description: Allocation month and year identifier (for example, december-2025)
           required: true
@@ -310,7 +308,6 @@ paths:
                     project_downloads: 10500000
                     project_dependent_repos: 20100
                     project_dependent_packages: 463
-
         "404":
           description: Fund or allocation period not found
 
@@ -357,7 +354,7 @@ components:
         projects_count:
           type: integer
           format: int64
-          description: Total number of projects associated with the package
+          description: Total number of projects associated
           example: 2481
         project_downloads:
           type: integer
@@ -394,7 +391,7 @@ components:
         top_3_funders:
           type: array
           description: Top three funders by contribution amount
-          minItems: 3
+          minItems: 0
           maxItems: 3
           items:
             $ref: "#/components/schemas/TopFunder"
@@ -412,37 +409,49 @@ components:
 
     FundSearchResult:
       type: object
-      properties:
-        name:
-          type: string
-          description: Package name
-          example: Django
-        url:
-          type: string
-          format: uri
-          description: URL of the funding page for the package
-          example: https://funds.ecosyste.ms/funds/django
-        description:
-          type: string
-          nullable: true
-          description: Short description of the package
-          example: Django is a web application framework for Python.
-        total_funded_projects:
-          type: integer
-          format: int64
-          description: Number of funded projects using this package
-          example: 361
-        total_donors:
-          type: integer
-          format: int64
-          description: Number of donors supporting the package
-          example: 7
       required:
-        - name
-        - url
-        - description
-        - total_funded_projects
-        - total_donors
+        - current_page
+        - total_pages
+        - funds
+      properties:
+        current_page:
+          type: integer
+          description: The current page number being returned
+          example: 1
+        total_pages:
+          type: integer
+          description: Total number of available pages
+          example: 5
+        funds:
+          type: array
+          description: List of matching funded packages
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Fund name
+                example: Django
+              url:
+                type: string
+                format: uri
+                description: URL of the fund page
+                example: https://funds.ecosyste.ms/funds/django
+              description:
+                type: string
+                nullable: true
+                description: Short description of the fund
+                example: Django is a web application framework for Python.
+              total_donors:
+                type: integer
+                format: int64
+                description: Number of donors supporting the fund
+                example: 7
+            required:
+              - name
+              - url
+              - description
+              - total_donors
 
     FundProject:
       type: object
@@ -500,6 +509,14 @@ components:
           example: 64
         completed_allocations_total:
           $ref: "#/components/schemas/MonetaryAmount"
+        current_page:
+          type: integer
+          description: The current page number being returned
+          example: 1
+        total_pages:
+          type: integer
+          description: Total number of available pages
+          example: 5
         projects:
           type: array
           description: Paginated list of projects
@@ -510,6 +527,8 @@ components:
         - projects_count
         - funded_projects_count
         - completed_allocations_total
+        - current_page
+        - total_pages
         - projects
 
     Funder:
@@ -559,6 +578,14 @@ components:
           format: int64
           description: Number of funders who have donated exactly once
           example: 6
+        current_page:
+          type: integer
+          description: The current page number being returned
+          example: 1
+        total_pages:
+          type: integer
+          description: Total number of available pages
+          example: 5
         funders:
           type: array
           description: Paginated list of funders
@@ -569,6 +596,8 @@ components:
         - total_funders_count
         - repeat_funders_count
         - one_time_funders_count
+        - current_page
+        - total_pages
         - funders
 
     AllocationDetails:

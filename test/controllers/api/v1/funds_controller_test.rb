@@ -113,20 +113,40 @@ class Api::V1::FundsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Django", fund["name"]
     assert_equal "Django is a web application framework for Python.", fund["description"]
     assert fund["url"].end_with?("/funds/django")
-    assert_equal 2, fund["total_funded_projects"]
     assert_equal 3, fund["total_donors"]
   end
 
-  test "search without query returns bad request" do
+  test "search without query param returns bad request" do
     get search_api_v1_funds_path
     assert_response :bad_request
     assert_empty response.body
   end
 
-  test "search with no results returns not found" do
-    get search_api_v1_funds_path, params: { query: "does-not-exist" }
-    assert_response :not_found
+  test "search with query param exceeding 100 characters returns bad request" do
+    get search_api_v1_funds_path, params: { query: "a" * 101 }
+    assert_response :bad_request
     assert_empty response.body
+  end
+
+  test "search with invalid page param returns bad request" do
+    get search_api_v1_funds_path, params: { query: "django", page: -1 }
+    assert_response :bad_request
+    assert_empty response.body
+  end
+
+  test "search with no results for query returns empty funds list" do
+    get search_api_v1_funds_path, params: { query: "does-not-exist" }
+    assert_response :success
+
+    json = JSON.parse(response.body)
+    assert json.key?("funds")
+    assert_equal 0, json["funds"].length
+  end
+
+  test "search handles hostile query strings" do
+    get search_api_v1_funds_path, params: { query: "') THEN 0 ELSE (SELECT 1) END --" }
+    assert_response :success
+    assert_empty assigns(:funds)
   end
 
   test "show returns fund information" do
@@ -158,6 +178,24 @@ class Api::V1::FundsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 51.00, chris["funder_amount"]["value"]
     assert_equal "USD", chris["funder_amount"]["currency"]
     assert_equal "https://opencollective.com/chris-adams", chris["funder_link"]
+  end
+
+  test "show returns 400 for empty slug" do
+    get api_v1_fund_path("   ")
+    assert_response :bad_request
+    assert_empty response.body
+  end
+
+  test "show returns 400 for slug exceeding 100 characters in length" do
+    get api_v1_fund_path("a" * 101)
+    assert_response :bad_request
+    assert_empty response.body
+  end
+
+  test "show handles hostile query strings" do
+    get api_v1_fund_path("') THEN 0 ELSE (SELECT 1) END --")
+    assert_response :not_found
+    assert_empty response.body
   end
 
   test "show returns 404 for unknown fund" do
