@@ -73,7 +73,99 @@ funds = [
     name: 'Django',
     slug: 'django',
     description: "Fund for the most critical django packages on pypi.org",
+    registry_name: "pypi.org",
     featured: true
+  },
+  {
+    name: 'Clojure',
+    slug: 'clojure',
+    description: "Fund for the most critical clojure packages on clojars.org",
+    registry_name: "clojars.org"
+  },
+  {
+    name: 'Scala',
+    slug: 'scala',
+    description: "Fund for the most critical scala packages on maven.org",
+    registry_name: "repo1.maven.org"
+  },
+  {
+    name: 'Kotlin',
+    slug: 'kotlin',
+    description: "Fund for the most critical kotlin packages on maven.org",
+    registry_name: "repo1.maven.org"
+  },
+  {
+    name: 'Perl',
+    slug: 'perl',
+    description: "Fund for the most critical perl packages on cpan.org",
+    registry_name: "cpan.org"
+  },
+  {
+    name: 'R',
+    slug: 'r',
+    description: "Fund for the most critical r packages on cran.r-project.org",
+    registry_name: "cran.r-project.org"
+  },
+  {
+    name: 'Julia',
+    slug: 'julia',
+    description: "Fund for the most critical julia packages on juliahub.com",
+    registry_name: "juliahub.com"
+  },
+  {
+    name: 'Lua',
+    slug: 'lua',
+    description: "Fund for the most critical lua packages on luarocks.org",
+    registry_name: "luarocks.org"
+  },
+  {
+    name: 'C++',
+    slug: 'cpp',
+    description: "Fund for the most critical c++ packages on conan.io",
+    registry_name: "conan.io"
+  },
+  {
+    name: 'C#',
+    slug: 'csharp',
+    description: "Fund for the most critical c# packages on nuget.org",
+    registry_name: "nuget.org"
+  },
+  {
+    name: 'TypeScript',
+    slug: 'typescript',
+    description: "Fund for the most critical typescript packages on npmjs.com",
+    registry_name: "npmjs.org",
+    featured: true
+  },
+  {
+    name: 'Objective-C',
+    slug: 'objective-c',
+    description: "Fund for the most critical objective-c packages on cocoapods.org",
+    registry_name: "cocoapods.org"
+  },
+  {
+    name: 'Erlang',
+    slug: 'erlang',
+    description: "Fund for the most critical erlang packages on hex.pm",
+    registry_name: "hex.pm"
+  },
+  {
+    name: 'Groovy',
+    slug: 'groovy',
+    description: "Fund for the most critical groovy packages on maven.org",
+    registry_name: "repo1.maven.org"
+  },
+  {
+    name: 'F#',
+    slug: 'fsharp',
+    description: "Fund for the most critical f# packages on nuget.org",
+    registry_name: "nuget.org"
+  },
+  {
+    name: 'Zig',
+    slug: 'zig',
+    description: "Fund for the most critical zig packages on zigistry.dev",
+    registry_name: "zigistry.dev"
   }
 ]
 

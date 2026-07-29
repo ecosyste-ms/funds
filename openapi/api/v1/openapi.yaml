@@ -14,5 +14,755 @@ externalDocs:
   description: GitHub Repository
   url: https://github.com/ecosyste-ms/funds
 servers:
-- url: https://funds.ecosyste.ms/api/v1
-paths: {}
+  - url: https://funds.ecosyste.ms/api/v1
+tags:
+  - name: Funds
+    description: Fund related operations
+  - name: Projects
+    description: Projects associated with a fund
+  - name: Allocations
+    description: Allocation of funds to projects
+  - name: Funders
+    description: People or organizations donating to a fund
+paths:
+  /funds/search:
+    get:
+      summary: Search for funds by name
+      description: >
+        Search for funds by name and determine whether funding information
+        is available. Returns a list of matching funds with pagination details.
+      operationId: searchFunds
+      tags:
+        - Funds
+      parameters:
+        - name: query
+          in: query
+          description: Fund name to search for
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 100
+        - name: page
+          in: query
+          description: The page number to retrieve
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100000
+            default: 1
+            example: 1
+        - name: limit
+          in: query
+          description: Number of items to retrieve in a page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 20
+            example: 50
+      responses:
+        "200":
+          description: Matching funds found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FundSearchResult"
+              example:
+                current_page: 1
+                total_pages: 5
+                funds:
+                  - name: Django
+                    html_url: https://funds.ecosyste.ms/funds/django
+                    description: Django is a web application framework for Python.
+                    total_donors: 7
+                  - name: Wagtail
+                    html_url: https://funds.ecosyste.ms/funds/wagtail
+                    description: Wagtail is an open source CMS written in Python and built on the Django web framework.
+                    total_donors: 0
+        "400":
+          description: Bad request when the search query or page number is invalid
+
+  /funds/{slug}:
+    get:
+      summary: Get funding information for a fund name
+      description: Retrieve funding statistics and allocation information for a fund by its name.
+      operationId: getFund
+      tags:
+        - Funds
+      parameters:
+        - name: slug
+          in: path
+          description: Slug of the fund
+          example: django
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 100
+      responses:
+        "200":
+          description: Fund information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Fund"
+              example:
+                projects_count: 2481
+                project_downloads: 542000000
+                project_dependent_repos: 604000
+                project_dependent_packages: 8240
+                total_donation_amount:
+                  value: 17736.00
+                  currency: USD
+                total_donors: 7
+                funded_projects_count: 64
+                completed_allocations_count: 10
+                completed_allocations_total:
+                  value: 17707.26
+                  currency: USD
+                top_3_funders:
+                  - funder_name: Sentry
+                    funder_amount:
+                      value: 16875.0
+                      currency: USD
+                    funder_link: https://opencollective.com/sentry
+                  - funder_name: Thibaud Colas
+                    funder_amount:
+                      value: 650.0
+                      currency: USD
+                    funder_link: https://opencollective.com/thibaudcolas
+                  - funder_name: Chris Adams
+                    funder_amount:
+                      value: 51.0
+                      currency: USD
+                    funder_link: https://opencollective.com/chris-adams
+        "400":
+          description: Bad request when the slug is empty or invalid
+        "404":
+          description: Fund not found
+
+  /funds/{slug}/projects:
+    get:
+      summary: List projects for a fund
+      description: >
+        Retrieve a paginated list of projects associated with a fund,
+        including funding allocation and ecosystem metrics.
+      operationId: getFundProjects
+      tags:
+        - Projects
+      parameters:
+        - name: slug
+          in: path
+          description: Slug of the fund
+          example: django
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 100
+        - name: page
+          in: query
+          description: The page number to retrieve
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100000
+            default: 1
+            example: 1
+        - name: limit
+          in: query
+          description: Number of items to retrieve in a page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 20
+            example: 50
+      responses:
+        "200":
+          description: List of projects
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FundProjects"
+              example:
+                fund_name: Django
+                projects_count: 2481
+                funded_projects_count: 64
+                completed_allocations_total:
+                  value: 17707.26
+                  currency: USD
+                current_page: 1
+                total_pages: 5
+                projects:
+                  - name: Django
+                    repo_link: https://github.com/django/django
+                    allocated_amount:
+                      value: 6665.72
+                      currency: USD
+                    downloads: 52500000
+                    dependent_repos: 115000
+                    dependent_packages: 2660
+        "404":
+          description: Fund not found
+        "400":
+          description: Bad request when slug or page number is invalid
+
+  /funds/{slug}/funders:
+    get:
+      summary: List funders for a fund
+      description: >
+        Retrieve a list of funders supporting a fund, including contribution totals and donation counts.
+      operationId: getFundFunders
+      tags:
+        - Funders
+      parameters:
+        - name: slug
+          in: path
+          description: Slug of the fund
+          example: django
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 100
+        - name: page
+          in: query
+          description: The page number to retrieve
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100000
+            default: 1
+            example: 1
+        - name: limit
+          in: query
+          description: Number of items to retrieve in a page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 20
+            example: 50
+      responses:
+        "200":
+          description: List of funders
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FundFunders"
+              example:
+                fund_name: Django
+                total_funders_count: 7
+                repeat_funders_count: 1
+                one_time_funders_count: 6
+                current_page: 1
+                total_pages: 5
+                funders:
+                  - name: Sentry
+                    total_funded:
+                      value: 16875.0
+                      currency: USD
+                    donations_count: 1
+                    profile: https://opencollective.com/sentry
+                  - name: Thibaud Colas
+                    total_funded:
+                      value: 650.0
+                      currency: USD
+                    donations_count: 13
+                    profile: https://opencollective.com/thibaudcolas
+        "400":
+          description: Bad request when slug or page number is invalid
+        "404":
+          description: Fund not found
+
+  /funds/{slug}/allocations/{allocation_month_year}:
+    get:
+      summary: Get funding allocations for a fund
+      description: >
+        Retrieve the funding allocation details for a specific fund and
+        allocation period, including summary statistics, participating
+        funders, and project allocations.
+      operationId: getFundAllocations
+      tags:
+        - Allocations
+      parameters:
+        - name: slug
+          in: path
+          description: Slug of the fund
+          example: django
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 100
+        - name: allocation_month_year
+          in: path
+          description: Allocation month and year identifier (for example, december-2025)
+          required: true
+          schema:
+            type: string
+          example: december-2025
+      responses:
+        "200":
+          description: Funding allocations retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FundAllocations"
+              example:
+                fund_name: Django
+                allocation_month_year: December 2025
+                allocation_details:
+                  total_funded_amount:
+                    value: 206.62
+                    currency: USD
+                  funders_count: 4
+                  projects_count: 4
+                distribution_details:
+                  open_collective: 7
+                  project_maintainers_invited: 6
+                funders:
+                  - name: Sentry
+                    total_funded:
+                      value: 16875.0
+                      currency: USD
+                    profile: https://opencollective.com/sentry
+                  - name: Thibaud Colas
+                    total_funded:
+                      value: 650.0
+                      currency: USD
+                    profile: https://opencollective.com/thibaudcolas
+                funding_allocations:
+                  - project_name: pytest-django
+                    project_repo_link: https://github.com/pytest-dev/pytest-django
+                    allocated_amount:
+                      value: 56.62
+                      currency: USD
+                    project_downloads: 10500000
+                    project_dependent_repos: 20100
+                    project_dependent_packages: 463
+        "404":
+          description: Fund or allocation period not found
+
+components:
+  schemas:
+    MonetaryAmount:
+      type: object
+      properties:
+        value:
+          type: number
+          format: double
+          description: Monetary value
+          example: 17736.00
+        currency:
+          type: string
+          description: ISO 4217 currency code
+          example: USD
+      required:
+        - value
+        - currency
+
+    TopFunder:
+      type: object
+      properties:
+        funder_name:
+          type: string
+          description: Name of the funder
+          example: Sentry
+        funder_amount:
+          $ref: "#/components/schemas/MonetaryAmount"
+        funder_link:
+          type: string
+          format: uri
+          description: URL to the funder's profile or donation page
+          example: https://opencollective.com/sentry
+      required:
+        - funder_name
+        - funder_amount
+        - funder_link
+
+    Fund:
+      type: object
+      properties:
+        projects_count:
+          type: integer
+          format: int64
+          description: Total number of projects associated
+          example: 2481
+        project_downloads:
+          type: integer
+          format: int64
+          description: Total downloads across associated projects
+          example: 542000000
+        project_dependent_repos:
+          type: integer
+          format: int64
+          description: Number of dependent repositories
+          example: 604000
+        project_dependent_packages:
+          type: integer
+          format: int64
+          description: Number of dependent packages
+          example: 8240
+        total_donation_amount:
+          $ref: "#/components/schemas/MonetaryAmount"
+        total_donors:
+          type: integer
+          description: Number of unique donors
+          example: 7
+        funded_projects_count:
+          type: integer
+          description: Number of funded projects
+          example: 64
+        completed_allocations_count:
+          type: integer
+          format: int64
+          description: Number of completed funding allocations
+          example: 10
+        completed_allocations_total:
+          $ref: "#/components/schemas/MonetaryAmount"
+        top_3_funders:
+          type: array
+          description: Top three funders by contribution amount
+          minItems: 0
+          maxItems: 3
+          items:
+            $ref: "#/components/schemas/TopFunder"
+      required:
+        - projects_count
+        - project_downloads
+        - project_dependent_repos
+        - project_dependent_packages
+        - total_donation_amount
+        - total_donors
+        - funded_projects_count
+        - completed_allocations_count
+        - completed_allocations_total
+        - top_3_funders
+
+    FundSearchResult:
+      type: object
+      required:
+        - current_page
+        - total_pages
+        - funds
+      properties:
+        current_page:
+          type: integer
+          description: The current page number being returned
+          example: 1
+        total_pages:
+          type: integer
+          description: Total number of available pages
+          example: 5
+        funds:
+          type: array
+          description: List of matching funded packages
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Fund name
+                example: Django
+              html_url:
+                type: string
+                format: uri
+                description: URL of the fund web page
+                example: https://funds.ecosyste.ms/funds/django
+              description:
+                type: string
+                nullable: true
+                description: Short description of the fund
+                example: Django is a web application framework for Python.
+              total_donors:
+                type: integer
+                format: int64
+                description: Number of donors supporting the fund
+                example: 7
+            required:
+              - name
+              - html_url
+              - description
+              - total_donors
+
+    FundProject:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Project name
+          example: Django
+        repo_link:
+          type: string
+          format: uri
+          description: Repository URL
+          example: https://github.com/django/django
+        allocated_amount:
+          $ref: "#/components/schemas/MonetaryAmount"
+        downloads:
+          type: integer
+          format: int64
+          description: Total project downloads
+          example: 52500000
+        dependent_repos:
+          type: integer
+          format: int64
+          description: Number of dependent repositories
+          example: 115000
+        dependent_packages:
+          type: integer
+          format: int64
+          description: Number of dependent packages
+          example: 2660
+      required:
+        - name
+        - repo_link
+        - allocated_amount
+        - downloads
+        - dependent_repos
+        - dependent_packages
+
+    FundProjects:
+      type: object
+      properties:
+        fund_name:
+          type: string
+          description: Name of the fund
+          example: Django
+        projects_count:
+          type: integer
+          format: int64
+          description: Total number of projects in the fund
+          example: 2481
+        funded_projects_count:
+          type: integer
+          format: int64
+          description: Number of projects that have received funding
+          example: 64
+        completed_allocations_total:
+          $ref: "#/components/schemas/MonetaryAmount"
+        current_page:
+          type: integer
+          description: The current page number being returned
+          example: 1
+        total_pages:
+          type: integer
+          description: Total number of available pages
+          example: 5
+        projects:
+          type: array
+          description: Paginated list of projects
+          items:
+            $ref: "#/components/schemas/FundProject"
+      required:
+        - fund_name
+        - projects_count
+        - funded_projects_count
+        - completed_allocations_total
+        - current_page
+        - total_pages
+        - projects
+
+    Funder:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the funder
+          example: Sentry
+        total_funded:
+          $ref: "#/components/schemas/MonetaryAmount"
+        donations_count:
+          type: integer
+          format: int64
+          description: Number of donations made by the funder
+          example: 1
+        profile:
+          type: string
+          format: uri
+          description: URL to the funder's profile
+          example: https://opencollective.com/sentry
+      required:
+        - name
+        - total_funded
+        - donations_count
+        - profile
+
+    FundFunders:
+      type: object
+      properties:
+        fund_name:
+          type: string
+          description: Name of the fund
+          example: Django
+        total_funders_count:
+          type: integer
+          format: int64
+          description: Total number of unique funders
+          example: 7
+        repeat_funders_count:
+          type: integer
+          format: int64
+          description: Number of funders who have donated more than once
+          example: 1
+        one_time_funders_count:
+          type: integer
+          format: int64
+          description: Number of funders who have donated exactly once
+          example: 6
+        current_page:
+          type: integer
+          description: The current page number being returned
+          example: 1
+        total_pages:
+          type: integer
+          description: Total number of available pages
+          example: 5
+        funders:
+          type: array
+          description: Paginated list of funders
+          items:
+            $ref: "#/components/schemas/Funder"
+      required:
+        - fund_name
+        - total_funders_count
+        - repeat_funders_count
+        - one_time_funders_count
+        - current_page
+        - total_pages
+        - funders
+
+    AllocationDetails:
+      type: object
+      properties:
+        total_funded_amount:
+          $ref: "#/components/schemas/MonetaryAmount"
+        funders_count:
+          type: integer
+          format: int64
+          description: Number of funders included in this allocation
+          example: 4
+        projects_count:
+          type: integer
+          format: int64
+          description: Number of funded projects in this allocation
+          example: 4
+      required:
+        - total_funded_amount
+        - funders_count
+        - projects_count
+
+    DistributionDetails:
+      type: object
+      properties:
+        open_collective:
+          type: integer
+          format: int64
+          description: Number of allocations distributed through Open Collective
+          example: 7
+        project_maintainers_invited:
+          type: integer
+          format: int64
+          description: Number of project maintainers invited
+          example: 6
+      required:
+        - open_collective
+        - project_maintainers_invited
+
+    AllocationFunder:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the funder
+          example: Sentry
+        total_funded:
+          $ref: "#/components/schemas/MonetaryAmount"
+        profile:
+          type: string
+          format: uri
+          description: URL to the funder's profile
+          example: https://opencollective.com/sentry
+      required:
+        - name
+        - total_funded
+        - profile
+
+    FundingAllocation:
+      type: object
+      properties:
+        project_name:
+          type: string
+          description: Name of the funded project
+          example: pytest-django
+        project_repo_link:
+          type: string
+          format: uri
+          description: Repository URL of the project
+          example: https://github.com/pytest-dev/pytest-django
+        allocated_amount:
+          $ref: "#/components/schemas/MonetaryAmount"
+        project_downloads:
+          type: integer
+          format: int64
+          description: Total downloads of the project
+          example: 10500000
+        project_dependent_repos:
+          type: integer
+          format: int64
+          description: Number of dependent repositories
+          example: 20100
+        project_dependent_packages:
+          type: integer
+          format: int64
+          description: Number of dependent packages
+          example: 463
+      required:
+        - project_name
+        - project_repo_link
+        - allocated_amount
+        - project_downloads
+        - project_dependent_repos
+        - project_dependent_packages
+
+    FundAllocations:
+      type: object
+      properties:
+        fund_name:
+          type: string
+          description: Name of the fund
+          example: Django
+        allocation_month_year:
+          type: string
+          description: Human-readable allocation month and year
+          example: December 2025
+        allocation_details:
+          $ref: "#/components/schemas/AllocationDetails"
+        distribution_details:
+          $ref: "#/components/schemas/DistributionDetails"
+        funders:
+          type: array
+          description: Funders contributing to this allocation period
+          items:
+            $ref: "#/components/schemas/AllocationFunder"
+        funding_allocations:
+          type: array
+          description: Funding allocations made to projects
+          items:
+            $ref: "#/components/schemas/FundingAllocation"
+      required:
+        - fund_name
+        - allocation_month_year
+        - allocation_details
+        - distribution_details
+        - funders
+        - funding_allocations
