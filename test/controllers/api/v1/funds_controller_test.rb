@@ -6,65 +6,17 @@ module Api
   module V1
     class FundsControllerTest < ActionDispatch::IntegrationTest
       setup do
+        # a fund Django is created
         @fund = create(
           :fund,
           name: "Django",
           description: "Django is a web application framework for Python.",
           slug: "django",
+          primary_topic: "python",
           registry_name: "pypi",
         )
 
-        @project1 = create(
-          :project,
-          name: "Django",
-          url: "https://github.com/django/django",
-          licenses: ["bsd"],
-          registry_names: ["pypi"],
-          repository: { "archived" => false },
-          funding_rejected: false,
-          total_downloads: 542_000_000,
-          total_dependent_repos: 604_000,
-          total_dependent_packages: 8_240,
-        )
-
-        @project2 = create(
-          :project,
-          name: "Wagtail",
-          url: "https://github.com/wagtail/wagtail",
-          licenses: ["bsd"],
-          registry_names: ["pypi"],
-          repository: { "archived" => false },
-          funding_rejected: false,
-          total_downloads: 1_000_000,
-          total_dependent_repos: 100,
-          total_dependent_packages: 50,
-        )
-
-        @allocation = create(
-          :allocation,
-          fund: @fund,
-          year: Time.zone.now.year,
-          month: Time.zone.now.month,
-          total_cents: 17_736_00,
-          funded_projects_count: 2,
-        )
-
-        create(
-          :project_allocation,
-          fund: @fund,
-          allocation: @allocation,
-          project: @project1,
-          paid_at: Time.zone.now,
-        )
-
-        create(
-          :project_allocation,
-          fund: @fund,
-          allocation: @allocation,
-          project: @project2,
-          paid_at: Time.zone.now,
-        )
-
+        # 3 donation transactions to the fund
         create(
           :transaction,
           fund: @fund,
@@ -79,7 +31,6 @@ module Api
           account_name: "Sentry",
           created_at: Time.zone.now,
         )
-
         create(
           :transaction,
           fund: @fund,
@@ -94,7 +45,6 @@ module Api
           account_name: "Thibaud Colas",
           created_at: Time.zone.now,
         )
-
         create(
           :transaction,
           fund: @fund,
@@ -110,6 +60,69 @@ module Api
           account_image_url: nil,
           created_at: Time.zone.now,
         )
+
+        # 2 out of 5 projects in the fund are allocated
+        @project1 = create(
+          :project,
+          name: "Django",
+          url: "https://github.com/django/django",
+          licenses: ["bsd"],
+          registry_names: ["pypi"],
+          keywords: ["python"],
+          funding_rejected: false,
+          total_downloads: 542_000_000,
+          total_dependent_repos: 604_000,
+          total_dependent_packages: 8_240,
+        )
+        @project2 = create(
+          :project,
+          name: "Wagtail",
+          url: "https://github.com/wagtail/wagtail",
+          licenses: ["bsd"],
+          registry_names: ["pypi"],
+          keywords: ["python"],
+          funding_rejected: false,
+          total_downloads: 1_000_000,
+          total_dependent_repos: 100,
+          total_dependent_packages: 50,
+        )
+        3.times do
+          create(
+            :project,
+            registry_names: ["pypi"],
+            keywords: ["python"],
+            funding_rejected: false,
+            total_downloads: 1_000_000,
+            total_dependent_repos: 100,
+            total_dependent_packages: 50,
+          )
+        end
+        @allocation = create(
+          :allocation,
+          fund: @fund,
+          year: Time.zone.now.year,
+          month: Time.zone.now.month,
+          total_cents: 17_736_00,
+          funded_projects_count: 2,
+        )
+        3.times do
+          create(
+            :project_allocation,
+            fund: @fund,
+            allocation: @allocation,
+            project: @project1,
+            paid_at: Time.zone.now,
+          )
+        end
+        4.times do
+          create(
+            :project_allocation,
+            fund: @fund,
+            allocation: @allocation,
+            project: @project2,
+            paid_at: Time.zone.now,
+          )
+        end
 
         @fund.update_stats
       end
@@ -230,7 +243,7 @@ module Api
 
         json = JSON.parse(response.body)
         assert_equal 2, json["funded_projects_count"]
-        assert_equal 2, json["projects_count"]
+        assert_equal 5, json["projects_count"]
         assert_equal 3, json["total_donors"]
         assert_equal 543_000_000, json["project_downloads"]
         assert_equal 604_100, json["project_dependent_repos"]

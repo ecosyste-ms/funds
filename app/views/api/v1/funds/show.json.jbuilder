@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-json.projects_count @fund.projects.count
+json.projects_count @fund.possible_projects_count
 json.project_downloads @fund.funded_project_downloads
 json.project_dependent_repos @fund.funded_project_dependent_repos
 json.project_dependent_packages @fund.funded_project_dependent_packages

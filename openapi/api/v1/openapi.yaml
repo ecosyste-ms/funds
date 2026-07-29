@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: "Ecosyste.ms: Funds"
-  description: "An open API service providing funding and allocation information for the open source software ecosystem."
+  description: "An open API service providing funding and allocation information for open source software ecosystems."
   contact:
     name: Ecosyste.ms
     email: support@ecosyste.ms
@@ -75,11 +75,11 @@ paths:
                 total_pages: 5
                 funds:
                   - name: Django
-                    url: https://funds.ecosyste.ms/funds/django
+                    html_url: https://funds.ecosyste.ms/funds/django
                     description: Django is a web application framework for Python.
                     total_donors: 7
                   - name: Wagtail
-                    url: https://funds.ecosyste.ms/funds/wagtail
+                    html_url: https://funds.ecosyste.ms/funds/wagtail
                     description: Wagtail is an open source CMS written in Python and built on the Django web framework.
                     total_donors: 0
         "400":
@@ -473,10 +473,10 @@ components:
                 type: string
                 description: Fund name
                 example: Django
-              url:
+              html_url:
                 type: string
                 format: uri
-                description: URL of the fund page
+                description: URL of the fund web page
                 example: https://funds.ecosyste.ms/funds/django
               description:
                 type: string
@@ -490,7 +490,7 @@ components:
                 example: 7
             required:
               - name
-              - url
+              - html_url
               - description
               - total_donors
 
