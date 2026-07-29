@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: "Ecosyste.ms: Funds"
-  description: "An open API service providing funding and allocation information of the open source software ecosystem."
+  description: "An open API service providing funding and allocation information for the open source software ecosystem."
   contact:
     name: Ecosyste.ms
     email: support@ecosyste.ms
@@ -15,6 +15,15 @@ externalDocs:
   url: https://github.com/ecosyste-ms/funds
 servers:
   - url: https://funds.ecosyste.ms/api/v1
+tags:
+  - name: Funds
+    description: Fund related operations
+  - name: Projects
+    description: Projects associated with a fund
+  - name: Allocations
+    description: Allocation of funds to projects
+  - name: Funders
+    description: People or organizations donating to a fund
 paths:
   /funds/search:
     get:
@@ -24,7 +33,7 @@ paths:
         is available. Returns a list of matching funds with pagination details.
       operationId: searchFunds
       tags:
-        - funds
+        - Funds
       parameters:
         - name: query
           in: query
@@ -44,6 +53,16 @@ paths:
             maximum: 100000
             default: 1
             example: 1
+        - name: limit
+          in: query
+          description: Number of items to retrieve in a page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 20
+            example: 50
       responses:
         "200":
           description: Matching funds found
@@ -72,7 +91,7 @@ paths:
       description: Retrieve funding statistics and allocation information for a fund by its name.
       operationId: getFund
       tags:
-        - funds
+        - Funds
       parameters:
         - name: slug
           in: path
@@ -133,7 +152,7 @@ paths:
         including funding allocation and ecosystem metrics.
       operationId: getFundProjects
       tags:
-        - funds
+        - Projects
       parameters:
         - name: slug
           in: path
@@ -154,6 +173,16 @@ paths:
             maximum: 100000
             default: 1
             example: 1
+        - name: limit
+          in: query
+          description: Number of items to retrieve in a page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 20
+            example: 50
       responses:
         "200":
           description: List of projects
@@ -168,6 +197,8 @@ paths:
                 completed_allocations_total:
                   value: 17707.26
                   currency: USD
+                current_page: 1
+                total_pages: 5
                 projects:
                   - name: Django
                     repo_link: https://github.com/django/django
@@ -189,7 +220,7 @@ paths:
         Retrieve a list of funders supporting a fund, including contribution totals and donation counts.
       operationId: getFundFunders
       tags:
-        - funds
+        - Funders
       parameters:
         - name: slug
           in: path
@@ -210,6 +241,16 @@ paths:
             maximum: 100000
             default: 1
             example: 1
+        - name: limit
+          in: query
+          description: Number of items to retrieve in a page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 20
+            example: 50
       responses:
         "200":
           description: List of funders
@@ -251,7 +292,7 @@ paths:
         funders, and project allocations.
       operationId: getFundAllocations
       tags:
-        - funds
+        - Allocations
       parameters:
         - name: slug
           in: path

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api
   module V1
     class FundsController < Api::V1::ApplicationController
@@ -5,11 +7,14 @@ module Api
         query = params[:query].to_s.strip
         return head :bad_request if query.blank? || query.length > 100
 
-        page = params[:page].present? ? params[:page].to_i : nil
-        return head :bad_request if page && page < 1
+        page = params[:page].present? ? params[:page].to_i : 1
+        return head :bad_request if page < 1 || page > 100_000
+
+        limit = params[:limit].present? ? params[:limit].to_i : 20
+        return head :bad_request if limit < 1 || limit > 1000
 
         @funds = Fund.search(query)
-        @pagy, @funds = pagy(@funds, page: page)
+        @pagy, @funds = pagy(@funds, page: page, limit: limit)
 
         render :search, formats: :json
       end
