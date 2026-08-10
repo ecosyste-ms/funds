@@ -19,14 +19,10 @@ class FundsController < ApplicationController
     @fund = Fund.find_by!(slug: params[:id])
     raise ActiveRecord::RecordNotFound unless @fund
 
-    @allocation = @fund.allocations.order('created_at DESC').first
+    @allocation = @fund.latest_allocation
     if @allocation
-      @projects = @fund.funded_projects
-        .joins(:project_allocations)
-        .select('projects.*, SUM(project_allocations.amount_cents) AS total_amount_cents')
-        .group('projects.id')
-
-      @projects = Project.from(@projects, :projects).order('total_amount_cents DESC').includes(:project_allocations).limit(5)
+      @projects = @fund.top_funded_projects
+      @allocations = @fund.allocations_with_totals
       @project_allocations = @allocation.project_allocations.includes(:funding_source, :invitation)
                                                              .order('amount_cents desc, score desc')
                                                              .where('amount_cents >= 1')

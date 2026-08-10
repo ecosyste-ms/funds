@@ -192,10 +192,9 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <% allocations = @fund.allocations.order('created_at desc') %>
-                    <% allocations.each_with_index do |allocation, index| %>
+                    <% @allocations.each_with_index do |allocation, index| %>
                       <tr class="">
-                        <td><%= allocations.length - index %></td>
+                        <td><%= @allocations.length - index %></td>
                         <td><%= link_to number_to_currency((allocation.total_allocated_cents/100.0).round(2)), fund_allocation_path(allocation.fund, allocation) %></td>
                         <td>
                         <% if allocation.completed_at %>
@@ -204,7 +203,7 @@
                           In progress
                           <% end %>
                         </td>
-                        <td><%= allocation.projects.count %></td>
+                        <td><%= allocation.projects_count %></td>
                       </tr>
                     <% end %>
                   </tbody>
@@ -255,4 +254,3 @@
       </small>
     </p>
 </div>
-

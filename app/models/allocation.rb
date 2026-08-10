@@ -248,7 +248,15 @@ class Allocation < ApplicationRecord
   end
 
   def total_allocated_cents
+    return self[:total_allocated_cents] if has_attribute?(:total_allocated_cents)
+
     project_allocations.sum(:amount_cents)
+  end
+
+  def projects_count
+    return self[:projects_count] if has_attribute?(:projects_count)
+
+    projects.count
   end
 
   def funders_count
