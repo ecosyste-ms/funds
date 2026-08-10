@@ -717,6 +717,31 @@ class Fund < ApplicationRecord
     funded_project_ids.length
   end
 
+  def top_funded_projects
+    funded_project_ids = project_allocations.funding_not_rejected.paid.select(:project_id)
+    project_allocations_table = ProjectAllocation.arel_table
+    total_amount = project_allocations_table[:amount_cents].sum
+    ranked_projects = ProjectAllocation
+      .where(project_id: funded_project_ids)
+      .select(project_allocations_table[:project_id], total_amount.as('total_amount_cents'))
+      .group(project_allocations_table[:project_id])
+      .order(total_amount.desc)
+      .limit(5)
+
+    projects_table = Project.arel_table
+    funded_project_totals = Arel::Table.new(:funded_project_totals)
+    funded_project_totals_join = projects_table
+      .join(funded_project_totals)
+      .on(funded_project_totals[:project_id].eq(projects_table[:id]))
+      .join_sources
+
+    Project
+      .with(funded_project_totals: ranked_projects)
+      .joins(funded_project_totals_join)
+      .select(projects_table[Arel.star], funded_project_totals[:total_amount_cents])
+      .order(funded_project_totals[:total_amount_cents].desc)
+  end
+
   def funded_project_downloads
     funded_projects.sum(:total_downloads)
   end
@@ -730,19 +755,54 @@ class Fund < ApplicationRecord
   end
 
   def possible_project_downloads
-    possible_projects.sum(:total_downloads)
+    possible_project_totals[0]
   end
 
   def possible_project_dependent_repos
-    possible_projects.sum(:total_dependent_repos)
+    possible_project_totals[1]
   end
 
   def possible_project_dependent_packages
-    possible_projects.sum(:total_dependent_packages)
+    possible_project_totals[2]
+  end
+
+  def possible_project_totals
+    projects_table = Project.arel_table
+    total_for = lambda do |column|
+      Arel::Nodes::NamedFunction.new(
+        'COALESCE',
+        [projects_table[column].sum, Arel::Nodes.build_quoted(0)]
+      )
+    end
+
+    @possible_project_totals ||= possible_projects.pick(
+      total_for.call(:total_downloads),
+      total_for.call(:total_dependent_repos),
+      total_for.call(:total_dependent_packages)
+    )
   end
 
   def latest_allocation
-    allocations.order(created_at: :desc).first
+    @latest_allocation ||= allocations.order(created_at: :desc).first
+  end
+
+  def allocations_with_totals
+    allocations_table = Allocation.arel_table
+    project_allocations_table = ProjectAllocation.arel_table
+    total_allocated = Arel::Nodes::NamedFunction.new(
+      'COALESCE',
+      [project_allocations_table[:amount_cents].sum, Arel::Nodes.build_quoted(0)]
+    ).as('total_allocated_cents')
+
+    allocations
+      .left_joins(:project_allocations)
+      .select(
+        allocations_table[Arel.star],
+        total_allocated,
+        project_allocations_table[:id].count.as('projects_count')
+      )
+      .group(allocations_table[:id])
+      .order(created_at: :desc)
   end
 
   def completed_allocations_total

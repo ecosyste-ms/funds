@@ -11,6 +11,80 @@ class FundTest < ActiveSupport::TestCase
     assert_equal 3, fund.possible_projects.count
   end
 
+  test 'possible project totals are calculated in one query' do
+    fund = create(:fund, primary_topic: nil, registry_name: 'npm')
+    create(:project, registry_names: ['npm'], total_downloads: 10, total_dependent_repos: 20, total_dependent_packages: 30)
+    create(:project, registry_names: ['npm'], total_downloads: 1, total_dependent_repos: 2, total_dependent_packages: 3)
+    create(:project, registry_names: ['npm'], funding_rejected: true, total_downloads: 100, total_dependent_repos: 100, total_dependent_packages: 100)
+    create(:project, registry_names: ['other'], total_downloads: 100, total_dependent_repos: 100, total_dependent_packages: 100)
+
+    queries = record_select_queries do
+      assert_equal 11, fund.possible_project_downloads
+      assert_equal 22, fund.possible_project_dependent_repos
+      assert_equal 33, fund.possible_project_dependent_packages
+      assert_equal 11, fund.possible_project_downloads
+    end
+
+    aggregate_queries = queries.select { |sql| sql.include?('SUM("projects"."total_downloads")') }
+    assert_equal 1, aggregate_queries.length
+  end
+
+  test 'top funded projects are ranked without loading project allocations' do
+    fund = create(:fund)
+    other_fund = create(:fund)
+    allocation = create(:allocation, fund: fund)
+    other_allocation = create(:allocation, fund: other_fund)
+    first_project = create(:project)
+    second_project = create(:project)
+    unpaid_project = create(:project)
+    rejected_project = create(:project, funding_rejected: true)
+
+    create(:project_allocation, fund: fund, allocation: allocation, project: first_project, amount_cents: 100, paid_at: Time.current)
+    create(:project_allocation, fund: other_fund, allocation: other_allocation, project: first_project, amount_cents: 900, paid_at: Time.current)
+    create(:project_allocation, fund: fund, allocation: allocation, project: second_project, amount_cents: 500, paid_at: Time.current)
+    create(:project_allocation, fund: fund, allocation: allocation, project: unpaid_project, amount_cents: 2000, paid_at: nil)
+    create(:project_allocation, fund: fund, allocation: allocation, project: rejected_project, amount_cents: 3000, paid_at: Time.current)
+
+    projects = nil
+    queries = record_select_queries do
+      projects = fund.top_funded_projects.to_a
+      projects.map(&:total_allocated)
+    end
+
+    assert_equal [first_project, second_project], projects
+    assert_equal [1000, 500], projects.map(&:total_allocated)
+    assert_equal 1, queries.length
+  end
+
+  test 'allocations with totals loads every allocation summary in one query' do
+    fund = create(:fund)
+    january = create(:allocation, fund: fund, year: 2026, month: 1, funded_projects_count: 2)
+    february = create(:allocation, fund: fund, year: 2026, month: 2, funded_projects_count: 1)
+    project = create(:project)
+
+    create(:project_allocation, fund: fund, allocation: january, project: project, amount_cents: 100)
+    create(:project_allocation, fund: fund, allocation: january, project: project, amount_cents: 250)
+    create(:project_allocation, fund: fund, allocation: february, project: project, amount_cents: 500)
+
+    allocations = nil
+    queries = record_select_queries do
+      allocations = fund.allocations_with_totals.to_a
+      allocations.map { |allocation| [allocation.total_allocated_cents, allocation.projects_count] }
+    end
+
+    assert_equal [february, january], allocations
+    assert_equal [500, 350], allocations.map(&:total_allocated_cents)
+    assert_equal [1, 2], allocations.map(&:projects_count)
+    assert_equal 1, queries.length
+  end
+
+  test 'registry names has a GIN index' do
+    index = ActiveRecord::Base.connection.indexes(:projects).find { |candidate| candidate.columns == ['registry_names'] }
+
+    assert_not_nil index
+    assert_equal :gin, index.using
+  end
+
   test 'update_stats stores donation totals and donor count from transactions' do
     fund = create(:fund)
     Transaction.create!(fund: fund, uuid: SecureRandom.uuid, transaction_type: 'CREDIT', account: 'alice', amount: 100.0, net_amount: 95.0)

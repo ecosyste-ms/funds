@@ -13,6 +13,21 @@ class FundsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "show does not query allocation totals and project counts per allocation" do
+    fund = create(:fund, primary_topic: nil, registry_name: 'npm')
+    project = create(:project, registry_names: ['npm'], total_downloads: 1)
+    january = create(:allocation, fund: fund, year: 2026, month: 1, funded_projects_count: 1)
+    february = create(:allocation, fund: fund, year: 2026, month: 2, funded_projects_count: 1)
+    create(:project_allocation, fund: fund, allocation: january, project: project, amount_cents: 100, paid_at: Time.current)
+    create(:project_allocation, fund: fund, allocation: february, project: project, amount_cents: 200, paid_at: Time.current)
+
+    queries = record_select_queries { get fund_url(fund) }
+
+    assert_response :success
+    assert_not queries.any? { |sql| sql.match?(/SELECT SUM\(.+\) FROM "project_allocations" WHERE "project_allocations"\."allocation_id"/) }
+    assert_not queries.any? { |sql| sql.match?(/SELECT COUNT\(\*\) FROM "projects".+"project_allocations"\."allocation_id"/) }
+  end
+
   test "should get show with no allocation" do
     fund = Fund.create!(name: 'Test Fund', slug: 'test', 'registry_name': 'npm')
     get fund_url(fund)
