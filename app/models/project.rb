@@ -842,6 +842,6 @@ class Project < ApplicationRecord
   def total_allocated
     return self[:total_amount_cents] if has_attribute?(:total_amount_cents)
 
-    project_allocations.sum(&:amount_cents)
+    project_allocations.sum(:amount_cents)
   end
 end

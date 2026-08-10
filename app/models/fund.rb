@@ -718,11 +718,11 @@ class Fund < ApplicationRecord
   end
 
   def top_funded_projects
-    funded_project_ids = project_allocations.funding_not_rejected.paid.select(:project_id)
+    funded_project_ids_query = project_allocations.funding_not_rejected.paid.select(:project_id)
     project_allocations_table = ProjectAllocation.arel_table
     total_amount = project_allocations_table[:amount_cents].sum
     ranked_projects = ProjectAllocation
-      .where(project_id: funded_project_ids)
+      .where(project_id: funded_project_ids_query)
       .select(project_allocations_table[:project_id], total_amount.as('total_amount_cents'))
       .group(project_allocations_table[:project_id])
       .order(total_amount.desc)
@@ -783,7 +783,9 @@ class Fund < ApplicationRecord
   end
 
   def latest_allocation
-    @latest_allocation ||= allocations.order(created_at: :desc).first
+    return @latest_allocation if defined?(@latest_allocation)
+
+    @latest_allocation = allocations.order(created_at: :desc).first
   end
 
   def allocations_with_totals
