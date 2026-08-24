@@ -160,21 +160,23 @@ class FundTest < ActiveSupport::TestCase
   end
 
   test 'allocate_to_projects records a skipped allocation when balance is below minimum and fund has prior rounds' do
-    fund = create(:fund, primary_topic: nil, registry_name: 'npm')
-    create(:project, registry_names: ['npm'], funding_rejected: false, total_dependent_repos: 1)
-    create(:allocation, fund: fund, year: 2020, month: 1, completed_at: 1.year.ago)
-    create(:transaction, fund: fund, net_amount: 500.0)
+    freeze_time do
+      fund = create(:fund, primary_topic: nil, registry_name: 'npm')
+      create(:project, registry_names: ['npm'], funding_rejected: false, total_dependent_repos: 1)
+      create(:allocation, fund: fund, year: 2020, month: 1, completed_at: 1.year.ago)
+      create(:transaction, fund: fund, net_amount: 500.0)
 
-    assert_difference -> { fund.allocations.count } do
-      fund.allocate_to_projects
+      assert_difference -> { fund.allocations.count } do
+        fund.allocate_to_projects
+      end
+
+      skipped = fund.allocations.order(:id).last
+      assert_equal 0, skipped.total_cents
+      assert_equal 0, skipped.funded_projects_count
+      assert skipped.completed?
+      assert_equal Time.zone.now.year, skipped.year
+      assert_equal Time.zone.now.month, skipped.month
     end
-
-    skipped = fund.allocations.order(:created_at).last
-    assert_equal 0, skipped.total_cents
-    assert_equal 0, skipped.funded_projects_count
-    assert skipped.completed?
-    assert_equal Time.zone.now.year, skipped.year
-    assert_equal Time.zone.now.month, skipped.month
   end
 
   test 'allocate_to_projects does not record a skipped allocation for funds with no prior rounds' do
