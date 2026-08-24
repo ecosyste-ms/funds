@@ -158,4 +158,42 @@ class FundTest < ActiveSupport::TestCase
     assert_equal 7, fund.total_donors
     assert_equal 67.89, fund.completed_allocations_total
   end
+
+  test 'allocate_to_projects records a skipped allocation when balance is below minimum and fund has prior rounds' do
+    fund = create(:fund, primary_topic: nil, registry_name: 'npm')
+    create(:project, registry_names: ['npm'], funding_rejected: false, total_dependent_repos: 1)
+    create(:allocation, fund: fund, year: 2020, month: 1, completed_at: 1.year.ago)
+    create(:transaction, fund: fund, net_amount: 500.0)
+
+    assert_difference -> { fund.allocations.count } do
+      fund.allocate_to_projects
+    end
+
+    skipped = fund.allocations.order(:created_at).last
+    assert_equal 0, skipped.total_cents
+    assert_equal 0, skipped.funded_projects_count
+    assert skipped.completed?
+    assert_equal Time.zone.now.year, skipped.year
+    assert_equal Time.zone.now.month, skipped.month
+  end
+
+  test 'allocate_to_projects does not record a skipped allocation for funds with no prior rounds' do
+    fund = create(:fund, primary_topic: nil, registry_name: 'npm')
+    create(:project, registry_names: ['npm'], funding_rejected: false, total_dependent_repos: 1)
+    create(:transaction, fund: fund, net_amount: 500.0)
+
+    assert_no_difference -> { fund.allocations.count } do
+      fund.allocate_to_projects
+    end
+  end
+
+  test 'allocate_to_projects does nothing when an allocation already exists for the current month' do
+    fund = create(:fund, primary_topic: nil, registry_name: 'npm')
+    create(:project, registry_names: ['npm'], funding_rejected: false, total_dependent_repos: 1)
+    create(:allocation, fund: fund, year: Time.zone.now.year, month: Time.zone.now.month, completed_at: 1.day.ago)
+
+    assert_no_difference -> { fund.allocations.count } do
+      fund.allocate_to_projects
+    end
+  end
 end

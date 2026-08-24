@@ -16,6 +16,8 @@ class Invitation < ApplicationRecord
   def self.delete_expired
     Invitation.draft.not_deleted.find_each do |invitation|
       invitation.delete_expense if invitation.expired?
+    rescue => e
+      Rails.logger.error "Invitation #{invitation.id} delete_expense raised: #{e.class} #{e.message}"
     end
   end
 
@@ -250,9 +252,9 @@ class Invitation < ApplicationRecord
       update!(status: 'DELETED', deleted_at: Time.zone.now)
       log_event('expense_deleted', metadata: { duration_ms: duration_ms })
     end
-  rescue Faraday::Error => e
+  rescue Faraday::Error, JSON::ParserError => e
     log_event('expense_deleted', status: 'error',
-      message: "Network error: #{e.message}",
+      message: "#{e.class}: #{e.message}",
       metadata: { error_class: e.class.name })
   end
 
