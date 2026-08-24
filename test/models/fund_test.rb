@@ -196,4 +196,11 @@ class FundTest < ActiveSupport::TestCase
       fund.allocate_to_projects
     end
   end
+
+  test 'allocate_to_projects returns quietly for funds with no topic or registry' do
+    fund = create(:fund, primary_topic: nil, registry_name: nil)
+
+    assert_nil fund.possible_projects
+    assert_nothing_raised { fund.allocate_to_projects }
+  end
 end

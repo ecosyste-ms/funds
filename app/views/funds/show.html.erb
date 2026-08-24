@@ -199,7 +199,7 @@
                         <td><%= link_to allocation.created_at.strftime('%B %Y'), fund_allocation_path(allocation.fund, allocation) %></td>
                         <td><%= number_to_currency((allocation.total_allocated_cents/100.0).round(2)) %></td>
                         <td>
-                        <% if allocation.funded_projects_count.to_i.zero? && allocation.completed? %>
+                        <% if allocation.total_cents.to_i.zero? && allocation.funded_projects_count.to_i.zero? && allocation.completed? %>
                           Skipped (below minimum)
                         <% elsif allocation.completed_at %>
                           <%= allocation.completed_at.strftime('%B %-d, %Y') %>

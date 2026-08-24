@@ -192,7 +192,7 @@ class Fund < ApplicationRecord
   end
 
   def allocate_to_projects
-    return unless possible_projects.any?
+    return unless possible_projects&.any?
     return if allocations.exists?(year: Time.zone.now.year, month: Time.zone.now.month)
 
     unless has_funds_for_allocation?
