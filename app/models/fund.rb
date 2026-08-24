@@ -192,10 +192,26 @@ class Fund < ApplicationRecord
   end
 
   def allocate_to_projects
-    return unless has_funds_for_allocation?
-    return unless possible_projects.any?
-    
+    return unless possible_projects&.any?
+    return if allocations.exists?(year: Time.zone.now.year, month: Time.zone.now.month)
+
+    unless has_funds_for_allocation?
+      Rails.logger.info "Fund #{slug}: balance #{current_balance_cents} below minimum #{minimum_for_allocation_cents}, recording skipped allocation"
+      record_skipped_allocation if allocations.completed.exists?
+      return
+    end
+
     allocate(current_balance_cents)
+  end
+
+  def record_skipped_allocation
+    allocations.create!(
+      year: Time.zone.now.year,
+      month: Time.zone.now.month,
+      total_cents: 0,
+      funded_projects_count: 0,
+      completed_at: Time.zone.now
+    )
   end
 
   def has_funds_for_allocation?
