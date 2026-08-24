@@ -13,6 +13,16 @@ class FundsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "show displays allocation completion dates in a compact format" do
+    fund = create(:fund, primary_topic: nil, registry_name: 'npm')
+    create(:allocation, fund: fund, completed_at: Time.zone.local(2026, 3, 28))
+
+    get fund_url(fund)
+
+    assert_response :success
+    assert_select "td", text: "28/03/2026"
+  end
+
   test "show does not query allocation totals and project counts per allocation" do
     fund = create(:fund, primary_topic: nil, registry_name: 'npm')
     project = create(:project, registry_names: ['npm'], total_downloads: 1)
