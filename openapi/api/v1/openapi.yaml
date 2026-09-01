@@ -209,9 +209,9 @@ paths:
                     dependent_repos: 115000
                     dependent_packages: 2660
         "404":
-          description: Fund not found
+          description: Fund with specified slug not found, or slug not specified
         "400":
-          description: Bad request when slug or page number is invalid
+          description: Bad request when invalid page or limit is specified
 
   /funds/{slug}/funders:
     get:

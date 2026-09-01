@@ -19,6 +19,7 @@ Rails.application.routes.draw do
           get :search
         end
       end
+      get 'funds/:slug/projects', to: 'projects#index', as: :fund_projects
     end
   end
 
