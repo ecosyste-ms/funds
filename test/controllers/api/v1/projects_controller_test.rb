@@ -128,7 +128,7 @@ module Api
       end
 
       test 'project index matches openapi spec' do
-        get api_v1_fund_projects_path(slug: 'django'), as: :json
+        get api_v1_fund_projects_path(fund_slug: 'django')
         assert_response :success
 
         json = JSON.parse(response.body)
@@ -161,64 +161,64 @@ module Api
       end
 
       test 'index with empty slug param returns not found' do
-        get api_v1_fund_projects_path(slug: ''), as: :json
+        get api_v1_fund_projects_path(fund_slug: '')
         assert_response :not_found
         assert_empty response.body
       end
 
       test 'index with slug having just whitespaces returns bad request' do
-        get api_v1_fund_projects_path(slug: '     '), as: :json
+        get api_v1_fund_projects_path(fund_slug: '     ')
         assert_response :bad_request
         assert_empty response.body
       end
 
       test 'index with slug not matching a fund returns bad request' do
-        get api_v1_fund_projects_path(slug: 'non-existent-fund'), as: :json
+        get api_v1_fund_projects_path(fund_slug: 'non-existent-fund')
         assert_response :not_found
         assert_empty response.body
       end
 
       test 'index with slug param exceeding 100 characters returns bad request' do
-        get api_v1_fund_projects_path(slug: 'a' * 101), as: :json
+        get api_v1_fund_projects_path(fund_slug: 'a' * 101)
         assert_response :bad_request
         assert_empty response.body
       end
 
       test 'index with invalid page param returns bad request' do
-        get api_v1_fund_projects_path(slug: 'django'), params: { page: 'hello' }, as: :json
+        get api_v1_fund_projects_path(fund_slug: 'django'), params: { page: 'hello' }
         assert_response :bad_request
         assert_empty response.body
 
-        get api_v1_fund_projects_path(slug: 'django'), params: { page: -1 }, as: :json
+        get api_v1_fund_projects_path(fund_slug: 'django'), params: { page: -1 }
         assert_response :bad_request
         assert_empty response.body
 
-        get api_v1_fund_projects_path(slug: 'django'), params: { page: 100_001 }, as: :json
+        get api_v1_fund_projects_path(fund_slug: 'django'), params: { page: 100_001 }
         assert_response :bad_request
         assert_empty response.body
       end
 
       test 'index with invalid limit param returns bad request' do
-        get api_v1_fund_projects_path(slug: 'django'), params: { limit: 'hello' }, as: :json
+        get api_v1_fund_projects_path(fund_slug: 'django'), params: { limit: 'hello' }
         assert_response :bad_request
         assert_empty response.body
 
-        get api_v1_fund_projects_path(slug: 'django'), params: { limit: -1 }, as: :json
+        get api_v1_fund_projects_path(fund_slug: 'django'), params: { limit: -1 }
         assert_response :bad_request
         assert_empty response.body
 
-        get api_v1_fund_projects_path(slug: 'django'), params: { limit: 1001 }, as: :json
+        get api_v1_fund_projects_path(fund_slug: 'django'), params: { limit: 1001 }
         assert_response :bad_request
         assert_empty response.body
       end
 
       test 'index handles hostile query strings' do
-        get api_v1_fund_projects_path(slug: "') THEN 0 ELSE (SELECT 1) END --"), as: :json
+        get api_v1_fund_projects_path(fund_slug: "') THEN 0 ELSE (SELECT 1) END --")
         assert_response :not_found
         assert_empty response.body
       end
 
-      test 'search is paginated with configurable limit of 20 items per page' do
+      test 'index is paginated with configurable limit of 20 items per page' do
         # Allocating 42 new projects
         num_projects = 42
         test_fund = create(:fund, name: 'Test Fund', slug: 'test-fund')
@@ -253,7 +253,7 @@ module Api
         slug = 'test-fund'
 
         # get all 42 items in single page by increasing limit
-        get api_v1_fund_projects_path(slug: slug), params: { page: 1, limit: 50 }, as: :json
+        get api_v1_fund_projects_path(fund_slug: slug), params: { page: 1, limit: 50 }
         assert_response :success
         json = JSON.parse(response.body)
         assert_equal 42, json['projects'].length
@@ -261,7 +261,7 @@ module Api
         assert_equal 1, json['total_pages']
 
         # page 1
-        get api_v1_fund_projects_path(slug: slug), params: { page: 1 }, as: :json
+        get api_v1_fund_projects_path(fund_slug: slug), params: { page: 1 }
         assert_response :success
         json = JSON.parse(response.body)
         assert_equal 20, json['projects'].length
@@ -269,7 +269,7 @@ module Api
         assert_equal 3, json['total_pages']
 
         # page 2 with new limit of 21 per page (page1=22, page2=20)
-        get api_v1_fund_projects_path(slug: slug), params: { page: 2, limit: 22 }, as: :json
+        get api_v1_fund_projects_path(fund_slug: slug), params: { page: 2, limit: 22 }
         assert_response :success
         json = JSON.parse(response.body)
         assert_equal 20, json['projects'].length
@@ -277,12 +277,47 @@ module Api
         assert_equal 2, json['total_pages']
 
         # page 3 for default limit of 20 per page (page1=20, page2=20, page3=2)
-        get api_v1_fund_projects_path(slug: slug), params: { page: 3 }, as: :json
+        get api_v1_fund_projects_path(fund_slug: slug), params: { page: 3 }
         assert_response :success
         json = JSON.parse(response.body)
         assert_equal 2, json['projects'].length
         assert_equal 3, json['current_page']
         assert_equal 3, json['total_pages']
+      end
+
+      test 'index returns project allocated amount converted from cents to dollars' do
+        test_fund = create(:fund, name: 'Test Fund', slug: 'test-fund-cents')
+        test_allocation = create(
+          :allocation,
+          fund: test_fund,
+          year: Time.zone.now.year,
+          month: Time.zone.now.month,
+          total_cents: 1_000_000,
+          funded_projects_count: 1
+        )
+        project = create(
+          :project,
+          registry_names: ['pypi'],
+          keywords: ['python'],
+          funding_rejected: false,
+          total_downloads: 1_000_000,
+          total_dependent_repos: 100,
+          total_dependent_packages: 50
+        )
+        create(
+          :project_allocation,
+          fund: test_fund,
+          allocation: test_allocation,
+          project: project,
+          paid_at: Time.zone.now
+        )
+        test_fund.update_stats
+        Project.any_instance.stubs(:total_allocated).returns(12_345)
+
+        get api_v1_fund_projects_path(fund_slug: 'test-fund-cents')
+        assert_response :success
+        json = JSON.parse(response.body)
+        assert_equal 123.45, json['projects'][0]['allocated_amount']['value']
       end
     end
   end

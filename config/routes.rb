@@ -12,14 +12,14 @@ Rails.application.routes.draw do
   mount Sidekiq::Web => "/sidekiq"
   mount PgHero::Engine, at: "pghero"
 
-  namespace :api do
+  namespace :api, :defaults => {:format => :json} do
     namespace :v1 do
       resources :funds, only: [:show], param: :slug do
         collection do
           get :search
         end
+        resources :projects, only: [:index]
       end
-      get 'funds/:slug/projects', to: 'projects#index', as: :fund_projects
     end
   end
 

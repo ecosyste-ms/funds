@@ -14,7 +14,7 @@ json.projects @projects do |project|
   json.name project.to_s
   json.repo_link project.url
   json.allocated_amount do
-    json.value(project.total_allocated / 100)
+    json.value(project.total_allocated / 100.0)
     json.currency 'USD'
   end
   json.downloads project.total_downloads

@@ -144,7 +144,7 @@ paths:
         "404":
           description: Fund not found
 
-  /funds/{slug}/projects:
+  /funds/{fund_slug}/projects:
     get:
       summary: List projects for a fund
       description: >
@@ -154,7 +154,7 @@ paths:
       tags:
         - Projects
       parameters:
-        - name: slug
+        - name: fund_slug
           in: path
           description: Slug of the fund
           example: django
