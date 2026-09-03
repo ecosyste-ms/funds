@@ -95,4 +95,66 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select ".card.bg-light", text: /Total Allocated.*\$80\.00/m
   end
+
+  test "should display total allocated amount for specific fund" do
+    test_fund = create(:fund, name: "Test Fund", slug: "test-fund-cents")
+    test_fund_2 = create(:fund, name: "Test Fund 2", slug: "test-fund-cents-2")
+    test_allocation = create(
+      :allocation,
+      fund: test_fund,
+      year: Time.zone.now.year,
+      month: Time.zone.now.month,
+      total_cents: 123_45,
+      funded_projects_count: 1,
+    )
+    test_allocation_2 = create(
+      :allocation,
+      fund: test_fund_2,
+      year: Time.zone.now.year,
+      month: Time.zone.now.month,
+      total_cents: 678_90,
+      funded_projects_count: 1,
+    )
+    project = create(
+      :project,
+      registry_names: ["pypi"],
+      keywords: ["python"],
+      funding_rejected: false,
+      total_downloads: 1_000_000,
+      total_dependent_repos: 100,
+      total_dependent_packages: 50,
+    )
+    create(
+      :project_allocation,
+      fund: test_fund,
+      allocation: test_allocation,
+      project: project,
+      paid_at: Time.zone.now,
+      amount_cents: 123_45,
+    )
+    create(
+      :project_allocation,
+      fund: test_fund_2,
+      allocation: test_allocation_2,
+      project: project,
+      paid_at: Time.zone.now,
+      amount_cents: 678_90,
+    )
+    test_fund.update_stats
+    test_fund_2.update_stats
+
+    # project funding from test 1
+    get fund_projects_path(test_fund)
+    assert_response :success
+    assert_select "tr" do
+      assert_select "td:nth-child(2) a", text: "$123.45"
+    end
+
+    # project funding from test 2
+    get fund_projects_path(test_fund_2)
+    assert_response :success
+    assert_select "tr" do
+      assert_select "td:nth-child(2) a", text: "$678.90"
+    end
+  end
 end
