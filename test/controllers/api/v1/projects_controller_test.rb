@@ -344,6 +344,38 @@ module Api
         json = JSON.parse(response.body)
         assert_equal 678.90, json['projects'][0]['allocated_amount']['value']
       end
+
+      test 'index orders equal totals consistently across pages' do
+        test_fund = create(:fund, name: 'Stable Project Order', slug: 'stable-project-order')
+        test_allocation = create(
+          :allocation,
+          fund: test_fund,
+          year: Time.zone.now.year,
+          month: Time.zone.now.month,
+          total_cents: 300,
+          funded_projects_count: 3
+        )
+        projects = 3.times.map do |index|
+          project = create(:project, name: "Equal Total #{index}", funding_rejected: false)
+          create(
+            :project_allocation,
+            fund: test_fund,
+            allocation: test_allocation,
+            project: project,
+            paid_at: Time.zone.now,
+            amount_cents: 100
+          )
+          project
+        end
+
+        project_names = [1, 2].flat_map do |page|
+          get api_v1_fund_projects_path(fund_slug: test_fund.slug), params: { page: page, limit: 2 }
+          assert_response :success
+          JSON.parse(response.body)['projects'].map { |project| project['name'] }
+        end
+
+        assert_equal projects.map(&:name), project_names
+      end
     end
   end
 end

@@ -839,7 +839,7 @@ class Fund < ApplicationRecord
       .where(projects: { funding_rejected: false })
       .select(projects[Arel.star], total.as("total_amount_cents"))
       .group(projects[:id])
-      .order(total.desc)
+      .order(total.desc, projects[:id].asc)
   end
 
   def update_stats
