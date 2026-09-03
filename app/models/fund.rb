@@ -827,6 +827,21 @@ class Fund < ApplicationRecord
     completed_allocations_total_cents / 100.0
   end
 
+  def funded_projects_with_totals
+    projects = Project.arel_table
+    allocations = ProjectAllocation.arel_table
+    total = allocations[:amount_cents].sum
+
+    Project
+      .joins(:project_allocations)
+      .where(project_allocations: { fund_id: id })
+      .where.not(project_allocations: { paid_at: nil })
+      .where(projects: { funding_rejected: false })
+      .select(projects[Arel.star], total.as("total_amount_cents"))
+      .group(projects[:id])
+      .order(total.desc)
+  end
+
   def update_stats
     update(
       balance: current_balance,

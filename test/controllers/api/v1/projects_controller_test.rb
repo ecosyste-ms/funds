@@ -287,12 +287,21 @@ module Api
 
       test 'index returns project allocated amount converted from cents to dollars' do
         test_fund = create(:fund, name: 'Test Fund', slug: 'test-fund-cents')
+        test_fund_2 = create(:fund, name: 'Test Fund 2', slug: 'test-fund-cents-2')
         test_allocation = create(
           :allocation,
           fund: test_fund,
           year: Time.zone.now.year,
           month: Time.zone.now.month,
-          total_cents: 1_000_000,
+          total_cents: 123_45,
+          funded_projects_count: 1
+        )
+        test_allocation_2 = create(
+          :allocation,
+          fund: test_fund_2,
+          year: Time.zone.now.year,
+          month: Time.zone.now.month,
+          total_cents: 678_90,
           funded_projects_count: 1
         )
         project = create(
@@ -309,15 +318,31 @@ module Api
           fund: test_fund,
           allocation: test_allocation,
           project: project,
-          paid_at: Time.zone.now
+          paid_at: Time.zone.now,
+          amount_cents: 123_45
+        )
+        create(
+          :project_allocation,
+          fund: test_fund_2,
+          allocation: test_allocation_2,
+          project: project,
+          paid_at: Time.zone.now,
+          amount_cents: 678_90
         )
         test_fund.update_stats
-        Project.any_instance.stubs(:total_allocated).returns(12_345)
+        test_fund_2.update_stats
 
+        # project funding from test fund 1
         get api_v1_fund_projects_path(fund_slug: 'test-fund-cents')
         assert_response :success
         json = JSON.parse(response.body)
         assert_equal 123.45, json['projects'][0]['allocated_amount']['value']
+
+        # project funding from test fund 2
+        get api_v1_fund_projects_path(fund_slug: 'test-fund-cents-2')
+        assert_response :success
+        json = JSON.parse(response.body)
+        assert_equal 678.90, json['projects'][0]['allocated_amount']['value']
       end
     end
   end
