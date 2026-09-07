@@ -111,6 +111,7 @@ module Api
             fund: @fund,
             allocation: @allocation,
             project: @project1,
+            amount_cents: 100_00,
             paid_at: Time.zone.now
           )
         end
@@ -120,6 +121,7 @@ module Api
             fund: @fund,
             allocation: @allocation,
             project: @project2,
+            amount_cents: 100_00,
             paid_at: Time.zone.now
           )
         end
