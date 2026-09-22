@@ -644,7 +644,7 @@ class Project < ApplicationRecord
 
   def package_funding_links
     return [] unless packages.present?
-    clean_funding_links packages.map{|pkg| pkg['metadata']['funding'] }.compact.flatten.map{|f| f.is_a?(Hash) ? f['url'] : f }.flatten.compact.uniq
+    clean_funding_links packages.map{|pkg| pkg.dig('metadata', 'funding') }.compact.flatten.map{|f| f.is_a?(Hash) ? f['url'] : f }.flatten.compact.uniq
   end
 
   def repo_owner_funding_links
