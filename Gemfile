@@ -10,7 +10,6 @@ gem "actionpack", "~> 8.1.1"
 gem "actionmailer", "~> 8.1.1"
 gem "actionview", "~> 8.1.1"
 gem "activesupport", "~> 8.1.1"
-gem "json", "< 3" # rails/rails#58601
 
 gem "secure_headers"
 gem "sprockets-rails"
@@ -58,4 +57,3 @@ group :test do
   gem 'faker'
   gem "minitest", "~> 6"
 end
-
