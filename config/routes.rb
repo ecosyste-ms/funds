@@ -19,6 +19,7 @@ Rails.application.routes.draw do
           get :search
         end
         resources :projects, only: [:index]
+        resources :funders, only: [:index]
       end
     end
   end
