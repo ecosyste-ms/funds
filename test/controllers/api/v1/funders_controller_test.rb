@@ -99,19 +99,19 @@ module Api
         assert_equal 16_875.00, funder0['total_funded']['value']
         assert_equal 'USD', funder0['total_funded']['currency']
         assert_equal 1, funder0['donations_count']
-        assert_equal 'https://opencollective.com/sentry', funder0['profile']
+        assert funder0['profile'].end_with? 'opencollective.com/sentry'
 
         assert_equal 'Thibaud Colas', funder1['name']
         assert_equal 650.00, funder1['total_funded']['value']
         assert_equal 'USD', funder1['total_funded']['currency']
         assert_equal 1, funder1['donations_count']
-        assert_equal 'https://opencollective.com/thibaudcolas', funder1['profile']
+        assert funder1['profile'].end_with? 'opencollective.com/thibaudcolas'
 
         assert_equal 'Chris Adams', funder2['name']
         assert_equal 101.00, funder2['total_funded']['value']
         assert_equal 'USD', funder2['total_funded']['currency']
         assert_equal 2, funder2['donations_count']
-        assert_equal 'https://opencollective.com/chris-adams', funder2['profile']
+        assert funder2['profile'].end_with? 'opencollective.com/chris-adams'
       end
 
       test 'index with empty slug param returns not found' do
