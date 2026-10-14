@@ -29,5 +29,5 @@ json.top_3_funders @fund.funders.first(3) do |funder|
     json.currency 'USD'
   end
 
-  json.funder_link "https://opencollective.com/#{funder[:slug]}"
+  json.funder_link "https://#{ENV['OPENCOLLECTIVE_DOMAIN']}/#{funder[:slug]}"
 end
