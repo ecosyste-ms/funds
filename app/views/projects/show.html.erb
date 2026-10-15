@@ -61,9 +61,9 @@
                       <% elsif pa.paid? && pa.invitation.blank? %>
                         <span class="badge bg-success">Paid</span>
                       <% elsif pa.invitation.present? %>
-                        <% if pa.invitation.accepted? %>
+                        <% if pa.invitation.awaiting_payment? %>
                           <span class="badge bg-info">Awaiting Payment</span>
-                        <% elsif pa.invitation.rejected? %>
+                        <% elsif pa.invitation.declined? %>
                           <span class="badge bg-danger">Invitation Rejected</span>
                         <% else %>
                           <span class="badge bg-warning text-dark">Invitation Pending</span>
