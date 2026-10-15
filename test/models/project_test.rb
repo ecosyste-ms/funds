@@ -15,15 +15,16 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal ['https://opencollective.com/example', 'https://patreon.com/example', 'https://ko-fi.com/example'], project.package_funding_links
   end
 
-  test 'total allocated uses a database aggregate' do
+  test 'total funded uses a database aggregate' do
     project = create(:project)
     fund = create(:fund)
     allocation = create(:allocation, fund: fund)
-    create(:project_allocation, project: project, fund: fund, allocation: allocation, amount_cents: 100)
-    create(:project_allocation, project: project, fund: fund, allocation: allocation, amount_cents: 250)
+    create(:project_allocation, project: project, fund: fund, allocation: allocation, amount_cents: 100, paid_at: Time.current)
+    create(:project_allocation, project: project, fund: fund, allocation: allocation, amount_cents: 250, paid_at: Time.current)
+    create(:project_allocation, project: project, fund: fund, allocation: allocation, amount_cents: 9000)
 
     queries = record_select_queries do
-      assert_equal 350, project.total_allocated
+      assert_equal 350, project.total_funded
     end
 
     assert_equal 1, queries.length

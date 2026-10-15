@@ -96,7 +96,7 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".badge.bg-info", text: "Awaiting Payment"
   end
 
-  test "should display total allocated amount" do
+  test "unpaid allocations remain visible but do not contribute to funded totals" do
     fund = create(:fund)
     allocation = create(:allocation, fund: fund)
     project = create(:project)
@@ -105,7 +105,9 @@ class ProjectsControllerTest < ActionDispatch::IntegrationTest
 
     get project_url(project)
     assert_response :success
-    assert_select ".card.bg-light", text: /Total Allocated.*\$80\.00/m
+    assert_select 'tbody tr', count: 2
+    assert_select 'tfoot th', text: '$0.00'
+    assert_select ".card.bg-light", text: /Total Funded.*\$0\.00/m
   end
 
   test "should display total allocated amount for specific fund" do
