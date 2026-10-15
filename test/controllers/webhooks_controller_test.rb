@@ -1,0 +1,61 @@
+require "test_helper"
+
+class WebhooksControllerTest < ActionDispatch::IntegrationTest
+  setup do
+    SyncInviteWorker.clear
+  end
+
+  teardown do
+    SyncInviteWorker.clear
+  end
+
+  test "paid expense webhook syncs status and displays payment" do
+    project = create(:project, funding_rejected: false)
+    project_allocation = create(:project_allocation, project: project, paid_at: Time.current)
+    invitation = create(:invitation, project_allocation: project_allocation, member_invitation_id: '277913', status: 'APPROVED', data: {
+      'id' => 'expense-id', 'status' => 'PENDING', 'draftKey' => 'draft-key',
+      'aggregated_allocation_ids' => [project_allocation.id]
+    })
+    request = stub_request(:post, /graphql\/v2/).with { |req| JSON.parse(req.body).dig('variables', 'id') == '277913' }
+      .to_return(body: { data: { expense: { id: 'expense-id', legacyId: 277913, status: 'PAID' } } }.to_json)
+
+    post '/webhooks', params: { type: 'collective.expense.paid', data: { expense: { id: 277913 } } }, as: :json
+
+    assert_response :success
+    assert_equal [[invitation.id]], SyncInviteWorker.jobs.map { |job| job['args'] }
+    SyncInviteWorker.drain
+    assert_requested request
+    assert_equal 'PAID', invitation.reload.status
+    assert_equal 'PAID', invitation[:status]
+    assert_equal 'PAID', invitation.data['status']
+    assert_equal 'draft-key', invitation.data['draftKey']
+    assert_equal [project_allocation.id], invitation.data['aggregated_allocation_ids']
+    assert_equal 'expense_synced', invitation.events.last.event_type
+
+    get project_path(project)
+
+    assert_response :success
+    assert_select '.badge', text: 'Paid'
+    assert_select 'a', text: '#277913'
+    assert_select '.badge', text: 'Invitation Pending', count: 0
+  end
+
+  test "expense status changes schedule a sync" do
+    invitation = create(:invitation, member_invitation_id: '277913')
+    %w[updated approved unapproved rejected unpaid processing scheduledForPayment reApprovalRequested error invite.declined].each do |event|
+      SyncInviteWorker.clear
+      post '/webhooks', params: { type: "collective.expense.#{event}", data: { expense: { id: 277913 } } }, as: :json
+      assert_response :success
+      assert_equal [[invitation.id]], SyncInviteWorker.jobs.map { |job| job['args'] }, event
+    end
+  end
+
+  test "missing and unknown expense ids do not sync a local invitation" do
+    create(:invitation, member_invitation_id: nil)
+    [{}, { data: {} }, { data: { expense: {} } }, { data: { expense: { id: 999999 } } }].each do |payload|
+      post '/webhooks', params: payload.merge(type: 'collective.expense.paid'), as: :json
+      assert_response :success
+      assert_empty SyncInviteWorker.jobs
+    end
+  end
+end

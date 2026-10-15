@@ -237,7 +237,7 @@ class ProjectAllocation < ApplicationRecord
     data = response_body['data']['draftExpenseAndInviteUser']
     puts "Expense draft created successfully (fallback):"
     puts JSON.pretty_generate(data)
-    inv = Invitation.create!(project_allocation: self, email: project.contact_email, status: 'DRAFT', member_invitation_id: data['legacyId'], data: data)
+    inv = Invitation.create!(project_allocation: self, email: project.contact_email, status: data['status'], member_invitation_id: data['legacyId'], data: data)
     log_event('expense_created', invitation_record: inv, metadata: { legacy_id: data['legacyId'], fallback: true })
     inv
   end
@@ -319,7 +319,7 @@ class ProjectAllocation < ApplicationRecord
     puts JSON.pretty_generate(data)
 
     # Create invitation record for tracking on the first allocation
-    inv = Invitation.create!(project_allocation: self, email: project.contact_email, status: 'DRAFT', member_invitation_id: data['legacyId'], data: data.merge('aggregated_allocation_ids' => allocations.map(&:id)))
+    inv = Invitation.create!(project_allocation: self, email: project.contact_email, status: data['status'], member_invitation_id: data['legacyId'], data: data.merge('aggregated_allocation_ids' => allocations.map(&:id)))
     log_event('expense_created', invitation_record: inv, metadata: { legacy_id: data['legacyId'], vendor_slug: vendor.slug, aggregated: true, allocation_ids: allocations.map(&:id) })
     inv
   end
@@ -432,7 +432,7 @@ class ProjectAllocation < ApplicationRecord
     data = response_body['data']['draftExpenseAndInviteUser']
     puts "Expense draft created successfully:"
     puts JSON.pretty_generate(data)
-    inv = Invitation.create!(project_allocation: self, email: project.contact_email, status: 'DRAFT', member_invitation_id: data['legacyId'], data: data)
+    inv = Invitation.create!(project_allocation: self, email: project.contact_email, status: data['status'], member_invitation_id: data['legacyId'], data: data)
     log_event('expense_created', invitation_record: inv, metadata: { legacy_id: data['legacyId'] })
     inv
   end
@@ -546,7 +546,7 @@ class ProjectAllocation < ApplicationRecord
     data = response_body['data']['draftExpenseAndInviteUser']
     puts "Draft expense created successfully and invitation sent:"
     puts JSON.pretty_generate(data)
-    inv = Invitation.create!(project_allocation: self, email: project.contact_email, status: 'DRAFT', member_invitation_id: data['legacyId'], data: data)
+    inv = Invitation.create!(project_allocation: self, email: project.contact_email, status: data['status'], member_invitation_id: data['legacyId'], data: data)
     log_event('expense_created', invitation_record: inv, metadata: { legacy_id: data['legacyId'] })
     data
   end
@@ -605,7 +605,7 @@ class ProjectAllocation < ApplicationRecord
     data = response_body['data']['createExpense']
     puts "Draft expense created successfully and invitation sent:"
     puts JSON.pretty_generate(data)
-    inv = Invitation.create!(project_allocation: self, email: project.contact_email, status: 'DRAFT', member_invitation_id: data['legacyId'], data: data)
+    inv = Invitation.create!(project_allocation: self, email: project.contact_email, status: data['status'], member_invitation_id: data['legacyId'], data: data)
     log_event('expense_created', invitation_record: inv, metadata: { legacy_id: data['legacyId'], vendor_slug: vendor.slug })
     inv
   end
