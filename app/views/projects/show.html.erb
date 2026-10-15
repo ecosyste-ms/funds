@@ -116,8 +116,8 @@
               </tbody>
               <tfoot>
                 <tr class="table-light">
-                  <th>Total from <%= fund.name %></th>
-                  <th><%= number_to_currency(allocations.sum(&:amount_cents) / 100.0) %></th>
+                  <th>Funded from <%= fund.name %></th>
+                  <th><%= number_to_currency(@funded_totals.fetch(fund.id, 0) / 100.0) %></th>
                   <th colspan="7"></th>
                 </tr>
               </tfoot>
@@ -129,7 +129,7 @@
 
     <div class="card bg-light">
       <div class="card-body">
-        <strong>Total Allocated:</strong> <%= number_to_currency(@project.total_allocated / 100.0) %>
+        <strong>Total Funded:</strong> <%= number_to_currency(@funded_totals.values.sum / 100.0) %>
       </div>
     </div>
   <% else %>

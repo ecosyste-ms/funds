@@ -8,6 +8,7 @@ class ProjectsController < ApplicationController
 
   def show
     @project = Project.find(params[:id])
+    @funded_totals = @project.project_allocations.funded.group(:fund_id).sum(:amount_cents)
     @project_allocations = @project.project_allocations
       .joins(:allocation)
       .preload(:fund, :allocation, :invitation, :funding_source)
