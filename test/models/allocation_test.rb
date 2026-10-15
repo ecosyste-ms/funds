@@ -167,6 +167,7 @@ class AllocationTest < ActiveSupport::TestCase
           headers: { 'Content-Type' => 'application/json' }
         }
       else
+        assert_equal 'APPROVED', Invitation.find_by!(member_invitation_id: '789')[:status]
         {
           status: 200,
           body: { data: { processExpense: { id: '1', status: 'APPROVED' } } }.to_json,

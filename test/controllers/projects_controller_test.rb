@@ -1,6 +1,38 @@
 require "test_helper"
 
 class ProjectsControllerTest < ActionDispatch::IntegrationTest
+  test "approved expense awaits payment even when its snapshot is pending" do
+    project = create(:project, funding_rejected: false)
+    pa = create(:project_allocation, project: project, paid_at: Time.current)
+    create(:invitation, project_allocation: pa, status: 'APPROVED', data: { 'status' => 'PENDING' })
+
+    get project_url(project)
+
+    assert_response :success
+    assert_select '.badge', text: 'Awaiting Payment'
+    assert_select '.badge', text: 'Invitation Pending', count: 0
+  end
+
+  test "expense statuses map to project badges" do
+    {
+      'PROCESSING' => 'Awaiting Payment',
+      'SCHEDULED_FOR_PAYMENT' => 'Awaiting Payment',
+      'REJECTED' => 'Invitation Rejected',
+      'INVITE_DECLINED' => 'Invitation Rejected',
+      'CANCELED' => 'Invitation Rejected',
+      'PENDING' => 'Invitation Pending'
+    }.each do |status, badge|
+      project = create(:project, funding_rejected: false)
+      pa = create(:project_allocation, project: project)
+      create(:invitation, project_allocation: pa, status: status, data: { 'status' => status })
+
+      get project_url(project)
+
+      assert_response :success
+      assert_select '.badge', { text: badge }, status
+    end
+  end
+
   test "should get show for project without allocations" do
     project = create(:project)
     get project_url(project)

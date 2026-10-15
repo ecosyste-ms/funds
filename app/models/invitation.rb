@@ -64,6 +64,14 @@ class Invitation < ApplicationRecord
     rejected_at.present?
   end
 
+  def awaiting_payment?
+    accepted? || %w[APPROVED PROCESSING SCHEDULED_FOR_PAYMENT].include?(status)
+  end
+
+  def declined?
+    rejected? || %w[REJECTED INVITE_DECLINED CANCELED].include?(status)
+  end
+
   def send_email
     MaintainerMailer.invitation_email(
       email,
@@ -165,7 +173,7 @@ class Invitation < ApplicationRecord
       puts JSON.pretty_generate(response_body['data']['expense'])
       old_status = read_attribute(:status)
       new_status = response_body['data']['expense']['status']
-      update!(data: response_body['data']['expense'], status: new_status)
+      update!(data: (data || {}).merge(response_body['data']['expense']), status: new_status)
       log_event('expense_synced', metadata: { duration_ms: duration_ms, old_status: old_status, new_status: new_status })
     end
   rescue Faraday::Error => e
@@ -296,7 +304,7 @@ class Invitation < ApplicationRecord
       puts "Approved expense:"
       puts JSON.pretty_generate(response_body['data']['processExpense'])
       new_status = response_body['data']['processExpense']['status']
-      update!(status: new_status)
+      update!(status: new_status, data: data.merge('status' => new_status))
       log_event('expense_approved', metadata: { duration_ms: duration_ms, new_status: new_status })
     end
   rescue Faraday::Error => e
@@ -343,7 +351,7 @@ class Invitation < ApplicationRecord
       puts "Unapproved expense:"
       puts JSON.pretty_generate(response_body['data']['processExpense'])
       new_status = response_body['data']['processExpense']['status']
-      update!(status: new_status)
+      update!(status: new_status, data: data.merge('status' => new_status))
       log_event('expense_unapproved', metadata: { duration_ms: duration_ms, new_status: new_status })
     end
   rescue Faraday::Error => e
@@ -354,8 +362,11 @@ class Invitation < ApplicationRecord
 
   def status
     return 'DELETED' if deleted_at.present?
-    return nil if data.blank?
-    data['status']
+
+    # Older expense creation stored DRAFT regardless of the API status.
+    return self[:status] if self[:status].present? && self[:status] != 'DRAFT'
+
+    data&.dig('status').presence || self[:status]
   end
 
   def legacy_order_id
