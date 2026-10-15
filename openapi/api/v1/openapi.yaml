@@ -283,7 +283,7 @@ paths:
         "404":
           description: Fund not found
 
-  /funds/{slug}/allocations/{allocation_month_year}:
+  /funds/{slug}/allocations/{month_year}:
     get:
       summary: Get funding allocations for a fund
       description: >
@@ -303,12 +303,14 @@ paths:
             type: string
             minLength: 1
             maxLength: 100
-        - name: allocation_month_year
+        - name: month_year
           in: path
           description: Allocation month and year identifier (for example, december-2025)
           required: true
           schema:
             type: string
+            minLength: 1
+            maxLength: 100
           example: december-2025
       responses:
         "200":
@@ -327,8 +329,10 @@ paths:
                   funders_count: 4
                   projects_count: 4
                 distribution_details:
-                  open_collective: 7
-                  project_maintainers_invited: 6
+                  open_collective_projects: 7
+                  github_sponsored_projects: 0
+                  other_projects: 0
+                  invited_projects: 6
                 funders:
                   - name: Sentry
                     total_funded:
@@ -349,8 +353,19 @@ paths:
                     project_downloads: 10500000
                     project_dependent_repos: 20100
                     project_dependent_packages: 463
+                    is_funding_rejected: false
+                    is_funding_allocation_success: true
+                    project_funding_source:
+                      url: https://opencollective.com/pytest
+                      is_approved: true
+                    funding_invitation:
+                      invitation_accepted_at: 2026-10-14T23:59:59+00:00
+                      invitation_rejected_at: null
+        "400":
+          description: Bad request when fund slug or month year is invalid
         "404":
-          description: Fund or allocation period not found
+          description: Fund matching slug or Allocation matching month year not found
+
 
 components:
   schemas:
@@ -664,19 +679,31 @@ components:
     DistributionDetails:
       type: object
       properties:
-        open_collective:
+        open_collective_projects:
           type: integer
           format: int64
           description: Number of allocations distributed through Open Collective
           example: 7
-        project_maintainers_invited:
+        github_sponsored_projects:
+          type: integer
+          format: int64
+          description: Number of allocations distributed through GitHub Sponsors
+          example: 7
+        other_projects:
+          type: integer
+          format: int64
+          description: Number of allocations distributed through other platforms
+          example: 0
+        invited_projects:
           type: integer
           format: int64
           description: Number of project maintainers invited
           example: 6
       required:
-        - open_collective
-        - project_maintainers_invited
+        - open_collective_projects
+        - github_sponsored_projects
+        - other_projects
+        - invited_projects
 
     AllocationFunder:
       type: object
@@ -696,6 +723,41 @@ components:
         - name
         - total_funded
         - profile
+
+    ProjectFundingSource:
+      type: object
+      properties:
+        url:
+          type: string
+          description: Funding source url
+          example: https://opencollective.com/pytest
+        is_approved:
+          type: boolean
+          format: boolean
+          description: Whether the funding source has been approved, or not
+          example: false
+      required:
+        - url
+        - is_approved
+
+    FundingInvitation:
+      type: object
+      properties:
+        invitation_accepted_at:
+          type: string
+          format: string
+          nullable: true
+          description: Invitation accepted at timestamp
+          example: 2026-10-14T23:59:59+00:00
+        invitation_rejected_at:
+          type: string
+          format: string
+          nullable: true
+          description: Invitation rejected at timestamp
+          example: 2026-10-14T23:59:59+00:00
+      required:
+        - invitation_accepted_at
+        - invitation_rejected_at
 
     FundingAllocation:
       type: object
@@ -726,6 +788,21 @@ components:
           format: int64
           description: Number of dependent packages
           example: 463
+        is_funding_rejected:
+          type: boolean
+          format: boolean
+          description: Whether the funding has been rejected, or not
+          example: true
+        is_funding_allocation_success:
+          type: boolean
+          format: boolean
+          description: Whether the funding allocation has succeeded, or not
+          example: true
+        project_funding_source:
+          $ref: "#/components/schemas/ProjectFundingSource"
+        funding_invitation:
+          $ref: "#/components/schemas/FundingInvitation"
+
       required:
         - project_name
         - project_repo_link
@@ -733,6 +810,10 @@ components:
         - project_downloads
         - project_dependent_repos
         - project_dependent_packages
+        - is_funding_rejected
+        - is_funding_allocation_success
+        - project_funding_source
+        - funding_invitation
 
     FundAllocations:
       type: object
@@ -766,3 +847,4 @@ components:
         - distribution_details
         - funders
         - funding_allocations
+

@@ -174,7 +174,7 @@ module Api
         assert_empty response.body
       end
 
-      test 'index with slug not matching a fund returns bad request' do
+      test 'index with slug not matching a fund returns not found' do
         get api_v1_fund_projects_path(fund_slug: 'non-existent-fund')
         assert_response :not_found
         assert_empty response.body
