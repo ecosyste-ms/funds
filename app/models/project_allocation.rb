@@ -15,6 +15,23 @@ class ProjectAllocation < ApplicationRecord
   scope :paid, -> { where.not(paid_at: nil) }
   scope :unpaid, -> { where(paid_at: nil) }
 
+  scope :funded, -> {
+    funding_not_rejected.where(<<~SQL)
+      COALESCE((
+        SELECT invitations.deleted_at IS NULL AND
+          COALESCE(NULLIF(NULLIF(invitations.status, ''), 'DRAFT'),
+                   NULLIF(invitations.data->>'status', ''), invitations.status, '') IN ('APPROVED', 'PAID')
+        FROM project_allocations expense_allocations
+        INNER JOIN invitations ON invitations.project_allocation_id = expense_allocations.id
+        WHERE expense_allocations.allocation_id = project_allocations.allocation_id
+          AND (expense_allocations.id = project_allocations.id
+            OR (invitations.data->'aggregated_allocation_ids')::jsonb @> jsonb_build_array(project_allocations.id))
+        ORDER BY NULLIF(invitations.member_invitation_id, '') IS NULL, invitations.id DESC
+        LIMIT 1
+      ), project_allocations.paid_at IS NOT NULL)
+    SQL
+  }
+
   scope :platform, ->(platform) { joins(:funding_source).where(funding_sources: { platform: platform }) }
   scope :not_platform, ->(platform) { joins(:funding_source).where.not(funding_sources: { platform: platform }) }
 

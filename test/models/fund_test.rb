@@ -48,11 +48,11 @@ class FundTest < ActiveSupport::TestCase
     projects = nil
     queries = record_select_queries do
       projects = fund.top_funded_projects.to_a
-      projects.map(&:total_allocated)
+      projects.map(&:total_funded)
     end
 
     assert_equal [first_project, second_project], projects
-    assert_equal [1000, 500], projects.map(&:total_allocated)
+    assert_equal [1000, 500], projects.map(&:total_funded)
     assert_equal 1, queries.length
   end
 

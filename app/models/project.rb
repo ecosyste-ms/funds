@@ -839,9 +839,9 @@ class Project < ApplicationRecord
     funding.is_a?(Hash) ? funding : nil
   end
 
-  def total_allocated
+  def total_funded
     return self[:total_amount_cents] if has_attribute?(:total_amount_cents)
 
-    project_allocations.sum(:amount_cents)
+    project_allocations.funded.sum(:amount_cents)
   end
 end
