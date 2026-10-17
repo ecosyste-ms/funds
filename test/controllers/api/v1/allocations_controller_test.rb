@@ -72,7 +72,19 @@ module Api
           platform: 'opencollective.com'
         )
 
-        # 2 out of 5 projects in the fund are allocated
+        # 3 out of 5 projects in the fund are allocated
+        @project0 = create(
+          :project,
+          name: 'Requests',
+          url: 'https://github.com/psf/requests',
+          licenses: ['apache'],
+          registry_names: ['pypi'],
+          keywords: ['python'],
+          funding_rejected: false,
+          total_downloads: 100_000_000,
+          total_dependent_repos: 50_000,
+          total_dependent_packages: 10_000
+        )
         @project1 = create(
           :project,
           name: 'Django',
@@ -97,7 +109,7 @@ module Api
           total_dependent_repos: 100,
           total_dependent_packages: 50
         )
-        3.times do
+        2.times do
           create(
             :project,
             registry_names: ['pypi'],
@@ -108,15 +120,29 @@ module Api
             total_dependent_packages: 50
           )
         end
+
         @allocation = create(
           :allocation,
           fund: @fund,
           year: Time.zone.now.year,
           month: Time.zone.now.month,
           total_cents: 17_736_00,
-          funded_projects_count: 2
+          funded_projects_count: 1
         )
+
+        # project allocation with no invite
         create(
+          :project_allocation,
+          fund: @fund,
+          allocation: @allocation,
+          project: @project0,
+          amount_cents: 202_00,
+          paid_at: Time.zone.now,
+          funding_source: @fs_opencollective
+        )
+
+        # project allocation with rejected invite
+        pa_rejected = create(
           :project_allocation,
           fund: @fund,
           allocation: @allocation,
@@ -125,16 +151,10 @@ module Api
           paid_at: Time.zone.now,
           funding_source: @fs_opencollective
         )
-        create(
-          :project_allocation,
-          fund: @fund,
-          allocation: @allocation,
-          project: @project1,
-          amount_cents: 202_00,
-          paid_at: Time.zone.now,
-          funding_source: @fs_opencollective
-        )
-        create(
+        create(:invitation, project_allocation: pa_rejected).reject!
+
+        # project allocation with accepted invite
+        pa_accepted = create(
           :project_allocation,
           fund: @fund,
           allocation: @allocation,
@@ -143,6 +163,11 @@ module Api
           paid_at: Time.zone.now,
           funding_source: @fs_github
         )
+        inv_accepted = create(:invitation, project_allocation: pa_accepted)
+        inv_accepted.accept!
+
+        # Mocking the invitation status to approved to skip calling OC API.
+        inv_accepted.update!(data: { 'status' => 'APPROVED' })
 
         @fund.update_stats
       end
@@ -161,7 +186,7 @@ module Api
         assert allocation_details['total_funded_amount']['value'].positive?
         assert_equal 'USD', allocation_details['total_funded_amount']['currency']
         assert_equal 3, allocation_details['funders_count']
-        assert_equal 2, allocation_details['projects_count']
+        assert_equal 1, allocation_details['projects_count']
 
         distribution_details = json['distribution_details']
         assert_equal 2, distribution_details['open_collective_projects']
@@ -188,14 +213,15 @@ module Api
 
         funding_allocations = json['funding_allocations']
         alloc0 = funding_allocations[0]
-        assert_equal 'Django', alloc0['project_name']
-        assert_equal 'https://github.com/django/django', alloc0['project_repo_link']
+        assert_equal 'Requests', alloc0['project_name']
+        assert_equal 'https://github.com/psf/requests', alloc0['project_repo_link']
         assert_equal 202.0, alloc0['allocated_amount']['value']
         assert_equal 'USD', alloc0['allocated_amount']['currency']
-        assert_equal 542_000_000, alloc0['project_downloads']
-        assert_equal 604_000, alloc0['project_dependent_repos']
-        assert_equal 8_240, alloc0['project_dependent_packages']
+        assert_equal 100_000_000, alloc0['project_downloads']
+        assert_equal 50_000, alloc0['project_dependent_repos']
+        assert_equal 10_000, alloc0['project_dependent_packages']
         assert_equal false, alloc0['is_funding_rejected']
+        assert_equal false, alloc0['is_funding_allocation_success']
         assert_equal 'https://opencollective.com/ecosystems', alloc0['project_funding_source']['url']
         assert_equal true, alloc0['project_funding_source']['is_approved']
         assert_nil alloc0['funding_invitation']
@@ -208,10 +234,12 @@ module Api
         assert_equal 542_000_000, alloc1['project_downloads']
         assert_equal 604_000, alloc1['project_dependent_repos']
         assert_equal 8_240, alloc1['project_dependent_packages']
-        assert_equal false, alloc1['is_funding_rejected']
+        assert_equal true, alloc1['is_funding_rejected']
+        assert_equal false, alloc1['is_funding_allocation_success']
         assert_equal 'https://opencollective.com/ecosystems', alloc1['project_funding_source']['url']
         assert_equal true, alloc1['project_funding_source']['is_approved']
-        assert_nil alloc1['funding_invitation']
+        assert_nil alloc1['funding_invitation']['invitation_accepted_at']
+        assert_not_nil alloc1['funding_invitation']['invitation_rejected_at']
 
         alloc2 = funding_allocations[2]
         assert_equal 'Wagtail', alloc2['project_name']
@@ -222,9 +250,11 @@ module Api
         assert_equal 100, alloc2['project_dependent_repos']
         assert_equal 50, alloc2['project_dependent_packages']
         assert_equal false, alloc2['is_funding_rejected']
+        assert_equal true, alloc2['is_funding_allocation_success']
         assert_equal 'https://github.com/ecosyste-ms', alloc2['project_funding_source']['url']
         assert_equal true, alloc2['project_funding_source']['is_approved']
-        assert_nil alloc2['funding_invitation']
+        assert_not_nil alloc2['funding_invitation']['invitation_accepted_at']
+        assert_nil alloc2['funding_invitation']['invitation_rejected_at']
       end
 
       test 'index with empty params returns not found' do

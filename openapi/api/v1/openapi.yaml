@@ -799,9 +799,15 @@ components:
           description: Whether the funding allocation has succeeded, or not
           example: true
         project_funding_source:
-          $ref: "#/components/schemas/ProjectFundingSource"
+          type: object
+          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/ProjectFundingSource"
         funding_invitation:
-          $ref: "#/components/schemas/FundingInvitation"
+          type: object
+          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/FundingInvitation"
 
       required:
         - project_name
