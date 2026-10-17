@@ -378,6 +378,127 @@ module Api
 
         assert_equal projects.map(&:name), project_names
       end
+      test 'lookup returns funding links and selected destination for a known repository url' do
+        project = create(
+          :project,
+          name: 'Readme Funded',
+          url: 'https://github.com/example/readme-funded',
+          readme: 'Please support our work: https://opencollective.com/readme-funded and https://patreon.com/readme-funded'
+        )
+
+        get api_v1_projects_lookup_path, params: { url: 'https://github.com/example/readme-funded' }
+        assert_response :success
+
+        json = JSON.parse(response.body)
+        assert_equal 'Readme Funded', json['name']
+        assert_equal 'https://github.com/example/readme-funded', json['repo_link']
+        assert_includes json['funding_links'], 'https://opencollective.com/readme-funded'
+        assert_includes json['funding_links'], 'https://patreon.com/readme-funded'
+        assert_equal 'opencollective.com', json['preferred_funding_platform']
+        assert_equal 'https://opencollective.com/readme-funded', json['preferred_funding_link']
+        assert_nil json['open_collective_match']
+        assert_nil json['open_collective_alternative']
+      end
+
+      test 'lookup surfaces a stored open collective match' do
+        funding_source = create(
+          :funding_source,
+          url: 'https://opencollective.com/oc-lookup-match',
+          platform: 'opencollective.com'
+        )
+        create(
+          :project,
+          name: 'OC Matched',
+          url: 'https://github.com/example/oc-matched',
+          funding_source: funding_source
+        )
+
+        get api_v1_projects_lookup_path, params: { url: 'https://github.com/example/oc-matched' }
+        assert_response :success
+
+        json = JSON.parse(response.body)
+        assert_equal 'OC Matched', json['name']
+        assert_equal [], json['funding_links']
+        assert_equal 'https://opencollective.com/oc-lookup-match', json['preferred_funding_link']
+        assert_equal 'https://opencollective.com/oc-lookup-match', json['open_collective_match']
+        assert_nil json['open_collective_alternative']
+      end
+
+      test 'lookup surfaces a mapped open collective alternative for a github sponsors link' do
+        FundingSource.stubs(:github_sponsors_logins).returns(['mappeduser'])
+        funding_source = create(
+          :funding_source,
+          url: 'https://opencollective.com/mapped-oc',
+          platform: 'opencollective.com'
+        )
+        create(
+          :project,
+          name: 'Mapped',
+          url: 'https://github.com/example/mapped',
+          repository: { 'metadata' => { 'funding' => { 'github' => 'mappeduser' } } },
+          funding_source: funding_source
+        )
+
+        get api_v1_projects_lookup_path, params: { url: 'https://github.com/example/mapped' }
+        assert_response :success
+
+        json = JSON.parse(response.body)
+        assert_includes json['funding_links'], 'https://github.com/sponsors/mappeduser'
+        assert_equal 'github.com', json['preferred_funding_platform']
+        assert_equal 'https://opencollective.com/mapped-oc', json['preferred_funding_link']
+        assert_equal 'https://opencollective.com/mapped-oc', json['open_collective_match']
+        assert_equal 'https://opencollective.com/mapped-oc', json['open_collective_alternative']
+      end
+
+      test 'lookup returns empty funding links for a known project without funding' do
+        create(:project, name: 'Unfunded', url: 'https://github.com/example/unfunded')
+
+        get api_v1_projects_lookup_path, params: { url: 'https://github.com/example/unfunded' }
+        assert_response :success
+
+        json = JSON.parse(response.body)
+        assert_equal 'Unfunded', json['name']
+        assert_equal 'https://github.com/example/unfunded', json['repo_link']
+        assert_equal [], json['funding_links']
+        assert_equal 'Unknown', json['preferred_funding_platform']
+        assert_nil json['preferred_funding_link']
+        assert_nil json['open_collective_match']
+        assert_nil json['open_collective_alternative']
+      end
+
+      test 'lookup normalizes the repository url' do
+        create(:project, name: 'Normalized', url: 'https://github.com/example/normalized')
+
+        get api_v1_projects_lookup_path, params: { url: 'https://github.com/Example/Normalized/' }
+        assert_response :success
+
+        json = JSON.parse(response.body)
+        assert_equal 'Normalized', json['name']
+      end
+
+      test 'lookup with unknown repository url returns not found' do
+        get api_v1_projects_lookup_path, params: { url: 'https://github.com/example/does-not-exist' }
+        assert_response :not_found
+        assert_empty response.body
+      end
+
+      test 'lookup handles hostile query strings' do
+        get api_v1_projects_lookup_path, params: { url: "') THEN 0 ELSE (SELECT 1) END --" }
+        assert_response :not_found
+        assert_empty response.body
+      end
+
+      test 'lookup with missing url param returns bad request' do
+        get api_v1_projects_lookup_path
+        assert_response :bad_request
+        assert_empty response.body
+      end
+
+      test 'lookup with blank url param returns bad request' do
+        get api_v1_projects_lookup_path, params: { url: '   ' }
+        assert_response :bad_request
+        assert_empty response.body
+      end
     end
   end
 end

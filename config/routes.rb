@@ -22,6 +22,7 @@ Rails.application.routes.draw do
         resources :funders, only: [:index]
         get "allocations(/:month_year)", to: "allocations#index", as: :allocations
       end
+      get 'projects/lookup', to: 'projects#lookup'
     end
   end
 
