@@ -20,6 +20,7 @@ Rails.application.routes.draw do
         end
         resources :projects, only: [:index]
       end
+      get 'projects/lookup', to: 'projects#lookup'
     end
   end
 
