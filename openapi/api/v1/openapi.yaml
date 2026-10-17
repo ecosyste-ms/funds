@@ -213,6 +213,52 @@ paths:
         "400":
           description: Bad request when invalid page or limit is specified
 
+  /projects/lookup:
+    get:
+      summary: Look up a project's funding links by repository URL
+      description: >
+        Retrieve known funding links and the selected funding destination for
+        a project by its repository URL. Discovered Open Collective matches and
+        mapped alternatives are included explicitly, since they are not
+        necessarily present in the funding links. Works for known projects
+        that have not received an allocation. Uses stored discovery results
+        only.
+      operationId: lookupProjectFunding
+      tags:
+        - Projects
+      parameters:
+        - name: url
+          in: query
+          description: Repository URL of the project to look up
+          example: https://github.com/django/django
+          required: true
+          schema:
+            type: string
+            format: uri
+            minLength: 1
+            maxLength: 500
+      responses:
+        "200":
+          description: Project funding information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectFundingLookup"
+              example:
+                name: Django
+                repo_link: https://github.com/django/django
+                funding_links:
+                  - https://github.com/sponsors/django
+                  - https://opencollective.com/django
+                preferred_funding_platform: opencollective.com
+                preferred_funding_link: https://opencollective.com/django
+                open_collective_match: https://opencollective.com/django
+                open_collective_alternative: null
+        "404":
+          description: No known project with the given repository URL
+        "400":
+          description: Bad request when the url parameter is missing, blank, or too long
+
   /funds/{slug}/funders:
     get:
       summary: List funders for a fund
@@ -571,6 +617,55 @@ components:
         - current_page
         - total_pages
         - projects
+
+    ProjectFundingLookup:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Project name
+          example: Django
+        repo_link:
+          type: string
+          format: uri
+          description: Repository URL
+          example: https://github.com/django/django
+        funding_links:
+          type: array
+          description: Known funding links discovered from package metadata, repository and owner metadata, and README content
+          items:
+            type: string
+            format: uri
+          example:
+            - https://github.com/sponsors/django
+            - https://opencollective.com/django
+        preferred_funding_platform:
+          type: string
+          description: Selected funding platform, preferring opencollective.com, then github.com
+          example: opencollective.com
+        preferred_funding_link:
+          type: string
+          format: uri
+          nullable: true
+          description: Selected funding destination (stored funding source URL when present)
+          example: https://opencollective.com/django
+        open_collective_match:
+          type: string
+          format: uri
+          nullable: true
+          description: Discovered Open Collective match for the repository URL (stored lookup result), if any
+          example: https://opencollective.com/django
+        open_collective_alternative:
+          type: string
+          format: uri
+          nullable: true
+          description: Open Collective alternative mapped from a GitHub Sponsors link, if any
+          example: https://opencollective.com/django
+      required:
+        - name
+        - repo_link
+        - funding_links
+        - preferred_funding_platform
 
     Funder:
       type: object
