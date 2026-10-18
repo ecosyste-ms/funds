@@ -726,14 +726,15 @@ components:
 
     ProjectFundingSource:
       type: object
+      nullable: true
       properties:
         url:
           type: string
+          format: uri
           description: Funding source url
           example: https://opencollective.com/pytest
         is_approved:
           type: boolean
-          format: boolean
           description: Whether the funding source has been approved, or not
           example: false
       required:
@@ -742,16 +743,17 @@ components:
 
     FundingInvitation:
       type: object
+      nullable: true
       properties:
         invitation_accepted_at:
           type: string
-          format: string
+          format: date-time
           nullable: true
           description: Invitation accepted at timestamp
           example: 2026-10-14T23:59:59+00:00
         invitation_rejected_at:
           type: string
-          format: string
+          format: date-time
           nullable: true
           description: Invitation rejected at timestamp
           example: 2026-10-14T23:59:59+00:00
@@ -790,24 +792,16 @@ components:
           example: 463
         is_funding_rejected:
           type: boolean
-          format: boolean
           description: Whether the funding has been rejected, or not
           example: true
         is_funding_allocation_success:
           type: boolean
-          format: boolean
           description: Whether the funding allocation has succeeded, or not
           example: true
         project_funding_source:
-          type: object
-          nullable: true
-          allOf:
-            - $ref: "#/components/schemas/ProjectFundingSource"
+          $ref: "#/components/schemas/ProjectFundingSource"
         funding_invitation:
-          type: object
-          nullable: true
-          allOf:
-            - $ref: "#/components/schemas/FundingInvitation"
+          $ref: "#/components/schemas/FundingInvitation"
 
       required:
         - project_name

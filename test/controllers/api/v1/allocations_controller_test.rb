@@ -212,6 +212,9 @@ module Api
         assert funder2['profile'].end_with? 'opencollective.com/chris-adams'
 
         funding_allocations = json['funding_allocations']
+        assert_equal 3, funding_allocations.length
+
+        # Pending
         alloc0 = funding_allocations[0]
         assert_equal 'Requests', alloc0['project_name']
         assert_equal 'https://github.com/psf/requests', alloc0['project_repo_link']
@@ -226,6 +229,7 @@ module Api
         assert_equal true, alloc0['project_funding_source']['is_approved']
         assert_nil alloc0['funding_invitation']
 
+        # Rejected invite
         alloc1 = funding_allocations[1]
         assert_equal 'Django', alloc1['project_name']
         assert_equal 'https://github.com/django/django', alloc1['project_repo_link']
@@ -241,6 +245,7 @@ module Api
         assert_nil alloc1['funding_invitation']['invitation_accepted_at']
         assert_not_nil alloc1['funding_invitation']['invitation_rejected_at']
 
+        # Accepted invite
         alloc2 = funding_allocations[2]
         assert_equal 'Wagtail', alloc2['project_name']
         assert_equal 'https://github.com/wagtail/wagtail', alloc2['project_repo_link']
@@ -255,6 +260,66 @@ module Api
         assert_equal true, alloc2['project_funding_source']['is_approved']
         assert_not_nil alloc2['funding_invitation']['invitation_accepted_at']
         assert_nil alloc2['funding_invitation']['invitation_rejected_at']
+      end
+
+      test 'project index returns only completed funding allocations' do
+        @allocation.complete!
+
+        month_year = @allocation.created_at.strftime('%B-%Y').downcase
+        get api_v1_fund_allocations_path(fund_slug: 'django', month_year: month_year)
+        assert_response :success
+
+        json = JSON.parse(response.body)
+        assert_equal 'Django Fund', json['fund_name']
+        assert_equal @allocation.created_at.strftime('%B-%Y'), json['allocation_month_year']
+
+        allocation_details = json['allocation_details']
+        assert_not_nil allocation_details
+        assert allocation_details['total_funded_amount']['value'].positive?
+        assert_equal 'USD', allocation_details['total_funded_amount']['currency']
+        assert_equal 3, allocation_details['funders_count']
+        assert_equal 1, allocation_details['projects_count']
+
+        distribution_details = json['distribution_details']
+        assert_equal 2, distribution_details['open_collective_projects']
+        assert_equal 1, distribution_details['github_sponsored_projects']
+        assert_equal 0, distribution_details['other_projects']
+        assert_equal 0, distribution_details['invited_projects']
+
+        funders = json['funders']
+        funder0 = funders[0]
+        funder1 = funders[1]
+        funder2 = funders[2]
+        assert_equal 'Sentry', funder0['name']
+        assert_equal 16_875.00, funder0['total_funded']['value']
+        assert_equal 'USD', funder0['total_funded']['currency']
+        assert funder0['profile'].end_with? 'opencollective.com/sentry'
+        assert_equal 'Thibaud Colas', funder1['name']
+        assert_equal 650.00, funder1['total_funded']['value']
+        assert_equal 'USD', funder1['total_funded']['currency']
+        assert funder1['profile'].end_with? 'opencollective.com/thibaudcolas'
+        assert_equal 'Chris Adams', funder2['name']
+        assert_equal 51.00, funder2['total_funded']['value']
+        assert_equal 'USD', funder2['total_funded']['currency']
+        assert funder2['profile'].end_with? 'opencollective.com/chris-adams'
+
+        funding_allocations = json['funding_allocations']
+        assert_equal 1, funding_allocations.length
+
+        alloc0 = funding_allocations[0]
+        assert_equal 'Wagtail', alloc0['project_name']
+        assert_equal 'https://github.com/wagtail/wagtail', alloc0['project_repo_link']
+        assert_equal 101.0, alloc0['allocated_amount']['value']
+        assert_equal 'USD', alloc0['allocated_amount']['currency']
+        assert_equal 1_000_000, alloc0['project_downloads']
+        assert_equal 100, alloc0['project_dependent_repos']
+        assert_equal 50, alloc0['project_dependent_packages']
+        assert_equal false, alloc0['is_funding_rejected']
+        assert_equal true, alloc0['is_funding_allocation_success']
+        assert_equal 'https://github.com/ecosyste-ms', alloc0['project_funding_source']['url']
+        assert_equal true, alloc0['project_funding_source']['is_approved']
+        assert_not_nil alloc0['funding_invitation']['invitation_accepted_at']
+        assert_nil alloc0['funding_invitation']['invitation_rejected_at']
       end
 
       test 'index with empty params returns not found' do
