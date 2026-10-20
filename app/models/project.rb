@@ -748,6 +748,38 @@ class Project < ApplicationRecord
     end
   end
 
+  # Selected funding destination from stored data only: the stored funding
+  # source when one was recorded during sync, otherwise the preferred link
+  # derived from the known funding links. Deliberately not
+  # preferred_funding_link, which may perform a live Open Collective mapping
+  # lookup.
+  def stored_preferred_funding_link
+    funding_source&.url || funding_links.find { |link| link.include?(preferred_funding_platform) }
+  end
+
+  # Platform for the selected funding destination, taken from the same source
+  # as stored_preferred_funding_link so the two cannot disagree.
+  def stored_preferred_funding_platform
+    funding_source&.platform || preferred_funding_platform
+  end
+
+  # Discovered Open Collective destination, surfaced explicitly since it is
+  # not necessarily present in funding_links (found via Open Collective lookup
+  # or mapped from a GitHub Sponsors link and stored on the funding source).
+  def open_collective_match
+    funding_source.url if funding_source&.platform == 'opencollective.com'
+  end
+
+  # A mapped alternative: an Open Collective destination stored for a project
+  # whose known links only include a GitHub Sponsors link.
+  def open_collective_alternative
+    return unless open_collective_match.present?
+    return unless funding_links.any? { |link| link.include?('github.com/sponsors') }
+    return if funding_links.include?(open_collective_match)
+
+    open_collective_match
+  end
+
   def readme_funding_links
     urls = readme_urls.select{|u| funding_domains.any?{|d| u.include?(d) } || u.include?('github.com/sponsors') }.reject{|u| ['.svg', '.png'].include? File.extname(URI.parse(u).path) }
     # remove anchors

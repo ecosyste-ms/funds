@@ -419,6 +419,7 @@ module Api
         json = JSON.parse(response.body)
         assert_equal 'OC Matched', json['name']
         assert_equal [], json['funding_links']
+        assert_equal 'opencollective.com', json['preferred_funding_platform']
         assert_equal 'https://opencollective.com/oc-lookup-match', json['preferred_funding_link']
         assert_equal 'https://opencollective.com/oc-lookup-match', json['open_collective_match']
         assert_nil json['open_collective_alternative']
@@ -444,7 +445,7 @@ module Api
 
         json = JSON.parse(response.body)
         assert_includes json['funding_links'], 'https://github.com/sponsors/mappeduser'
-        assert_equal 'github.com', json['preferred_funding_platform']
+        assert_equal 'opencollective.com', json['preferred_funding_platform']
         assert_equal 'https://opencollective.com/mapped-oc', json['preferred_funding_link']
         assert_equal 'https://opencollective.com/mapped-oc', json['open_collective_match']
         assert_equal 'https://opencollective.com/mapped-oc', json['open_collective_alternative']
