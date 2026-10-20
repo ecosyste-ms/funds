@@ -5,7 +5,7 @@ class ProjectAllocation < ApplicationRecord
   belongs_to :allocation
   belongs_to :fund
   belongs_to :funding_source, optional: true
-  has_one :invitation
+  has_one :invitation, -> { order(Arel.sql("NULLIF(invitations.member_invitation_id, '') IS NULL"), id: :desc) }
   has_many :events, class_name: 'ProjectAllocationEvent'
 
   scope :with_funding_source, -> { where.not(funding_source_id: nil) }
@@ -237,7 +237,7 @@ class ProjectAllocation < ApplicationRecord
     data = response_body['data']['draftExpenseAndInviteUser']
     puts "Expense draft created successfully (fallback):"
     puts JSON.pretty_generate(data)
-    inv = Invitation.create!(project_allocation: self, email: project.contact_email, status: data['status'], member_invitation_id: data['legacyId'], data: data)
+    inv = record_expense_invitation(data)
     log_event('expense_created', invitation_record: inv, metadata: { legacy_id: data['legacyId'], fallback: true })
     inv
   end
@@ -318,8 +318,7 @@ class ProjectAllocation < ApplicationRecord
     puts "Aggregated expense created successfully:"
     puts JSON.pretty_generate(data)
 
-    # Create invitation record for tracking on the first allocation
-    inv = Invitation.create!(project_allocation: self, email: project.contact_email, status: data['status'], member_invitation_id: data['legacyId'], data: data.merge('aggregated_allocation_ids' => allocations.map(&:id)))
+    inv = record_expense_invitation(data.merge('aggregated_allocation_ids' => allocations.map(&:id)))
     log_event('expense_created', invitation_record: inv, metadata: { legacy_id: data['legacyId'], vendor_slug: vendor.slug, aggregated: true, allocation_ids: allocations.map(&:id) })
     inv
   end
@@ -432,7 +431,7 @@ class ProjectAllocation < ApplicationRecord
     data = response_body['data']['draftExpenseAndInviteUser']
     puts "Expense draft created successfully:"
     puts JSON.pretty_generate(data)
-    inv = Invitation.create!(project_allocation: self, email: project.contact_email, status: data['status'], member_invitation_id: data['legacyId'], data: data)
+    inv = record_expense_invitation(data)
     log_event('expense_created', invitation_record: inv, metadata: { legacy_id: data['legacyId'] })
     inv
   end
@@ -546,7 +545,7 @@ class ProjectAllocation < ApplicationRecord
     data = response_body['data']['draftExpenseAndInviteUser']
     puts "Draft expense created successfully and invitation sent:"
     puts JSON.pretty_generate(data)
-    inv = Invitation.create!(project_allocation: self, email: project.contact_email, status: data['status'], member_invitation_id: data['legacyId'], data: data)
+    inv = record_expense_invitation(data)
     log_event('expense_created', invitation_record: inv, metadata: { legacy_id: data['legacyId'] })
     data
   end
@@ -605,7 +604,7 @@ class ProjectAllocation < ApplicationRecord
     data = response_body['data']['createExpense']
     puts "Draft expense created successfully and invitation sent:"
     puts JSON.pretty_generate(data)
-    inv = Invitation.create!(project_allocation: self, email: project.contact_email, status: data['status'], member_invitation_id: data['legacyId'], data: data)
+    inv = record_expense_invitation(data)
     log_event('expense_created', invitation_record: inv, metadata: { legacy_id: data['legacyId'], vendor_slug: vendor.slug })
     inv
   end
@@ -707,9 +706,21 @@ class ProjectAllocation < ApplicationRecord
 
   def create_invite
     return if funding_source.present?
-    return if invitation.present?
-      
-    Invitation.create!(project_allocation: self, email: project.contact_email)  
+
+    with_lock do
+      create_invitation!(email: project.contact_email) unless reload_invitation
+    end
+  end
+
+  def record_expense_invitation(data)
+    with_lock do
+      inv = reload_invitation
+      inv = nil if inv&.member_invitation_id.present? && inv.member_invitation_id != data['legacyId'].to_s
+      inv ||= Invitation.new(project_allocation: self, email: project.contact_email)
+      inv.update!(status: data['status'], member_invitation_id: data['legacyId'], data: data)
+      association(:invitation).reset
+      inv
+    end
   end
 
   def send_invitation
