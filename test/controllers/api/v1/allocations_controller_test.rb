@@ -275,7 +275,7 @@ module Api
 
         allocation_details = json['allocation_details']
         assert_not_nil allocation_details
-        assert allocation_details['total_funded_amount']['value'].positive?
+        assert_equal 101.0, allocation_details['total_funded_amount']['value']
         assert_equal 'USD', allocation_details['total_funded_amount']['currency']
         assert_equal 3, allocation_details['funders_count']
         assert_equal 1, allocation_details['projects_count']
@@ -320,6 +320,18 @@ module Api
         assert_equal true, alloc0['project_funding_source']['is_approved']
         assert_not_nil alloc0['funding_invitation']['invitation_accepted_at']
         assert_nil alloc0['funding_invitation']['invitation_rejected_at']
+      end
+
+      test 'project index returns null funding source when absent' do
+        @allocation.project_allocations.find_by(project: @project0).update!(funding_source: nil)
+
+        month_year = @allocation.created_at.strftime('%B-%Y').downcase
+        get api_v1_fund_allocations_path(fund_slug: 'django', month_year: month_year)
+        assert_response :success
+
+        alloc = JSON.parse(response.body)['funding_allocations'].find { |a| a['project_name'] == 'Requests' }
+        assert alloc.key?('project_funding_source')
+        assert_nil alloc['project_funding_source']
       end
 
       test 'index with empty params returns not found' do
