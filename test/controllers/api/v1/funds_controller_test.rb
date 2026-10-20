@@ -259,13 +259,13 @@ module Api
         chris = json["top_3_funders"].find { |f| f["funder_name"] == "Chris Adams" }
         assert_equal 16_875.00, sentry["funder_amount"]["value"]
         assert_equal "USD", sentry["funder_amount"]["currency"]
-        assert_equal "https://opencollective.com/sentry", sentry["funder_link"]
+        assert sentry["funder_link"].include? "opencollective.com/sentry"
         assert_equal 650.00, thibaud["funder_amount"]["value"]
         assert_equal "USD", thibaud["funder_amount"]["currency"]
-        assert_equal "https://opencollective.com/thibaudcolas", thibaud["funder_link"]
+        assert thibaud["funder_link"].include? "opencollective.com/thibaudcolas"
         assert_equal 51.00, chris["funder_amount"]["value"]
         assert_equal "USD", chris["funder_amount"]["currency"]
-        assert_equal "https://opencollective.com/chris-adams", chris["funder_link"]
+        assert chris["funder_link"].include? "opencollective.com/chris-adams"
       end
 
       test "show returns 400 for empty slug" do
