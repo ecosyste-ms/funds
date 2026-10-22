@@ -722,7 +722,7 @@ class Fund < ApplicationRecord
   end
 
   def funded_project_ids
-    project_allocations.funding_not_rejected.paid.pluck(:project_id).uniq
+    project_allocations.funded.distinct.pluck(:project_id)
   end
 
   def funded_projects
@@ -734,11 +734,10 @@ class Fund < ApplicationRecord
   end
 
   def top_funded_projects
-    funded_project_ids_query = project_allocations.funding_not_rejected.paid.select(:project_id)
     project_allocations_table = ProjectAllocation.arel_table
     total_amount = project_allocations_table[:amount_cents].sum
-    ranked_projects = ProjectAllocation
-      .where(project_id: funded_project_ids_query)
+    ranked_projects = ProjectAllocation.funded
+      .where(project_id: project_allocations.where(funded: true).select(:project_id))
       .select(project_allocations_table[:project_id], total_amount.as('total_amount_cents'))
       .group(project_allocations_table[:project_id])
       .order(total_amount.desc)
@@ -835,8 +834,7 @@ class Fund < ApplicationRecord
     Project
       .joins(:project_allocations)
       .where(project_allocations: { fund_id: id })
-      .where.not(project_allocations: { paid_at: nil })
-      .where(projects: { funding_rejected: false })
+      .merge(ProjectAllocation.funded)
       .select(projects[Arel.star], total.as("total_amount_cents"))
       .group(projects[:id])
       .order(total.desc, projects[:id].asc)

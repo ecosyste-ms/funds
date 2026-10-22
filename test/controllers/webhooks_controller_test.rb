@@ -50,6 +50,50 @@ class WebhooksControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "shared expense webhook refreshes every member and the public funding totals" do
+    fund = create(:fund)
+    allocation = create(:allocation, fund: fund)
+    first = create(:project_allocation, fund: fund, allocation: allocation, amount_cents: 1200)
+    second = create(:project_allocation, fund: fund, allocation: allocation, amount_cents: 3400)
+    unrelated = create(:project_allocation, fund: fund, allocation: create(:allocation, fund: fund))
+    create(:invitation, project_allocation: second, status: 'DRAFT')
+    create(:invitation, project_allocation: first, member_invitation_id: '277914', status: 'DRAFT',
+      data: { 'aggregated_allocation_ids' => [first.id, second.id, unrelated.id] })
+    request = stub_request(:post, /graphql\/v2/)
+      .with { |req| JSON.parse(req.body).dig('variables', 'id') == '277914' }
+      .to_return(body: { data: { expense: { id: 'shared-expense', status: 'PAID' } } }.to_json)
+
+    post '/webhooks', params: { type: 'collective.expense.paid', data: { expense: { id: 277914 } } }, as: :json
+    assert_response :success
+    SyncInviteWorker.drain
+    assert_requested request
+    assert first.reload.funded?
+    assert second.reload.funded?
+    assert_not unrelated.reload.funded?
+
+    queries = record_select_queries do
+      get api_v1_fund_projects_path(fund_slug: fund.slug)
+    end
+    assert_response :success
+    assert_equal 2, response.parsed_body['funded_projects_count']
+    assert_equal [12.0, 34.0], response.parsed_body['projects'].map { |row| row['allocated_amount']['value'] }.sort
+    assert queries.none? { |sql| sql.include?('"invitations"') }, 'funding reads must use stored flags'
+
+    stub_request(:post, /graphql\/v2/)
+      .with { |req| JSON.parse(req.body).dig('variables', 'id') == '277914' }
+      .to_return(body: { data: { expense: { id: 'shared-expense', status: 'PENDING' } } }.to_json)
+    post '/webhooks', params: { type: 'collective.expense.unapproved', data: { expense: { id: 277914 } } }, as: :json
+    assert_response :success
+    SyncInviteWorker.drain
+    assert_not first.reload.funded?
+    assert_not second.reload.funded?
+
+    get api_v1_fund_projects_path(fund_slug: fund.slug)
+    assert_response :success
+    assert_equal 0, response.parsed_body['funded_projects_count']
+    assert_empty response.parsed_body['projects']
+  end
+
   test "missing and unknown expense ids do not sync a local invitation" do
     create(:invitation, member_invitation_id: nil)
     [{}, { data: {} }, { data: { expense: {} } }, { data: { expense: { id: 999999 } } }].each do |payload|
