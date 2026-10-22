@@ -23,6 +23,7 @@ class FundedProjectAllocationsTest < ActiveSupport::TestCase
       pa = create(:project_allocation, project: project, fund: fund, allocation: allocation, paid_at: Time.current)
       create(:invitation, project_allocation: pa, member_invitation_id: "expense-#{pa.id}",
         status: status, data: { 'status' => snapshot }, deleted_at: deleted_at)
+      assert_equal funded, pa.reload.funded?
       pa.id if funded
     end
 
@@ -71,5 +72,83 @@ class FundedProjectAllocationsTest < ActiveSupport::TestCase
       data: { 'aggregated_allocation_ids' => [pa.id] })
 
     assert_equal [pa.id], ProjectAllocation.where(id: pa.id).funded.pluck(:id)
+  end
+
+  test 'paid at changes refresh the flag while invitations take precedence' do
+    pa = create(:project_allocation)
+    assert_not pa.reload.funded?
+
+    pa.update!(paid_at: Time.current)
+    assert pa.reload.funded?
+    pa.update!(paid_at: nil)
+    assert_not pa.reload.funded?
+
+    create(:invitation, project_allocation: pa, status: 'DRAFT')
+    pa.update!(paid_at: Time.current)
+    assert_not pa.reload.funded?
+  end
+
+  test 'changing shared expense members refreshes both old and new members' do
+    allocation = create(:allocation)
+    first, second, third = Array.new(3) { create(:project_allocation, allocation: allocation) }
+    invitation = create(:invitation, project_allocation: first, member_invitation_id: 'shared', status: 'PAID',
+      data: { 'aggregated_allocation_ids' => [first.id, second.id] })
+    assert first.reload.funded?
+    assert second.reload.funded?
+    assert_not third.reload.funded?
+
+    invitation.update!(data: { 'aggregated_allocation_ids' => [first.id, third.id] })
+    assert first.reload.funded?
+    assert_not second.reload.funded?
+    assert third.reload.funded?
+  end
+
+  test 'snapshot status changes and soft deletion refresh stored flags' do
+    pa = create(:project_allocation)
+    invitation = create(:invitation, project_allocation: pa, status: 'DRAFT', data: { 'status' => 'PAID' })
+    assert pa.reload.funded?
+
+    invitation.update!(data: { 'status' => 'PENDING' })
+    assert_not pa.reload.funded?
+    invitation.update!(data: { 'status' => 'APPROVED' })
+    assert pa.reload.funded?
+    invitation.update!(deleted_at: Time.current)
+    assert_not pa.reload.funded?
+  end
+
+  test 'destroying the latest invitation restores the previous expense or paid at fallback' do
+    pa = create(:project_allocation, paid_at: Time.current)
+    older = create(:invitation, project_allocation: pa, member_invitation_id: 'older', status: 'PAID')
+    latest = create(:invitation, project_allocation: pa, member_invitation_id: 'latest', status: 'REJECTED')
+    assert_not pa.reload.funded?
+
+    latest.destroy!
+    assert pa.reload.funded?
+    older.update!(status: 'PENDING')
+    assert_not pa.reload.funded?
+    older.destroy!
+    assert pa.reload.funded?
+  end
+
+  test 'moving an invitation refreshes its old and new allocations' do
+    first = create(:project_allocation)
+    second = create(:project_allocation)
+    invitation = create(:invitation, project_allocation: first, status: 'PAID')
+    assert first.reload.funded?
+    assert_not second.reload.funded?
+
+    invitation.update!(project_allocation: second)
+    assert_not first.reload.funded?
+    assert second.reload.funded?
+  end
+
+  test 'expense id changes refresh invitation precedence' do
+    pa = create(:project_allocation)
+    older = create(:invitation, project_allocation: pa, member_invitation_id: 'older', status: 'PAID')
+    create(:invitation, project_allocation: pa, status: 'PENDING')
+    assert pa.reload.funded?
+
+    older.update!(member_invitation_id: nil)
+    assert_not pa.reload.funded?
   end
 end

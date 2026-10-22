@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_10_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_22_120100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -117,7 +117,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_120000) do
     t.integer "project_id"
     t.float "score"
     t.datetime "updated_at", null: false
+    t.boolean "funded", default: false, null: false
     t.index ["allocation_id"], name: "index_project_allocations_on_allocation_id"
+    t.index ["fund_id", "funded"], name: "index_project_allocations_on_fund_id_and_funded"
     t.index ["fund_id"], name: "index_project_allocations_on_fund_id"
     t.index ["funding_source_id"], name: "index_project_allocations_on_funding_source_id"
     t.index ["project_id"], name: "index_project_allocations_on_project_id"

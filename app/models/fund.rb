@@ -734,11 +734,10 @@ class Fund < ApplicationRecord
   end
 
   def top_funded_projects
-    funded_project_ids_query = project_allocations.funded.select(:project_id)
     project_allocations_table = ProjectAllocation.arel_table
     total_amount = project_allocations_table[:amount_cents].sum
     ranked_projects = ProjectAllocation.funded
-      .where(project_id: funded_project_ids_query)
+      .where(project_id: project_allocations.where(funded: true).select(:project_id))
       .select(project_allocations_table[:project_id], total_amount.as('total_amount_cents'))
       .group(project_allocations_table[:project_id])
       .order(total_amount.desc)

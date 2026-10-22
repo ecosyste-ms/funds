@@ -8,6 +8,8 @@ class ProjectAllocation < ApplicationRecord
   has_one :invitation, -> { order(Arel.sql("NULLIF(invitations.member_invitation_id, '') IS NULL"), id: :desc) }
   has_many :events, class_name: 'ProjectAllocationEvent'
 
+  after_save :refresh_funded!, if: -> { saved_change_to_id? || saved_change_to_paid_at? || saved_change_to_allocation_id? }
+
   scope :with_funding_source, -> { where.not(funding_source_id: nil) }
   scope :with_approved_funding_source, -> { joins(:funding_source).where(funding_sources: { platform: FundingSource::APPROVED_PLATFORMS }) }
   scope :without_funding_source, -> { where(funding_source_id: nil) }
@@ -15,22 +17,7 @@ class ProjectAllocation < ApplicationRecord
   scope :paid, -> { where.not(paid_at: nil) }
   scope :unpaid, -> { where(paid_at: nil) }
 
-  scope :funded, -> {
-    funding_not_rejected.where(<<~SQL)
-      COALESCE((
-        SELECT invitations.deleted_at IS NULL AND
-          COALESCE(NULLIF(NULLIF(invitations.status, ''), 'DRAFT'),
-                   NULLIF(invitations.data->>'status', ''), invitations.status, '') IN ('APPROVED', 'PAID')
-        FROM project_allocations expense_allocations
-        INNER JOIN invitations ON invitations.project_allocation_id = expense_allocations.id
-        WHERE expense_allocations.allocation_id = project_allocations.allocation_id
-          AND (expense_allocations.id = project_allocations.id
-            OR (invitations.data->'aggregated_allocation_ids')::jsonb @> jsonb_build_array(project_allocations.id))
-        ORDER BY NULLIF(invitations.member_invitation_id, '') IS NULL, invitations.id DESC
-        LIMIT 1
-      ), project_allocations.paid_at IS NOT NULL)
-    SQL
-  }
+  scope :funded, -> { funding_not_rejected.where(funded: true) }
 
   scope :platform, ->(platform) { joins(:funding_source).where(funding_sources: { platform: platform }) }
   scope :not_platform, ->(platform) { joins(:funding_source).where.not(funding_sources: { platform: platform }) }
@@ -39,6 +26,18 @@ class ProjectAllocation < ApplicationRecord
 
   scope :expense_invites, -> { without_funding_source.funding_not_rejected }
   scope :proxy_collectives, -> { with_approved_funding_source.funding_not_rejected.not_platform('opencollective.com') }
+
+  def refresh_funded!
+    with_lock do
+      expense = Invitation.joins(:project_allocation)
+        .where(project_allocations: { allocation_id: allocation_id })
+        .where("invitations.project_allocation_id = :id OR (invitations.data->'aggregated_allocation_ids')::jsonb @> jsonb_build_array(CAST(:id AS bigint))", id: id)
+        .order(Arel.sql("NULLIF(invitations.member_invitation_id, '') IS NULL"), id: :desc)
+        .first
+
+      update_column(:funded, expense ? %w[APPROVED PAID].include?(expense.status) : paid?)
+    end
+  end
 
   def self.update_funding_sources
     ProjectAllocation.without_funding_source.find_each(&:update_funding_source)

@@ -5,6 +5,8 @@ class Invitation < ApplicationRecord
   has_many :events, class_name: 'ProjectAllocationEvent'
 
   before_validation :generate_token, on: :create
+  after_save :refresh_funded_allocations, if: -> { saved_changes.keys.intersect?(%w[status data deleted_at member_invitation_id project_allocation_id]) }
+  after_destroy :refresh_funded_allocations
 
   scope :accepted, -> { where.not(accepted_at: nil) }
   scope :rejected, -> { where.not(rejected_at: nil) }
@@ -12,6 +14,16 @@ class Invitation < ApplicationRecord
   scope :deleted, -> { where.not(deleted_at: nil) }
   scope :not_deleted, -> { where(deleted_at: nil) }
   scope :draft, -> { where(status: 'DRAFT') }
+
+  def refresh_funded_allocations
+    ids = [project_allocation_id, project_allocation_id_before_last_save].compact
+    grouped_ids = Array(data&.dig('aggregated_allocation_ids')) + Array(data_before_last_save&.dig('aggregated_allocation_ids'))
+
+    ProjectAllocation.where(id: ids).pluck(:id, :allocation_id).each do |owner_id, allocation_id|
+      ProjectAllocation.where(allocation_id: allocation_id, id: [owner_id] + grouped_ids)
+        .order(:id).each(&:refresh_funded!)
+    end
+  end
 
   def self.delete_expired
     Invitation.draft.not_deleted.find_each do |invitation|
