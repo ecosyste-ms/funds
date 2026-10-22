@@ -31,6 +31,7 @@ class ProjectAllocationEvent < ApplicationRecord
   ].freeze
 
   INVITATION_EVENTS = %w[
+    invitation_contact_unresolved
     invitation_created
     invitation_email_sent
     invitation_accepted

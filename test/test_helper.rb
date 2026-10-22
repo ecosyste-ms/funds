@@ -1,4 +1,5 @@
 ENV["RAILS_ENV"] ||= "test"
+ENV['OPENCOLLECTIVE_TOKEN'] = 'test-token'
 require_relative "../config/environment"
 require "rails/test_help"
 

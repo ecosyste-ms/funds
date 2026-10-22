@@ -6,7 +6,7 @@ class ExpenseInvitationsTest < ActionDispatch::IntegrationTest
     Rails.application.load_tasks unless Rake::Task.task_defined?('funds:run_allocations')
     @fund = create(:fund, name: 'Go', slug: 'go')
     @allocation = create(:allocation, fund: @fund, year: Time.current.year, month: Time.current.month, total_cents: 5000)
-    @project = create(:project, funding_rejected: false, owner: { 'email' => 'maintainer@example.com' })
+    @project = create(:project, funding_rejected: false, owner: { 'login' => 'example', 'email' => 'maintainer@example.com' })
     @pa = create(:project_allocation, fund: @fund, allocation: @allocation, project: @project, funding_source: nil, amount_cents: 5000, created_at: Time.current)
   end
 

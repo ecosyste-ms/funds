@@ -50,8 +50,8 @@ class ProjectAllocationTest < ActiveSupport::TestCase
   end
 
   test "payout falls back to email invite when amount below funding source minimum" do
-    funding_source = create(:funding_source, platform: 'github.com', github_sponsors: { 'minimum_sponsorship_amount' => 100 })
-    project = create(:project, owner: { 'email' => 'test@example.com' }, funding_source: funding_source)
+    funding_source = create(:funding_source, platform: 'github.com', url: 'https://github.com/sponsors/example', github_sponsors: { 'minimum_sponsorship_amount' => 100 })
+    project = create(:project, owner: { 'login' => 'example', 'email' => 'test@example.com' }, funding_source: funding_source)
     pa = create(:project_allocation, project: project, funding_source: funding_source, amount_cents: 5000)
 
     # Stub the OC API call
@@ -103,8 +103,8 @@ class ProjectAllocationTest < ActiveSupport::TestCase
   end
 
   test "send_expense_invite_fallback allows sending even with approved funding source" do
-    funding_source = create(:funding_source, platform: 'github.com')
-    project = create(:project, owner: { 'email' => 'test@example.com' }, funding_source: funding_source)
+    funding_source = create(:funding_source, platform: 'github.com', url: 'https://github.com/sponsors/example')
+    project = create(:project, owner: { 'login' => 'example', 'email' => 'test@example.com' }, funding_source: funding_source)
     pa = create(:project_allocation, project: project, funding_source: funding_source)
 
     # send_expense_invite would return skipped for approved funding source
