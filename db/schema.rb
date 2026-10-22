@@ -127,6 +127,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_22_190000) do
 
   create_table "projects", force: :cascade do |t|
     t.json "commits", default: {}
+    t.string "confirmed_contact_email"
+    t.string "confirmed_contact_recipient"
     t.datetime "created_at", null: false
     t.json "dependencies", default: []
     t.string "description"
@@ -148,8 +150,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_22_190000) do
     t.bigint "total_downloads", default: 0
     t.datetime "updated_at", null: false
     t.citext "url"
-    t.string "confirmed_contact_email"
-    t.string "confirmed_contact_recipient"
     t.index ["funding_source_id"], name: "index_projects_on_funding_source_id"
     t.index ["registry_names"], name: "index_projects_on_registry_names", using: :gin
     t.index ["url"], name: "index_projects_on_url", unique: true
