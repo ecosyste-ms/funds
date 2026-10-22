@@ -2,6 +2,9 @@ class Project < ApplicationRecord
   include EcosystemsApiClient
 
   validates :url, presence: true, uniqueness: { case_sensitive: false }
+  validates :confirmed_contact_email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true
+  validates :confirmed_contact_email, presence: true, if: -> { confirmed_contact_recipient.present? }
+  validates :confirmed_contact_recipient, presence: true, if: -> { confirmed_contact_email.present? }
 
   has_many :project_allocations
   has_many :allocations, through: :project_allocations
@@ -824,11 +827,81 @@ class Project < ApplicationRecord
     top_committers.map{|c| c['email'] }.compact.uniq
   end
 
-  def contact_email
-    return owner_email if owner_email.present?
-    return maintainer_emails.first if maintainer_emails.present?
-    return committer_emails.first if committer_emails.present?
-    return nil
+  def contact_candidates
+    host = URI.parse(repository_url).host&.downcase
+    candidates = []
+    candidates << { email: owner_email, source: 'owner', login: owner['login'], identity_host: host } if owner.present?
+    Array(packages).each do |package|
+      Array(package['maintainers']).each do |maintainer|
+        candidates << { email: maintainer['email'], source: 'package_maintainer', login: maintainer['login'],
+                        identity_host: package.dig('registry', 'name'), package: package['name'] }
+      end
+    end
+    Array(commits&.dig('committers')).each do |committer|
+      next if committer['name'].to_s.match?(/\[bot\]/i) || committer['login'].to_s.match?(/\[bot\]\z/i)
+      next if [committer['name'], committer['login']].include?('github-actions')
+
+      candidates << { email: committer['email'], source: 'committer', login: committer['login'], identity_host: host }
+    end
+    candidates.filter_map do |candidate|
+      email = candidate[:email].to_s.strip
+      next unless email.match?(URI::MailTo::EMAIL_REGEXP)
+      next if email.match?(/noreply|no-reply|@localhost\z/i)
+
+      candidate.merge(email: email)
+    end.uniq
+  end
+
+  def contact_recipient_url
+    funding_source&.url.presence || repository_url
+  end
+
+  def github_contact_login(recipient_url)
+    uri = URI.parse(recipient_url.to_s)
+    return unless uri.is_a?(URI::HTTP) && uri.host&.casecmp?('github.com')
+
+    parts = uri.path.split('/').reject(&:empty?)
+    return parts.first.downcase if parts.length == 1
+    parts.last.downcase if parts.length == 2 && parts.first.casecmp?('sponsors')
+  rescue URI::InvalidURIError
+    nil
+  end
+
+  def contact_recipient_key(recipient_url)
+    login = github_contact_login(recipient_url)
+    return "github.com/#{login}" if login
+
+    uri = URI.parse(recipient_url.to_s).normalize
+    uri.path = uri.path.sub(%r{/+\z}, '')
+    uri.path = uri.path.downcase if uri.host&.casecmp?('github.com')
+    uri.to_s
+  end
+
+  def contact_email(recipient_url: contact_recipient_url)
+    recipient_key = contact_recipient_key(recipient_url)
+    if confirmed_contact_email.present? && contact_recipient_key(confirmed_contact_recipient) == recipient_key
+      return confirmed_contact_email
+    end
+
+    candidates = contact_candidates
+    login = github_contact_login(recipient_url)
+    if login
+      candidates = candidates.select { |candidate| candidate[:identity_host] == 'github.com' && candidate[:source] != 'package_maintainer' && candidate[:login].to_s.casecmp?(login) }
+    elsif recipient_key == contact_recipient_key(repository_url)
+      owners = candidates.select { |candidate| candidate[:source] == 'owner' }
+      candidates = owners if owners.any?
+    else
+      return nil
+    end
+
+    emails = candidates.map { |candidate| candidate[:email] }.uniq(&:downcase)
+    emails.first if emails.one?
+  rescue URI::InvalidURIError
+    nil
+  end
+
+  def confirm_contact_email!(email, recipient_url: contact_recipient_url)
+    update!(confirmed_contact_email: email.to_s.strip, confirmed_contact_recipient: contact_recipient_key(recipient_url))
   end
 
   def funding_data

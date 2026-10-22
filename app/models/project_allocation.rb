@@ -82,6 +82,10 @@ class ProjectAllocation < ApplicationRecord
     funding_source.platform == 'opencollective.com' ? funding_source.name : nil
   end
 
+  def contact_email
+    project.contact_email(recipient_url: funding_source&.url.presence || project.contact_recipient_url)
+  end
+
   def payout_method_name
     return "Funding Rejected" if funding_rejected?
 
@@ -91,8 +95,8 @@ class ProjectAllocation < ApplicationRecord
       "Open Collective (non-OSC): #{funding_source.name} (#{funding_source.host})"
     elsif approved_funding_source?
       funding_source.url
-    elsif project && project.contact_email.present?
-      "Email invite: #{project.contact_email}"
+    elsif project && contact_email.present?
+      "Email invite: #{contact_email}"
     else
       "No valid payout method"
     end
@@ -152,16 +156,16 @@ class ProjectAllocation < ApplicationRecord
         minimum_cents: funding_source.minimum_donation_ammount_cents
       })
       payout_via_email_invite
-    elsif project && project.contact_email.present?
-      puts "  Sending expense invite: #{project.contact_email}"
+    elsif project && contact_email.present?
+      puts "  Sending expense invite: #{contact_email}"
       result = send_expense_invite
       if result.is_a?(Hash) && result[:skipped]
         log_event('payout_skipped', status: 'success', message: "Skipped expense invite: #{result[:skipped]}", metadata: result)
       elsif result
         update!(paid_at: Time.now)
-        log_event('payout_completed', message: "Sent expense invite to: #{project.contact_email}")
+        log_event('payout_completed', message: "Sent expense invite to: #{contact_email}")
       else
-        log_event('payout_failed', status: 'error', message: "Failed to send expense invite to: #{project.contact_email}")
+        log_event('payout_failed', status: 'error', message: "Failed to send expense invite to: #{contact_email}")
       end
     else
       puts "  No valid payout method found for #{project.to_s}"
@@ -173,28 +177,28 @@ class ProjectAllocation < ApplicationRecord
     return if funding_rejected?
     return if paid?
 
-    unless project&.contact_email.present?
+    unless project && contact_email.present?
       puts "  No contact email for #{project.to_s}, cannot fall back to email invite"
       log_event('payout_skipped', status: 'error', message: "No contact email for email fallback")
       return
     end
 
-    puts "  Sending expense invite (fallback): #{project.contact_email}"
+    puts "  Sending expense invite (fallback): #{contact_email}"
     result = send_expense_invite_fallback
     if result.is_a?(Hash) && result[:skipped]
       log_event('payout_skipped', status: 'success', message: "Skipped expense invite fallback: #{result[:skipped]}", metadata: result)
     elsif result
       update!(paid_at: Time.now)
-      log_event('payout_completed', message: "Sent expense invite (fallback) to: #{project.contact_email}")
+      log_event('payout_completed', message: "Sent expense invite (fallback) to: #{contact_email}")
     else
-      log_event('payout_failed', status: 'error', message: "Failed to send expense invite fallback to: #{project.contact_email}")
+      log_event('payout_failed', status: 'error', message: "Failed to send expense invite fallback to: #{contact_email}")
     end
   end
 
   def send_expense_invite_fallback
     # Like send_expense_invite but allows fallback when funding source is approved but below minimum
     return { skipped: 'funding_rejected' } if funding_rejected?
-    return { skipped: 'no_contact_email' } unless project.contact_email.present?
+    return { skipped: 'no_contact_email' } unless contact_email.present?
     return { skipped: 'invitation_already_sent', invitation_id: invitation.member_invitation_id } if invitation.present? && invitation.member_invitation_id.present?
     return { skipped: 'already_paid' } if paid?
 
@@ -231,7 +235,7 @@ class ProjectAllocation < ApplicationRecord
         type: "INVOICE",
         payee: {
           name: "#{project.to_s} maintainer",
-          email: project.contact_email
+          email: contact_email
         },
         items: [
           {
@@ -388,7 +392,7 @@ class ProjectAllocation < ApplicationRecord
   def send_expense_invite
     return { skipped: 'funding_rejected' } if funding_rejected?
     return { skipped: 'has_approved_funding_source' } if approved_funding_source?
-    return { skipped: 'no_contact_email' } unless project.contact_email.present?
+    return { skipped: 'no_contact_email' } unless contact_email.present?
     return { skipped: 'invitation_already_sent', invitation_id: invitation.member_invitation_id } if invitation.present? && invitation.member_invitation_id.present?
     return { skipped: 'already_paid' } if paid?
 
@@ -425,7 +429,7 @@ class ProjectAllocation < ApplicationRecord
         type: "INVOICE",
         payee: {
           name: "#{project.to_s} maintainer",
-          email: project.contact_email
+          email: contact_email
         },
         items: [
           {
@@ -518,7 +522,7 @@ class ProjectAllocation < ApplicationRecord
           account: $account,
           expense: $expense,
           lockedFields: [AMOUNT],
-          skipInvite: true
+          skipInvite: false
         ) {
           id
           status
@@ -722,9 +726,10 @@ class ProjectAllocation < ApplicationRecord
 
   def create_invite
     return if funding_source.present?
+    return unless contact_email.present?
 
     with_lock do
-      create_invitation!(email: project.contact_email) unless reload_invitation
+      create_invitation!(email: contact_email) unless reload_invitation
     end
   end
 
@@ -732,7 +737,8 @@ class ProjectAllocation < ApplicationRecord
     with_lock do
       inv = reload_invitation
       inv = nil if inv&.member_invitation_id.present? && inv.member_invitation_id != data['legacyId'].to_s
-      inv ||= Invitation.new(project_allocation: self, email: project.contact_email)
+      inv = nil if inv && contact_email.present? && !inv.email.to_s.casecmp?(contact_email)
+      inv ||= Invitation.new(project_allocation: self, email: contact_email)
       inv.update!(status: data['status'], member_invitation_id: data['legacyId'], data: data)
       association(:invitation).reset
       inv
@@ -743,6 +749,14 @@ class ProjectAllocation < ApplicationRecord
     return if funding_source.present?
     return if invitation.present?
     return if funding_rejected?
+
+    unless contact_email.present?
+      log_event('invitation_contact_unresolved', status: 'pending', metadata: {
+        recipient_url: project.contact_recipient_url,
+        candidates: project.contact_candidates
+      })
+      return
+    end
 
     inv = create_invite
     return unless inv

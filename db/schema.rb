@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_22_120100) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_22_190000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -76,7 +76,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_22_120100) do
     t.datetime "created_at", null: false
     t.json "data"
     t.datetime "deleted_at"
-    t.string "email", null: false
+    t.string "email"
     t.string "member_invitation_id"
     t.integer "project_allocation_id", null: false
     t.datetime "rejected_at"
@@ -148,6 +148,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_22_120100) do
     t.bigint "total_downloads", default: 0
     t.datetime "updated_at", null: false
     t.citext "url"
+    t.string "confirmed_contact_email"
+    t.string "confirmed_contact_recipient"
     t.index ["funding_source_id"], name: "index_projects_on_funding_source_id"
     t.index ["registry_names"], name: "index_projects_on_registry_names", using: :gin
     t.index ["url"], name: "index_projects_on_url", unique: true

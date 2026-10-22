@@ -85,6 +85,8 @@ class Invitation < ApplicationRecord
   end
 
   def send_email
+    return if email.blank?
+
     MaintainerMailer.invitation_email(
       email,
       project_allocation.project.to_s,
@@ -98,6 +100,8 @@ class Invitation < ApplicationRecord
   end
 
   def send_expense_invite_email
+    return if email.blank?
+    return if project_allocation.is_non_osc_collective?
     return if draft_key.blank?
     MaintainerMailer.expense_email(
       self,

@@ -81,7 +81,7 @@
                     </td>
                     <td>
                       <% if pa.invitation.present? %>
-                        <%= pa.invitation.email.gsub(/(.{2})(.*)(@.*)/) { $1 + '*' * $2.length + $3 } %>
+                        <%= pa.invitation.email&.gsub(/(.{2})(.*)(@.*)/) { $1 + '*' * $2.length + $3 } %>
                         <br>
                         <small class="text-muted">
                           Deadline: <%= pa.invitation.decline_deadline.strftime('%b %d, %Y') %>
