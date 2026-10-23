@@ -50,6 +50,21 @@ class ProjectTest < ActiveSupport::TestCase
     FundingSource.instance_variable_set(:@github_sponsors_logins, nil)
   end
 
+  test 'set funding links ignores non-url values from unknown funding.yml keys' do
+    project = create(:project, repository: { 'metadata' => { 'funding' => {
+      'github' => nil,
+      'open_collective' => 'hiddify',
+      'custom' => ['https://github.com/hiddify/hiddify-manager/wiki/Support', 42],
+      'bitcoin' => '3Epy7jyUUCVb1w12MNTu2JFVVhmfpr4EGX',
+      'ethereum' => 1377979888499107190715896424743981346969345115104,
+      'other' => 'https://example.com/donate'
+    } } })
+
+    project.set_funding_links
+
+    assert_equal ['https://opencollective.com/hiddify', 'https://example.com/donate'], project.reload.funding_links
+  end
+
   test 'reading funding links makes no http requests' do
     project = create(:project, repository: { 'metadata' => { 'funding' => { 'github' => 'someone' } } }, funding_links: ['https://github.com/sponsors/someone'])
 
