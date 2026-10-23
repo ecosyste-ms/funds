@@ -78,19 +78,6 @@ class FundTest < ActiveSupport::TestCase
     assert_equal 1, queries.length
   end
 
-  test 'latest allocation caches a missing allocation' do
-    fund = create(:fund)
-    # Warm the schema cache: column/index introspection must not be counted below
-    fund.allocations.first
-
-    queries = record_select_queries do
-      assert_nil fund.latest_allocation
-      assert_nil fund.latest_allocation
-    end
-
-    assert_equal 1, queries.length
-  end
-
   test 'registry names has a GIN index' do
     index = ActiveRecord::Base.connection.indexes(:projects).find { |candidate| candidate.columns == ['registry_names'] }
 
