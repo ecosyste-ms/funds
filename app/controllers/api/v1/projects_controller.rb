@@ -24,8 +24,7 @@ module Api
         url = params[:url].to_s.strip
         return head :bad_request if url.blank? || url.length > 500
 
-        # projects.url is citext, so this match is case-insensitive;
-        # strip a trailing slash for a friendlier lookup
+        # projects.url is citext, so this is case-insensitive
         @project = Project.find_by(url: url.chomp('/'))
         return head :not_found unless @project
       end

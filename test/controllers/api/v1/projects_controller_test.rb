@@ -378,12 +378,13 @@ module Api
 
         assert_equal projects.map(&:name), project_names
       end
+
       test 'lookup returns funding links and selected destination for a known repository url' do
         project = create(
           :project,
           name: 'Readme Funded',
           url: 'https://github.com/example/readme-funded',
-          readme: 'Please support our work: https://opencollective.com/readme-funded and https://patreon.com/readme-funded'
+          funding_links: ['https://opencollective.com/readme-funded', 'https://patreon.com/readme-funded']
         )
 
         get api_v1_projects_lookup_path, params: { url: 'https://github.com/example/readme-funded' }
@@ -426,7 +427,6 @@ module Api
       end
 
       test 'lookup surfaces a mapped open collective alternative for a github sponsors link' do
-        FundingSource.stubs(:github_sponsors_logins).returns(['mappeduser'])
         funding_source = create(
           :funding_source,
           url: 'https://opencollective.com/mapped-oc',
@@ -436,7 +436,7 @@ module Api
           :project,
           name: 'Mapped',
           url: 'https://github.com/example/mapped',
-          repository: { 'metadata' => { 'funding' => { 'github' => 'mappeduser' } } },
+          funding_links: ['https://github.com/sponsors/mappeduser'],
           funding_source: funding_source
         )
 
@@ -449,6 +449,20 @@ module Api
         assert_equal 'https://opencollective.com/mapped-oc', json['preferred_funding_link']
         assert_equal 'https://opencollective.com/mapped-oc', json['open_collective_match']
         assert_equal 'https://opencollective.com/mapped-oc', json['open_collective_alternative']
+      end
+
+      test 'lookup makes no http requests' do
+        create(
+          :project,
+          url: 'https://github.com/example/sponsored',
+          repository: { 'metadata' => { 'funding' => { 'github' => 'someuser' } } },
+          funding_links: ['https://github.com/sponsors/someuser']
+        )
+
+        get api_v1_projects_lookup_path, params: { url: 'https://github.com/example/sponsored' }
+        assert_response :success
+
+        assert_equal ['https://github.com/sponsors/someuser'], JSON.parse(response.body)['funding_links']
       end
 
       test 'lookup returns empty funding links for a known project without funding' do

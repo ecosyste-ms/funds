@@ -77,7 +77,7 @@ class ProjectTest < ActiveSupport::TestCase
     funding_source = create(:funding_source, url: 'https://patreon.com/stored', platform: 'patreon.com')
     project = create(
       :project,
-      readme: 'Please support our work: https://opencollective.com/readme-funded',
+      funding_links: ['https://opencollective.com/readme-funded'],
       funding_source: funding_source
     )
 
@@ -88,7 +88,7 @@ class ProjectTest < ActiveSupport::TestCase
   test 'stored preferred funding link and platform fall back to funding links without a stored source' do
     project = create(
       :project,
-      readme: 'Please support our work: https://opencollective.com/readme-funded and https://patreon.com/readme-funded'
+      funding_links: ['https://opencollective.com/readme-funded', 'https://patreon.com/readme-funded']
     )
 
     assert_equal 'https://opencollective.com/readme-funded', project.stored_preferred_funding_link
@@ -117,17 +117,16 @@ class ProjectTest < ActiveSupport::TestCase
   end
 
   test 'open collective match is nil without a funding source' do
-    project = create(:project, readme: 'Please support our work: https://opencollective.com/readme-funded')
+    project = create(:project, funding_links: ['https://opencollective.com/readme-funded'])
 
     assert_nil project.open_collective_match
   end
 
   test 'open collective alternative returns the stored match for a github sponsors only project' do
-    FundingSource.stubs(:github_sponsors_logins).returns(['mappeduser'])
     funding_source = create(:funding_source, url: 'https://opencollective.com/mapped-oc', platform: 'opencollective.com')
     project = create(
       :project,
-      repository: { 'metadata' => { 'funding' => { 'github' => 'mappeduser' } } },
+      funding_links: ['https://github.com/sponsors/mappeduser'],
       funding_source: funding_source
     )
 
@@ -142,11 +141,10 @@ class ProjectTest < ActiveSupport::TestCase
   end
 
   test 'open collective alternative is nil when the match is already in funding links' do
-    FundingSource.stubs(:github_sponsors_logins).returns(['mappeduser'])
     funding_source = create(:funding_source, url: 'https://opencollective.com/mapped-oc', platform: 'opencollective.com')
     project = create(
       :project,
-      repository: { 'metadata' => { 'funding' => { 'github' => 'mappeduser', 'open_collective' => 'mapped-oc' } } },
+      funding_links: ['https://github.com/sponsors/mappeduser', 'https://opencollective.com/mapped-oc'],
       funding_source: funding_source
     )
 
