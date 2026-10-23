@@ -80,6 +80,8 @@ class FundTest < ActiveSupport::TestCase
 
   test 'latest allocation caches a missing allocation' do
     fund = create(:fund)
+    # Warm the schema cache: column/index introspection must not be counted below
+    fund.allocations.first
 
     queries = record_select_queries do
       assert_nil fund.latest_allocation

@@ -19,6 +19,15 @@ module Api
         @projects = @fund.funded_projects_with_totals
         @pagy, @projects = pagy(@projects, page: page, limit: limit)
       end
+
+      def lookup
+        url = params[:url].to_s.strip
+        return head :bad_request if url.blank? || url.length > 500
+
+        # projects.url is citext, so this is case-insensitive
+        @project = Project.find_by(url: url.chomp('/'))
+        return head :not_found unless @project
+      end
     end
   end
 end

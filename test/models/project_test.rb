@@ -72,4 +72,83 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal 1, queries.length
     assert_includes queries.first, 'SUM("project_allocations"."amount_cents")'
   end
+
+  test 'stored preferred funding link and platform come from the stored funding source' do
+    funding_source = create(:funding_source, url: 'https://patreon.com/stored', platform: 'patreon.com')
+    project = create(
+      :project,
+      funding_links: ['https://opencollective.com/readme-funded'],
+      funding_source: funding_source
+    )
+
+    assert_equal 'https://patreon.com/stored', project.stored_preferred_funding_link
+    assert_equal 'patreon.com', project.stored_preferred_funding_platform
+  end
+
+  test 'stored preferred funding link and platform fall back to funding links without a stored source' do
+    project = create(
+      :project,
+      funding_links: ['https://opencollective.com/readme-funded', 'https://patreon.com/readme-funded']
+    )
+
+    assert_equal 'https://opencollective.com/readme-funded', project.stored_preferred_funding_link
+    assert_equal 'opencollective.com', project.stored_preferred_funding_platform
+  end
+
+  test 'stored preferred funding link is nil and platform unknown without any funding' do
+    project = create(:project)
+
+    assert_nil project.stored_preferred_funding_link
+    assert_equal 'Unknown', project.stored_preferred_funding_platform
+  end
+
+  test 'open collective match returns the stored open collective url' do
+    funding_source = create(:funding_source, url: 'https://opencollective.com/matched', platform: 'opencollective.com')
+    project = create(:project, funding_source: funding_source)
+
+    assert_equal 'https://opencollective.com/matched', project.open_collective_match
+  end
+
+  test 'open collective match is nil for a non open collective funding source' do
+    funding_source = create(:funding_source, url: 'https://patreon.com/stored', platform: 'patreon.com')
+    project = create(:project, funding_source: funding_source)
+
+    assert_nil project.open_collective_match
+  end
+
+  test 'open collective match is nil without a funding source' do
+    project = create(:project, funding_links: ['https://opencollective.com/readme-funded'])
+
+    assert_nil project.open_collective_match
+  end
+
+  test 'open collective alternative returns the stored match for a github sponsors only project' do
+    funding_source = create(:funding_source, url: 'https://opencollective.com/mapped-oc', platform: 'opencollective.com')
+    project = create(
+      :project,
+      funding_links: ['https://github.com/sponsors/mappeduser'],
+      funding_source: funding_source
+    )
+
+    assert_equal 'https://opencollective.com/mapped-oc', project.open_collective_alternative
+  end
+
+  test 'open collective alternative is nil without a github sponsors link' do
+    funding_source = create(:funding_source, url: 'https://opencollective.com/matched', platform: 'opencollective.com')
+    project = create(:project, funding_source: funding_source)
+
+    assert_nil project.open_collective_alternative
+  end
+
+  test 'open collective alternative is nil when the match is already in funding links' do
+    funding_source = create(:funding_source, url: 'https://opencollective.com/mapped-oc', platform: 'opencollective.com')
+    project = create(
+      :project,
+      funding_links: ['https://github.com/sponsors/mappeduser', 'https://opencollective.com/mapped-oc'],
+      funding_source: funding_source
+    )
+
+    assert_includes project.funding_links, 'https://opencollective.com/mapped-oc'
+    assert_nil project.open_collective_alternative
+  end
 end

@@ -748,6 +748,27 @@ class Project < ApplicationRecord
     end
   end
 
+  # preferred_funding_link can fetch the Open Collective mapping
+  def stored_preferred_funding_link
+    funding_source&.url || funding_links.find { |link| link.include?(preferred_funding_platform) }
+  end
+
+  def stored_preferred_funding_platform
+    funding_source&.platform || preferred_funding_platform
+  end
+
+  def open_collective_match
+    funding_source.url if funding_source&.platform == 'opencollective.com'
+  end
+
+  def open_collective_alternative
+    return unless open_collective_match.present?
+    return unless funding_links.any? { |link| link.include?('github.com/sponsors') }
+    return if funding_links.include?(open_collective_match)
+
+    open_collective_match
+  end
+
   def readme_funding_links
     urls = readme_urls.select{|u| funding_domains.any?{|d| u.include?(d) } || u.include?('github.com/sponsors') }.reject{|u| ['.svg', '.png'].include? File.extname(URI.parse(u).path) }
     # remove anchors
