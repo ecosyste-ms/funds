@@ -6,4 +6,8 @@ namespace :projects do
   task sync_projects_with_allocations: :environment do
     Project.sync_projects_with_allocations
   end
+
+  task set_funding_links: :environment do
+    Project.find_each(&:set_funding_links)
+  end
 end

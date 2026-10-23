@@ -29,11 +29,9 @@ class FundingSource < ApplicationRecord
 
   def self.github_sponsors_logins
     @github_sponsors_logins ||= begin
-      url = 'https://sponsors.ecosyste.ms/api/v1/accounts/sponsor_logins'
-      response = ecosystems_api_request(url)
+      response = ecosystems_api_request('https://sponsors.ecosyste.ms/api/v1/accounts/sponsor_logins')
+      raise "GitHub Sponsors login fetch failed: #{response.status}" unless response.success?
       JSON.parse(response.body)
-    rescue
-      []  
     end
   end
 

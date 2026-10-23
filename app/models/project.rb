@@ -102,6 +102,7 @@ class Project < ApplicationRecord
     # fetch_events
     # fetch_issue_stats
     fetch_readme
+    set_funding_links
     find_or_create_funding_source
     search_for_collective
     set_licenses
@@ -618,8 +619,8 @@ class Project < ApplicationRecord
     repo_funding_links + package_funding_links + owner_funding_links + repo_owner_funding_links + readme_funding_links
   end
 
-  def funding_links
-    @funding_links ||= clean_funding_links(all_funding_links).uniq
+  def set_funding_links
+    update(funding_links: clean_funding_links(all_funding_links).uniq)
   end
 
   def clean_funding_links(links)
