@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_22_190000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_23_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -133,6 +133,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_22_190000) do
     t.json "dependencies", default: []
     t.string "description"
     t.json "events", default: {}
+    t.json "funding_links", default: []
     t.boolean "funding_rejected", default: false
     t.integer "funding_source_id"
     t.json "issue_stats", default: {}
