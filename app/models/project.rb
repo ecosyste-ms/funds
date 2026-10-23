@@ -624,7 +624,7 @@ class Project < ApplicationRecord
   end
 
   def clean_funding_links(links)
-    links.reject do |link|
+    links.grep(String).reject do |link|
       begin
         link.strip!
         link = "https://#{link}" unless link =~ /\Ahttps?:\/\//
@@ -696,7 +696,7 @@ class Project < ApplicationRecord
       when 'thanks_dev'
         "https://thanks.dev/#{v}"
       else
-        v
+        Array(v).grep(%r{\Ahttps?://}i)
       end
     end.flatten.compact
   end
