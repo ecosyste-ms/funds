@@ -405,7 +405,7 @@ paths:
                       url: https://opencollective.com/pytest
                       is_approved: true
                     funding_invitation:
-                      invitation_accepted_at: 2026-10-14T23:59:59+00:00
+                      invitation_accepted_at: "2026-10-14T23:59:59+00:00"
                       invitation_rejected_at: null
         "400":
           description: Bad request when fund slug or month year is invalid
@@ -845,13 +845,13 @@ components:
           format: date-time
           nullable: true
           description: Invitation accepted at timestamp
-          example: 2026-10-14T23:59:59+00:00
+          example: "2026-10-14T23:59:59+00:00"
         invitation_rejected_at:
           type: string
           format: date-time
           nullable: true
           description: Invitation rejected at timestamp
-          example: 2026-10-14T23:59:59+00:00
+          example: "2026-10-14T23:59:59+00:00"
       required:
         - invitation_accepted_at
         - invitation_rejected_at
