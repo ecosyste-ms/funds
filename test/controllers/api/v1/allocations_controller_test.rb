@@ -188,6 +188,8 @@ module Api
         assert_equal 3, allocation_details['funders_count']
         assert_equal 1, allocation_details['projects_count']
 
+        # Distribution details here include every allocated project because
+        # the allocation isn't complete yet.
         distribution_details = json['distribution_details']
         assert_equal 2, distribution_details['open_collective_projects']
         assert_equal 1, distribution_details['github_sponsored_projects']
@@ -280,8 +282,10 @@ module Api
         assert_equal 3, allocation_details['funders_count']
         assert_equal 1, allocation_details['projects_count']
 
+        # Distribution details here include only successfully allocated projects
+        # because it's a completed allocation.
         distribution_details = json['distribution_details']
-        assert_equal 2, distribution_details['open_collective_projects']
+        assert_equal 0, distribution_details['open_collective_projects']
         assert_equal 1, distribution_details['github_sponsored_projects']
         assert_equal 0, distribution_details['other_projects']
         assert_equal 0, distribution_details['invited_projects']

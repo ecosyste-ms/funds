@@ -20,13 +20,15 @@ json.allocation_details do
   end
 end
 json.distribution_details do
-  json.open_collective_projects @allocation.open_collective_projects_count
   if @allocation.completed?
     json.github_sponsored_projects @allocation.completed_github_sponsored_projects_count
+    json.open_collective_projects @allocation.completed_open_collective_projects_count
+    json.other_projects @allocation.completed_other_projects_count
   else
+    json.open_collective_projects @allocation.open_collective_projects_count
     json.github_sponsored_projects @allocation.github_sponsored_projects_count
+    json.other_projects @allocation.other_projects_count
   end
-  json.other_projects @allocation.other_projects_count
   json.invited_projects @allocation.invited_projects_count
 end
 json.funders @allocation.funders do |funder|

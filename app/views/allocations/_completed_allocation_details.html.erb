@@ -33,19 +33,19 @@
       </div>
     <% end %>
 
-    <% if @allocation.open_collective_projects_count > 0 %>
+    <% if @allocation.completed_open_collective_projects_count > 0 %>
       <div class="stat-card mb-2">
         <div class="stat-card-body">
-          <span class="stat-card-title"><%= @allocation.open_collective_projects_count %></span>
+          <span class="stat-card-title"><%= @allocation.completed_open_collective_projects_count %></span>
           <span class="stat-card-text">Open Collective</span>
         </div>
       </div>
     <% end %>
   
-    <% if @allocation.other_projects_count > 0 %>
+    <% if @allocation.completed_other_projects_count > 0 %>
       <div class="stat-card mb-2">
         <div class="stat-card-body">
-          <span class="stat-card-title"><%= @allocation.other_projects_count %></span>
+          <span class="stat-card-title"><%= @allocation.completed_other_projects_count %></span>
           <span class="stat-card-text" data-bs-toggle="tooltip" data-bs-title="ecosyste.ms supports most funding platforms like Patreon, Kofi, and GoFundMe.">Other sources <a href="#"><%= bootstrap_icon 'info-circle', width: 14, height: 14 %></a></span>
         </div>
       </div>
