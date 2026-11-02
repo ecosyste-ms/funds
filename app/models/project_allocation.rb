@@ -808,6 +808,8 @@ class ProjectAllocation < ApplicationRecord
     if potential_transactions.length == 1
       return potential_transactions.first
     else
+      return unless funding_source.present?
+
       potential_transactions.select{|t| t.account == funding_source.name }.first
     end
   end

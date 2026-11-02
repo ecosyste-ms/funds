@@ -1,6 +1,37 @@
 require "test_helper"
 
 class ProjectAllocationTest < ActiveSupport::TestCase
+  test "find_transaction returns nil without a funding source when multiple transactions match" do
+    pa = create(:project_allocation, funding_source: nil, amount_cents: 5000)
+    create(:transaction, fund: pa.fund, amount: -50, account: nil)
+    create(:transaction, fund: pa.fund, amount: -50, account: 'other-recipient')
+
+    assert_nil pa.find_transaction
+    assert_nil pa.status
+  end
+
+  test "find_transaction returns the only matching transaction without a funding source" do
+    pa = create(:project_allocation, funding_source: nil, amount_cents: 5000)
+    transaction = create(:transaction, fund: pa.fund, amount: -50)
+
+    assert_equal transaction, pa.find_transaction
+  end
+
+  test "find_transaction returns nil when no transactions match without a funding source" do
+    pa = create(:project_allocation, funding_source: nil, amount_cents: 5000)
+
+    assert_nil pa.find_transaction
+  end
+
+  test "find_transaction matches the funding source when multiple transactions match the amount" do
+    funding_source = create(:funding_source, platform: 'opencollective.com', url: 'https://opencollective.com/recipient')
+    pa = create(:project_allocation, funding_source: funding_source, amount_cents: 5000)
+    create(:transaction, fund: pa.fund, amount: -50, account: 'other-recipient')
+    transaction = create(:transaction, fund: pa.fund, amount: -50, account: 'recipient')
+
+    assert_equal transaction, pa.find_transaction
+  end
+
   test "send_expense_invite returns skipped hash when funding is rejected" do
     project = create(:project, funding_rejected: true, owner: { 'email' => 'test@example.com' })
     pa = create(:project_allocation, project: project, funding_source: nil)
