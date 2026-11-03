@@ -1,6 +1,40 @@
 require "test_helper"
 
 class FundTest < ActiveSupport::TestCase
+  {
+    'topic' => { primary_topic: 'testing', registry_name: nil },
+    'registry' => { primary_topic: nil, registry_name: 'npm' }
+  }.each do |selection, attributes|
+    test "#{selection} fund allocations exclude aliases and preserve their allocation history" do
+      fund = create(:fund, **attributes)
+      funding_source = create(:funding_source, url: 'https://opencollective.com/example', platform: 'opencollective.com')
+      metadata = {
+        keywords: ['testing'], registry_names: ['npm'], licenses: ['mit'],
+        repository: { 'archived' => false, 'license' => 'mit' },
+        packages: [{ 'name' => 'example', 'registry' => { 'name' => 'npm' },
+          'downloads' => 100, 'dependent_repos_count' => 10, 'dependent_packages_count' => 5 }],
+        total_downloads: 100, total_dependent_repos: 10, total_dependent_packages: 5,
+        funding_links: [funding_source.url], funding_source: funding_source
+      }
+      canonical = create(:project, **metadata)
+      project_alias = create(:project, **metadata, canonical_project: canonical)
+      previous = create(:allocation, fund: fund, year: 2020, month: 1,
+        created_at: Time.zone.local(2020, 1, 1), completed_at: 1.year.ago)
+      historical_payment = create(:project_allocation, fund: fund, allocation: previous,
+        project: project_alias, funding_source: funding_source, amount_cents: 7000, paid_at: 1.year.ago)
+      create(:transaction, fund: fund, amount: 1000.0, net_amount: 1000.0)
+
+      fund.allocate_to_projects
+
+      allocation = fund.allocations.find_by!(year: Time.current.year, month: Time.current.month)
+      assert_equal [canonical.id], allocation.project_allocations.pluck(:project_id)
+      assert_equal [canonical.id], fund.possible_projects.pluck(:id)
+      assert_equal [historical_payment.id], project_alias.project_allocations.pluck(:id)
+      assert_equal 7000, historical_payment.reload.amount_cents
+      assert historical_payment.paid_at.present?
+    end
+  end
+
   test 'possible_projects' do
     fund = Fund.create!(name: 'Test Fund', slug: 'test', 'registry_name': 'npm')
 
