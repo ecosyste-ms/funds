@@ -12,6 +12,7 @@ class Project < ApplicationRecord
   belongs_to :funding_source, optional: true
   belongs_to :canonical_project, class_name: 'Project', optional: true
 
+  scope :canonical, -> { where(canonical_project_id: nil) }
   scope :active, -> { where("(repository ->> 'archived') = ?", 'false') }
   scope :archived, -> { where("(repository ->> 'archived') = ?", 'true') }
 
@@ -49,7 +50,7 @@ class Project < ApplicationRecord
   end
 
   def self.sync_least_recently_synced
-    Project.where(canonical_project_id: nil)
+    Project.canonical
       .where('COALESCE(last_sync_attempted_at, last_synced_at) IS NULL OR COALESCE(last_sync_attempted_at, last_synced_at) < ?', 1.day.ago)
       .order(Arel.sql('COALESCE(last_sync_attempted_at, last_synced_at) ASC NULLS FIRST, id')).limit(100).each do |project|
       project.sync_async
