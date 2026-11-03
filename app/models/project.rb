@@ -10,6 +10,7 @@ class Project < ApplicationRecord
   has_many :allocations, through: :project_allocations
   has_many :funds, through: :allocations
   belongs_to :funding_source, optional: true
+  belongs_to :canonical_project, class_name: 'Project', optional: true
 
   scope :active, -> { where("(repository ->> 'archived') = ?", 'false') }
   scope :archived, -> { where("(repository ->> 'archived') = ?", 'true') }
@@ -48,7 +49,9 @@ class Project < ApplicationRecord
   end
 
   def self.sync_least_recently_synced
-    Project.where(last_synced_at: nil).or(Project.where("last_synced_at < ?", 1.day.ago)).order('last_synced_at asc nulls first').limit(100).each do |project|
+    Project.where(canonical_project_id: nil)
+      .where('COALESCE(last_sync_attempted_at, last_synced_at) IS NULL OR COALESCE(last_sync_attempted_at, last_synced_at) < ?', 1.day.ago)
+      .order(Arel.sql('COALESCE(last_sync_attempted_at, last_synced_at) ASC NULLS FIRST, id')).limit(100).each do |project|
       project.sync_async
     end
   end
@@ -90,9 +93,16 @@ class Project < ApplicationRecord
     Time.parse(repository['created_at'])
   end
 
-  def sync
+  def sync(visited_ids = [])
+    return if visited_ids.include?(id)
+
+    update_columns(last_sync_attempted_at: Time.current)
+    return sync_canonical_project(visited_ids) if canonical_project_id.present?
+
     status = check_url
     return if status.blank?
+    return sync_canonical_project(visited_ids) if canonical_project_id.present?
+
     fetch_repository
     fetch_owner
     # fetch_dependencies
@@ -107,8 +117,19 @@ class Project < ApplicationRecord
     search_for_collective
     set_licenses
     set_totals
-    update(last_synced_at: Time.now)
+    update!(last_synced_at: Time.current)
     ping
+    true
+  end
+
+  def sync_canonical_project(visited_ids)
+    return unless canonical_project.sync(visited_ids + [id])
+
+    update!(canonical_project.attributes.slice(
+      'repository', 'owner', 'packages', 'keywords', 'commits', 'readme', 'funding_links',
+      'funding_source_id', 'licenses', 'total_downloads', 'total_dependent_repos',
+      'total_dependent_packages', 'last_synced_at'
+    ))
   end
 
   def set_totals
@@ -130,7 +151,12 @@ class Project < ApplicationRecord
 
     response = conn.get
     return unless response.success?
-    update!(url: response.env.url.to_s) 
+    destination = Project.where.not(id: id).find_by(url: response.env.url.to_s)
+    if destination
+      update!(canonical_project: destination)
+    else
+      update!(url: response.env.url.to_s)
+    end
   rescue ActiveRecord::RecordInvalid => e
     puts "Duplicate url #{url}"
     puts e.class

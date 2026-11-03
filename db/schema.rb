@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_23_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_03_120100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "pg_catalog.plpgsql"
@@ -151,6 +151,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_23_090000) do
     t.bigint "total_downloads", default: 0
     t.datetime "updated_at", null: false
     t.citext "url"
+    t.datetime "last_sync_attempted_at"
+    t.bigint "canonical_project_id"
+    t.index "COALESCE(last_sync_attempted_at, last_synced_at) NULLS FIRST, id", name: "index_projects_on_sync_attempt_order"
+    t.index ["canonical_project_id"], name: "index_projects_on_canonical_project_id"
     t.index ["funding_source_id"], name: "index_projects_on_funding_source_id"
     t.index ["registry_names"], name: "index_projects_on_registry_names", using: :gin
     t.index ["url"], name: "index_projects_on_url", unique: true
@@ -195,4 +199,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_23_090000) do
   add_foreign_key "project_allocation_events", "funds"
   add_foreign_key "project_allocation_events", "invitations"
   add_foreign_key "project_allocation_events", "project_allocations"
+  add_foreign_key "projects", "projects", column: "canonical_project_id"
 end
