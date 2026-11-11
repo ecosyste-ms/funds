@@ -11,7 +11,7 @@ module EcosystemsApiClient
       end
       
       response = conn.get do |req|
-        req.params = params unless params.empty?
+        req.params.merge!(params)
       end
       
       response
