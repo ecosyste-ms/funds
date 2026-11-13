@@ -311,7 +311,11 @@ class Project < ApplicationRecord
   # TODO fetch repo tags
 
   def packages_url
-    "https://packages.ecosyste.ms/api/v1/packages/lookup?repository_url=#{repository_url}"
+    "https://packages.ecosyste.ms/api/v1/packages/lookup?order=asc&repository_url=#{repository_url}&sort=created_at"
+  end
+
+  private def has_next_page?(response)
+    response['Link'].to_s.match?(/;\s*rel\s*=\s*"?next(?:\s|[,;"]|$)/i)
   end
 
   def fetch_packages
@@ -323,14 +327,13 @@ class Project < ApplicationRecord
       return unless response.success?
 
       items = JSON.parse(response.body)
-      break if items.empty?
-
       items.each do |item|
         id = item["id"]
         raise "Missing package id in item: #{item.inspect}" if id.blank?
         packages[id] ||= item
       end
 
+      break unless has_next_page?(response)
       page += 1
     end
 
