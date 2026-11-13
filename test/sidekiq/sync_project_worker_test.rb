@@ -236,15 +236,12 @@ class SyncProjectWorkerTest < ActiveSupport::TestCase
     stub_request(:get, project.repos_api_url).to_return(body: repository.to_json)
     stub_request(:get, 'https://repos.ecosyste.ms/api/v1/hosts/GitHub/owners/example').to_return(body: '{}')
 
-    # page 2 returns empty array so fetching ends there.
     packages_url_p1 = "#{project.packages_url}&page=1"
-    packages_url_p2 = "#{project.packages_url}&page=2"
 
     # duplicate items in packages here to ensure dedupe is performed while fetching packages.
     packages_with_duplicates = packages + [packages.first, packages.last]
 
     stub_request(:get, packages_url_p1).to_return(body: packages_with_duplicates.to_json)
-    stub_request(:get, packages_url_p2).to_return(body: [].to_json)
     stub_request(:get, project.commits_api_url).to_return(body: '{}')
     stub_request(:get, "#{project.url}/raw/main/README.md").to_return(body: '# Example project')
     stub_request(:get, %r{https://[^/]+\.ecosyste\.ms/api/v1/.+/ping}).to_return(status: 200)
@@ -292,7 +289,7 @@ class SyncProjectWorkerTest < ActiveSupport::TestCase
     # duplicate items in packages here to ensure dedupe is performed while fetching packages.
     stub_request(:get, packages_url_p1).to_return(
       body: [packages[0], packages[1], packages[0]].to_json,
-      headers: { 'Link' => "#{packages_url_p2};REL=\"next\"" }
+      headers: { 'Link' => "<#{packages_url_p1}>; rel=\"first\", <#{packages_url_p2}>; rel=\"next\"" }
     )
     stub_request(:get, packages_url_p2).to_return(
       body: [packages[2], packages[1], packages[1]].to_json,
@@ -314,7 +311,7 @@ class SyncProjectWorkerTest < ActiveSupport::TestCase
     assert_equal 'opencollective.com', project.funding_source.platform
   end
 
-test 'sync completes and replaces stored packages only after successful packages lookup' do
+  test 'sync completes and replaces stored packages only after successful packages lookup' do
     existing_packages = [
       { 'id' => 1, 'name' => 'funded-package-1', 'registry' => { 'name' => 'npmjs.org' },
       'metadata' => { 'funding' => { 'url' => 'https://opencollective.com/example' } } },
@@ -350,19 +347,16 @@ test 'sync completes and replaces stored packages only after successful packages
     ]
     packages_url_p1 = "#{project.packages_url}&page=1"
     packages_url_p2 = "#{project.packages_url}&page=2"
-    packages_url_p3 = "#{project.packages_url}&page=3"
     stub_request(:get, packages_url_p1).to_return(
       body: new_packages.to_json,
       headers: { 'Link' => "#{packages_url_p2}; rel=\"next\"" }
     )
     stub_request(:get, packages_url_p2).to_return(status: 500)
-    stub_request(:get, packages_url_p3).to_return(body: [].to_json)
 
     stub_request(:get, project.commits_api_url).to_return(body: '{}')
     stub_request(:get, "#{project.url}/raw/main/README.md").to_return(body: '# Example project')
     stub_request(:get, %r{https://[^/]+\.ecosyste\.ms/api/v1/.+/ping}).to_return(status: 200)
 
-    # Running the worker and reloading the project.
     SyncProjectWorker.new.perform(project.id)
     project.reload
 

@@ -314,7 +314,7 @@ class Project < ApplicationRecord
     "https://packages.ecosyste.ms/api/v1/packages/lookup?order=asc&repository_url=#{repository_url}&sort=created_at"
   end
 
-  private def has_next_page?(response)
+  def has_next_page?(response)
     response['Link'].to_s.match?(/;\s*rel\s*=\s*"?next(?:\s|[,;"]|$)/i)
   end
 
