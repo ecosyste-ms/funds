@@ -311,16 +311,36 @@ class Project < ApplicationRecord
   # TODO fetch repo tags
 
   def packages_url
-    "https://packages.ecosyste.ms/api/v1/packages/lookup?repository_url=#{repository_url}"
+    "https://packages.ecosyste.ms/api/v1/packages/lookup?order=asc&repository_url=#{repository_url}&sort=created_at"
+  end
+
+  def has_next_page?(response)
+    response['Link'].to_s.match?(/;\s*rel\s*=\s*"?next(?:\s|[,;"]|$)/i)
   end
 
   def fetch_packages
-    response = ecosystems_api_request(packages_url)
-    return unless response.success?
-    self.packages = JSON.parse(response.body)
-    self.save
-  rescue
-    puts "Error fetching packages for #{repository_url}"
+    page = 1
+    packages = {}
+
+    loop do
+      response = ecosystems_api_request(packages_url, {page: page})
+      return unless response.success?
+
+      items = JSON.parse(response.body)
+      items.each do |item|
+        id = item["id"]
+        raise "Missing package id in item: #{item.inspect}" if id.blank?
+        packages[id] ||= item
+      end
+
+      break unless has_next_page?(response)
+      page += 1
+    end
+
+    self.packages = packages.values
+    self.save!
+  rescue StandardError => e
+    puts "Error fetching packages for #{repository_url}: #{e.message}"
   end
 
   def commits_api_url

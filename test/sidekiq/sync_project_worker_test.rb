@@ -226,16 +226,22 @@ class SyncProjectWorkerTest < ActiveSupport::TestCase
       'metadata' => {}
     }
     packages = [
-      { 'name' => 'missing-metadata', 'registry' => { 'name' => 'npmjs.org' } },
-      { 'name' => 'null-metadata', 'registry' => { 'name' => 'npmjs.org' }, 'metadata' => nil },
-      { 'name' => 'funded-package', 'registry' => { 'name' => 'npmjs.org' },
-        'metadata' => { 'funding' => { 'url' => 'https://opencollective.com/example' } } }
+      { 'id' => 1, 'name' => 'missing-metadata', 'registry' => { 'name' => 'npmjs.org' } },
+      { 'id' => 2, 'name' => 'null-metadata', 'registry' => { 'name' => 'npmjs.org' }, 'metadata' => nil },
+      { 'id' => 3, 'name' => 'funded-package', 'registry' => { 'name' => 'npmjs.org' },
+        'metadata' => { 'funding' => { 'url' => 'https://opencollective.com/example' } } },
     ]
 
     stub_request(:get, project.url).to_return(status: 200)
     stub_request(:get, project.repos_api_url).to_return(body: repository.to_json)
     stub_request(:get, 'https://repos.ecosyste.ms/api/v1/hosts/GitHub/owners/example').to_return(body: '{}')
-    stub_request(:get, project.packages_url).to_return(body: packages.to_json)
+
+    packages_url_p1 = "#{project.packages_url}&page=1"
+
+    # duplicate items in packages here to ensure dedupe is performed while fetching packages.
+    packages_with_duplicates = packages + [packages.first, packages.last]
+
+    stub_request(:get, packages_url_p1).to_return(body: packages_with_duplicates.to_json)
     stub_request(:get, project.commits_api_url).to_return(body: '{}')
     stub_request(:get, "#{project.url}/raw/main/README.md").to_return(body: '# Example project')
     stub_request(:get, %r{https://[^/]+\.ecosyste\.ms/api/v1/.+/ping}).to_return(status: 200)
@@ -246,6 +252,118 @@ class SyncProjectWorkerTest < ActiveSupport::TestCase
     assert_not_nil project.last_synced_at
     assert_not_nil project.last_sync_attempted_at
     assert_equal packages, project.packages
+    assert_equal 3, project.packages.length
+    assert_equal 'https://opencollective.com/example', project.funding_source.url
+    assert_equal 'opencollective.com', project.funding_source.platform
+  end
+
+  test 'sync completes and saves packages from all pages of packages lookup' do
+    project = create(:project, url: 'https://github.com/example/project', last_synced_at: nil)
+    repository = {
+      'full_name' => 'example/project',
+      'html_url' => project.url,
+      'host' => { 'name' => 'GitHub' },
+      'owner' => 'example',
+      'default_branch' => 'main',
+      'topics' => [],
+      'metadata' => {}
+    }
+    packages = [
+        { 'id' => 1, 'name' => 'funded-package-1', 'registry' => { 'name' => 'npmjs.org' },
+        'metadata' => { 'funding' => { 'url' => 'https://opencollective.com/example' } } },
+        { 'id' => 2, 'name' => 'funded-package-2', 'registry' => { 'name' => 'npmjs.org' },
+        'metadata' => { 'funding' => { 'url' => 'https://opencollective.com/example' } } },
+        { 'id' => 3, 'name' => 'funded-package-3', 'registry' => { 'name' => 'npmjs.org' },
+        'metadata' => { 'funding' => { 'url' => 'https://opencollective.com/example' } } },
+    ]
+
+    stub_request(:get, project.url).to_return(status: 200)
+    stub_request(:get, project.repos_api_url).to_return(body: repository.to_json)
+    stub_request(:get, 'https://repos.ecosyste.ms/api/v1/hosts/GitHub/owners/example').to_return(body: '{}')
+
+    # page 3 returns empty array so fetching ends there.
+    packages_url_p1 = "#{project.packages_url}&page=1"
+    packages_url_p2 = "#{project.packages_url}&page=2"
+    packages_url_p3 = "#{project.packages_url}&page=3"
+
+    # duplicate items in packages here to ensure dedupe is performed while fetching packages.
+    stub_request(:get, packages_url_p1).to_return(
+      body: [packages[0], packages[1], packages[0]].to_json,
+      headers: { 'Link' => "<#{packages_url_p1}>; rel=\"first\", <#{packages_url_p2}>; rel=\"next\"" }
+    )
+    stub_request(:get, packages_url_p2).to_return(
+      body: [packages[2], packages[1], packages[1]].to_json,
+      headers: { 'Link' => "#{packages_url_p3};rel=next" }
+    )
+    stub_request(:get, packages_url_p3).to_return(body: [].to_json)
+    stub_request(:get, project.commits_api_url).to_return(body: '{}')
+    stub_request(:get, "#{project.url}/raw/main/README.md").to_return(body: '# Example project')
+    stub_request(:get, %r{https://[^/]+\.ecosyste\.ms/api/v1/.+/ping}).to_return(status: 200)
+
+    SyncProjectWorker.new.perform(project.id)
+
+    project.reload
+    assert_not_nil project.last_synced_at
+    assert_not_nil project.last_sync_attempted_at
+    assert_equal packages, project.packages
+    assert_equal 3, project.packages.length
+    assert_equal 'https://opencollective.com/example', project.funding_source.url
+    assert_equal 'opencollective.com', project.funding_source.platform
+  end
+
+  test 'sync completes and replaces stored packages only after successful packages lookup' do
+    existing_packages = [
+      { 'id' => 1, 'name' => 'funded-package-1', 'registry' => { 'name' => 'npmjs.org' },
+      'metadata' => { 'funding' => { 'url' => 'https://opencollective.com/example' } } },
+      { 'id' => 2, 'name' => 'funded-package-2', 'registry' => { 'name' => 'npmjs.org' },
+      'metadata' => { 'funding' => { 'url' => 'https://opencollective.com/example' } } },
+      { 'id' => 3, 'name' => 'funded-package-3', 'registry' => { 'name' => 'npmjs.org' },
+      'metadata' => { 'funding' => { 'url' => 'https://opencollective.com/example' } } },
+      { 'id' => 4, 'name' => 'funded-package-4', 'registry' => { 'name' => 'npmjs.org' },
+      'metadata' => { 'funding' => { 'url' => 'https://opencollective.com/example' } } },
+    ]
+    project = create(:project, url: 'https://github.com/example/project', last_synced_at: nil, packages: existing_packages)
+    repository = {
+      'full_name' => 'example/project',
+      'html_url' => project.url,
+      'host' => { 'name' => 'GitHub' },
+      'owner' => 'example',
+      'default_branch' => 'main',
+      'topics' => [],
+      'metadata' => {}
+    }
+    stub_request(:get, project.url).to_return(status: 200)
+    stub_request(:get, project.repos_api_url).to_return(body: repository.to_json)
+    stub_request(:get, 'https://repos.ecosyste.ms/api/v1/hosts/GitHub/owners/example').to_return(body: '{}')
+
+    # Package lookup API throws an error on page 2, so stored packages are not replaced with the new packages.
+    new_packages = existing_packages + [
+      { 'id' => 5, 'name' => 'new-funded-package-1', 'registry' => { 'name' => 'npmjs.org' },
+      'metadata' => { 'funding' => { 'url' => 'https://opencollective.com/example' } } },
+      { 'id' => 6, 'name' => 'new-funded-package-2', 'registry' => { 'name' => 'npmjs.org' },
+      'metadata' => { 'funding' => { 'url' => 'https://opencollective.com/example' } } },
+      { 'id' => 7, 'name' => 'new-funded-package-3', 'registry' => { 'name' => 'npmjs.org' },
+      'metadata' => { 'funding' => { 'url' => 'https://opencollective.com/example' } } },
+    ]
+    packages_url_p1 = "#{project.packages_url}&page=1"
+    packages_url_p2 = "#{project.packages_url}&page=2"
+    stub_request(:get, packages_url_p1).to_return(
+      body: new_packages.to_json,
+      headers: { 'Link' => "#{packages_url_p2}; rel=\"next\"" }
+    )
+    stub_request(:get, packages_url_p2).to_return(status: 500)
+
+    stub_request(:get, project.commits_api_url).to_return(body: '{}')
+    stub_request(:get, "#{project.url}/raw/main/README.md").to_return(body: '# Example project')
+    stub_request(:get, %r{https://[^/]+\.ecosyste\.ms/api/v1/.+/ping}).to_return(status: 200)
+
+    SyncProjectWorker.new.perform(project.id)
+    project.reload
+
+    assert_not_nil project.last_synced_at
+    assert_not_nil project.last_sync_attempted_at
+    assert_equal existing_packages, project.packages
+    assert_equal 4, project.packages.length
     assert_equal 'https://opencollective.com/example', project.funding_source.url
     assert_equal 'opencollective.com', project.funding_source.platform
   end
@@ -258,7 +376,7 @@ class SyncProjectWorkerTest < ActiveSupport::TestCase
     }
     stub_request(:get, project.repos_api_url).to_return(body: repository.to_json)
     stub_request(:get, 'https://repos.ecosyste.ms/api/v1/hosts/GitHub/owners/example').to_return(body: '{}')
-    stub_request(:get, project.packages_url).to_return(body: '[]')
+    stub_request(:get, "#{project.packages_url}&page=1").to_return(body: '[]')
     stub_request(:get, project.commits_api_url).to_return(body: '{}')
     stub_request(:get, "#{project.url}/raw/main/README.md").to_return(body: '# Canonical project')
     stub_request(:get, %r{https://[^/]+\.ecosyste\.ms/api/v1/.+/ping}).to_return(status: 200)
